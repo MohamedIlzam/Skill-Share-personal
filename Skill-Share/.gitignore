@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Temporary logs and DB output files
+*.log
+*.txt
