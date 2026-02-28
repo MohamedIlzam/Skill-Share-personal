@@ -27,7 +27,7 @@ class SecurityIntegrationTest {
     void unauthenticatedRequestToProfile_ShouldRedirectToLogin() throws Exception {
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isFound()) // 302 Redirect
-                .andExpect(redirectedUrl("http://localhost/login"));
+                .andExpect(redirectedUrl("/login"));
     }
     
     @Test
@@ -52,7 +52,7 @@ class SecurityIntegrationTest {
 
         // Perform real DB-backed login via the form
         MvcResult result = mockMvc.perform(post("/login")
-                        .param("username", testEmail)
+                        .param("email", testEmail)
                         .param("password", testPassword)
                         .with(csrf()))
                 .andExpect(authenticated())
