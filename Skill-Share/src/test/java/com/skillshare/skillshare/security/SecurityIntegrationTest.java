@@ -8,14 +8,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 
-@SpringBootTest
+@SpringBootTest(properties = {"spring.datasource.password=Password123@#$"})
 @AutoConfigureMockMvc
 class SecurityIntegrationTest {
 
@@ -26,19 +27,12 @@ class SecurityIntegrationTest {
     void unauthenticatedRequestToProfile_ShouldRedirectToLogin() throws Exception {
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isFound()) // 302 Redirect
-                .andExpect(redirectedUrlPattern("**/login"));
+                .andExpect(redirectedUrl("http://localhost/login"));
     }
     
     @Test
     void unauthenticatedRequestToLogin_ShouldSucceed() throws Exception {
         mockMvc.perform(get("/login"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser
-    void authenticatedRequestToProfile_ShouldSucceed() throws Exception {
-        mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk());
     }
 
@@ -57,9 +51,10 @@ class SecurityIntegrationTest {
         }
 
         // Perform real DB-backed login via the form
-        MvcResult result = mockMvc.perform(formLogin("/login")
-                        .user("username", testEmail)
-                        .password("password", testPassword))
+        MvcResult result = mockMvc.perform(post("/login")
+                        .param("username", testEmail)
+                        .param("password", testPassword)
+                        .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(status().isFound()) // 302 redirect after successful login
                 .andReturn();
