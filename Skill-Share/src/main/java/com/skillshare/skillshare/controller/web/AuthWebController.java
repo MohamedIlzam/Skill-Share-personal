@@ -18,6 +18,12 @@ public class AuthWebController {
         this.authService = authService;
     }
 
+    // Add root mapping to prevent 302 redirect loops when hitting base url
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";

@@ -1,49 +1,92 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Skill-Share | Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Skill-Share</title>
+    <!-- Preload background image to prevent blue flash -->
+    <link rel="preload" as="image" th:href="@{/images/login-bg.png}">
+    <link rel="stylesheet" th:href="@{/css/glass-login.css}">
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h3 class="text-center mb-4">Login to Skill-Share</h3>
 
-                        <div th:if="${param.error}" class="alert alert-danger" role="alert">
-                            Invalid email or password.
-                        </div>
-                        <div th:if="${param.logout}" class="alert alert-success" role="alert">
-                            You have been logged out.
-                        </div>
-                        <div th:if="${param.registered}" class="alert alert-success" role="alert">
-                            Account created successfully! Please log in.
-                        </div>
+<body>
+    <div class="page-background">
+        <div class="glass-card" th:classappend="${param.error} ? 'shake-animation'">
+            <div class="card-content">
+                <div class="logo-container">
+                    <img src="/images/logo_ss.png" alt="Skill-Share Logo" class="custom-logo">
+                </div>
 
-                        <form th:action="@{/login}" method="post">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="email" name="email" required autofocus>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-primary d-block w-100">Login</button>
-                            </div>
-                        </form>
-                        
-                        <div class="text-center mt-3">
-                            <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
-                        </div>
+                <div class="login-header">
+                    <h3>Login</h3>
+                </div>
+
+                <div th:if="${param.error}" class="alert alert-error">
+                    Invalid email or password.
+                </div>
+                <div th:if="${param.logout}" class="alert alert-success">
+                    You have been logged out.
+                </div>
+                <div th:if="${param.registered}" class="alert alert-success">
+                    Registration successful! Please log in.
+                </div>
+
+                <form th:action="@{/login}" method="post">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control"
+                            placeholder="username@gmail.com" required autofocus />
                     </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password"
+                            required />
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Sign in</button>
+                </form>
+
+                <div class="social-login">
+                    <p>or continue with</p>
+                    <div class="social-buttons">
+                        <button class="btn-social" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                    fill="#4285F4" />
+                                <path
+                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                    fill="#34A853" />
+                                <path
+                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                    fill="#FBBC05" />
+                                <path
+                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                    fill="#EA4335" />
+                                <path d="M1 1h22v22H1z" fill="none" />
+                            </svg>
+                            Google
+                        </button>
+                        <button class="btn-social" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12.0006 2.24609C6.46788 2.24609 1.98438 6.73273 1.98438 12.269C1.98438 16.6966 4.8532 20.4503 8.83549 21.7766C9.33642 21.8687 9.51945 21.5599 9.51945 21.2981C9.51945 21.0664 9.51001 20.2541 9.50553 19.3879C6.71966 19.9926 6.13222 18.2255 6.13222 18.2255C5.6766 17.0689 5.01977 16.7601 5.01977 16.7601C4.11029 16.1394 5.0886 16.1517 5.0886 16.1517C6.09459 16.2223 6.62312 17.1843 6.62312 17.1843C7.51685 18.7149 8.96696 18.2725 9.53765 18.0163C9.62846 17.3705 9.88701 16.9295 10.1729 16.6787C7.94979 16.4259 5.6133 15.5677 5.6133 11.7451C5.6133 10.6559 6.00224 9.765 6.64024 9.06019C6.53738 8.80749 6.19656 7.79155 6.73812 6.42171C6.73812 6.42171 7.57563 6.15343 9.4988 7.4556C10.2952 7.23467 11.1506 7.12467 11.9996 7.12028C12.8484 7.12467 13.7032 7.23467 14.5008 7.4556C16.4227 6.15343 17.2589 6.42171 17.2589 6.42171C17.8016 7.79155 17.4608 8.80749 17.3592 9.06019C17.9984 9.765 18.3849 10.6559 18.3849 11.7451C18.3849 15.578 16.0441 16.4225 13.8122 16.6705C14.1713 16.9806 14.4925 17.5926 14.4925 18.5303C14.4925 19.8732 14.4804 20.9576 14.4804 21.2981C14.4804 21.562 14.6603 21.8736 15.1691 21.7758C19.148 20.4468 22.0163 16.695 22.0163 12.269C22.0163 6.73273 17.5332 2.24609 12.0006 2.24609Z"
+                                    fill="#24292F" />
+                            </svg>
+                            GitHub
+                        </button>
+                    </div>
+                </div>
+
+                <div class="register-link">
+                    Don't have an account yet? <a th:href="@{/register}">Register for free</a>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
