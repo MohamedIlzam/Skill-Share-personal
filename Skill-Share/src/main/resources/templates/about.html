@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Learn about SkillShare — our mission, values, and the story behind the platform built for peer-to-peer skill exchange.">
+    <title>About — SkillShare</title>
+    <!-- Bootstrap CSS: preloaded for fastest render -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style"
+        onload="this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    </noscript>
+    <!-- Bootstrap Icons: non-render-blocking -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    </noscript>
+
+    <style>
+        /* ── Design Tokens ───────────────────────────────── */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #93c5fd;
+            --primary-subtle: #eff6ff;
+            --accent: #6366f1;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: rgba(148, 163, 184, .15);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, .07), 0 2px 4px rgba(0, 0, 0, .04);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, .08), 0 4px 8px rgba(0, 0, 0, .04);
+            --radius: 1rem;
+            --max-prose: 700px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-body);
+            background: var(--bg-light);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Navbar ──────────────────────────────────────── */
+        .navbar-custom {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--card-border);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            transition: box-shadow .3s ease;
+        }
+
+        .navbar-custom.scrolled {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand-text {
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -.02em;
+        }
+
+        .nav-link-about {
+            color: var(--text-muted);
+            font-weight: 500;
+            text-decoration: none;
+            padding: .4rem .8rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+
+        .nav-link-about:hover,
+        .nav-link-about.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        .nav-cta-login {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            height: 38px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: .9rem;
+            text-decoration: none;
+            padding: 0 1.2rem;
+            border: 2px solid var(--primary);
+            border-radius: 50rem;
+            white-space: nowrap;
+            transition: background .2s, color .2s;
+        }
+
+        .nav-cta-login:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .nav-cta-register {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            height: 38px;
+            color: #fff;
+            font-weight: 600;
+            font-size: .9rem;
+            text-decoration: none;
+            padding: 0 1.3rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50rem;
+            border: none;
+            white-space: nowrap;
+            transition: box-shadow .2s, transform .2s;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, .3);
+        }
+
+        .nav-cta-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(59, 130, 246, .4);
+            color: #fff;
+        }
+
+        /* ── Section Common ──────────────────────────────── */
+        .section-label {
+            display: inline-block;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--primary);
+            background: var(--primary-subtle);
+            padding: .3rem .85rem;
+            border-radius: 50rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.02em;
+            margin-bottom: .75rem;
+        }
+
+        .prose {
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: var(--text-body);
+            max-width: var(--max-prose);
+            margin-bottom: 1.25rem;
+        }
+
+        /* ── Hero ────────────────────────────────────────── */
+        .hero-about {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 45%, #eff6ff 100%);
+            padding: 80px 1rem 60px;
+            text-align: center;
+        }
+
+        .hero-about::before,
+        .hero-about::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        .hero-about::before {
+            width: 380px;
+            height: 380px;
+            background: var(--primary-light);
+            top: -120px;
+            left: -80px;
+        }
+
+        .hero-about::after {
+            width: 300px;
+            height: 300px;
+            background: #c4b5fd;
+            bottom: -60px;
+            right: -60px;
+        }
+
+        .hero-about-content {
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .hero-about h1 {
+            font-size: clamp(2rem, 5.5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -.03em;
+            line-height: 1.1;
+            color: var(--text-dark);
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-about h1 .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-about .lead-text {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            line-height: 1.75;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ── Mission ─────────────────────────────────────── */
+        .section-mission {
+            padding: 80px 1rem;
+            background: #fff;
+            text-align: center;
+        }
+
+        .mission-box {
+            max-width: var(--max-prose);
+            margin: 0 auto;
+            background: var(--primary-subtle);
+            border: 1px solid rgba(59, 130, 246, .15);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+        }
+
+        .mission-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* ── How It Works ────────────────────────────────── */
+        .section-how {
+            padding: 80px 1rem;
+            background: var(--bg-light);
+        }
+
+        .how-list {
+            max-width: var(--max-prose);
+            margin: 0 auto;
+        }
+
+        .how-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.1rem;
+            padding: 1.25rem 1.5rem;
+            background: #fff;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            transition: all .3s ease;
+        }
+
+        .how-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+            border-color: transparent;
+        }
+
+        .how-num {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-weight: 700;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .how-item p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-body);
+        }
+
+        /* ── Why We Built ────────────────────────────────── */
+        .section-why {
+            padding: 80px 1rem;
+            background: #fff;
+        }
+
+        .why-card {
+            max-width: var(--max-prose);
+            margin: 0 auto;
+            background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+            border: 1px solid rgba(99, 102, 241, .1);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .why-card::before {
+            content: '\201C';
+            position: absolute;
+            top: -20px;
+            left: 16px;
+            font-size: 10rem;
+            line-height: 1;
+            color: rgba(59, 130, 246, .08);
+            font-family: Georgia, serif;
+            pointer-events: none;
+        }
+
+        .why-card p {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+
+        /* ── Values ──────────────────────────────────────── */
+        .section-values {
+            padding: 80px 1rem;
+            background: var(--bg-light);
+        }
+
+        .value-card {
+            background: #fff;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 2rem 1.6rem;
+            text-align: center;
+            height: 100%;
+            transition: all .35s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+
+        .value-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .vi-1 {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .vi-2 {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .vi-3 {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .vi-4 {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .value-card h5 {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: .4rem;
+            color: var(--text-dark);
+        }
+
+        .value-card p {
+            color: var(--text-muted);
+            font-size: .93rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* ── Technology ──────────────────────────────────── */
+        .section-tech {
+            padding: 80px 1rem;
+            background: #fff;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            max-width: 900px;
+            margin: 2rem auto 0;
+        }
+
+        .tech-pill {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            background: var(--bg-light);
+            border: 1px solid var(--card-border);
+            border-radius: .75rem;
+            padding: .9rem 1.2rem;
+            font-size: .93rem;
+            font-weight: 500;
+            color: var(--text-body);
+            transition: all .25s ease;
+        }
+
+        .tech-pill:hover {
+            background: var(--primary-subtle);
+            border-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .tech-pill i {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        /* ── CTA ─────────────────────────────────────────── */
+        .section-cta {
+            padding: 80px 1rem;
+            background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+            text-align: center;
+        }
+
+        .cta-inner {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-inner h2 {
+            font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.02em;
+            margin-bottom: .75rem;
+        }
+
+        .cta-inner p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .btn-cta-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .85rem 2.2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 50rem;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, .35);
+            transition: all .3s ease;
+        }
+
+        .btn-cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 26px rgba(59, 130, 246, .45);
+            color: #fff;
+        }
+
+        .btn-cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .85rem 2.2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 50rem;
+            text-decoration: none;
+            transition: all .3s ease;
+        }
+
+        .btn-cta-secondary:hover {
+            background: var(--primary-subtle);
+            transform: translateY(-3px);
+            color: var(--primary);
+        }
+
+        /* ── Footer ──────────────────────────────────────── */
+        .footer {
+            background: var(--text-dark);
+            color: #94a3b8;
+            text-align: center;
+            padding: 2.4rem 1rem;
+            font-size: .9rem;
+        }
+
+        .footer a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin: 0 .8rem;
+            transition: color .2s ease;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        .footer .footer-divider {
+            width: 60px;
+            height: 1px;
+            background: rgba(255, 255, 255, .1);
+            margin: 1rem auto;
+        }
+
+        /* ── Animations ──────────────────────────────────── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp .7s ease forwards;
+            opacity: 0;
+        }
+
+        .delay-1 {
+            animation-delay: .1s;
+        }
+
+        .delay-2 {
+            animation-delay: .2s;
+        }
+
+        .delay-3 {
+            animation-delay: .3s;
+        }
+
+        .delay-4 {
+            animation-delay: .4s;
+        }
+
+        /* ── Responsive ──────────────────────────────────── */
+        @media (max-width: 768px) {
+            .hero-about {
+                padding: 60px 1rem 40px;
+            }
+
+            .section-mission,
+            .section-how,
+            .section-why,
+            .section-values,
+            .section-tech,
+            .section-cta {
+                padding: 50px 1rem;
+            }
+
+            .mission-box,
+            .why-card {
+                padding: 1.8rem 1.4rem;
+            }
+
+            .btn-cta-primary,
+            .btn-cta-secondary {
+                width: 100%;
+                justify-content: center;
+                padding: .8rem 1.4rem;
+            }
+
+            .cta-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══════════════ Navbar ════════════════════════════ -->
+    <nav class="navbar-custom" id="navbar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a th:href="@{/}" class="text-decoration-none">
+                <span class="navbar-brand-text">
+                    <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+                </span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a th:href="@{/login}" class="nav-cta-login">Log in</a>
+                <a th:href="@{/register}" class="nav-cta-register">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══════════════ 1. Hero ═══════════════════════════ -->
+    <section class="hero-about" id="about-hero">
+        <div class="hero-about-content">
+            <div class="section-label animate-fade-up">
+                <i class="bi bi-info-circle me-1"></i>About Us
+            </div>
+            <h1 class="animate-fade-up delay-1">
+                About <span class="gradient-text">SkillShare</span>
+            </h1>
+            <p class="lead-text animate-fade-up delay-2">
+                SkillShare is a collaborative platform designed to empower individuals through skill exchange.
+                We believe that everyone has something valuable to teach and something meaningful to learn.
+            </p>
+        </div>
+    </section>
+
+    <!-- ══════════════ 2. Our Mission ═══════════════════ -->
+    <section class="section-mission" id="mission">
+        <div class="container">
+            <div class="mission-box animate-fade-up">
+                <div class="mission-icon"><i class="bi bi-bullseye"></i></div>
+                <div class="section-label">Our Mission</div>
+                <h2 class="section-title mt-2">Removing Barriers. Enabling Growth.</h2>
+                <p class="prose mx-auto mb-0">
+                    Our mission is to create a fair and transparent environment where individuals can exchange
+                    skills without monetary barriers. By removing financial limitations, we encourage learning,
+                    collaboration, and community growth — making knowledge accessible to everyone, everywhere.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ 3. How It Works ══════════════════ -->
+    <section class="section-how" id="how-it-works">
+        <div class="container text-center">
+            <div class="section-label animate-fade-up">How It Works</div>
+            <h2 class="section-title animate-fade-up delay-1">A Simple, Transparent Process</h2>
+            <p class="prose mx-auto animate-fade-up delay-2" style="margin-bottom: 2.5rem;">
+                SkillShare follows a structured workflow to ensure transparency and accountability at every step.
+            </p>
+
+            <div class="how-list text-start">
+                <div class="how-item animate-fade-up delay-1">
+                    <div class="how-num">1</div>
+                    <p><strong>Create a profile</strong> and list the skills you can offer to others in the community.
+                    </p>
+                </div>
+                <div class="how-item animate-fade-up delay-2">
+                    <div class="how-num">2</div>
+                    <p><strong>Request a skill</strong> you want to learn by browsing peer listings and sending an
+                        exchange request.</p>
+                </div>
+                <div class="how-item animate-fade-up delay-3">
+                    <div class="how-num">3</div>
+                    <p><strong>Complete the exchange</strong> through a guided process that keeps both participants on
+                        track.</p>
+                </div>
+                <div class="how-item animate-fade-up delay-4">
+                    <div class="how-num">4</div>
+                    <p><strong>Rate each other</strong> after the session to maintain fairness and community trust.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ 4. Why We Built ══════════════════ -->
+    <section class="section-why" id="why">
+        <div class="container text-center">
+            <div class="section-label animate-fade-up">Our Story</div>
+            <h2 class="section-title animate-fade-up delay-1">Why We Built SkillShare</h2>
+
+            <div class="why-card animate-fade-up delay-2 text-start mt-4">
+                <p class="prose mb-0" style="max-width: 100%;">
+                    In many communities, talented individuals lack access to opportunities simply because they
+                    cannot afford traditional learning systems. Courses are expensive, tutors are out of reach,
+                    and knowledge remains locked behind paywalls. We built SkillShare to break that barrier —
+                    to create a platform where knowledge is exchanged freely, respectfully, and on equal terms.
+                    Every person has something worth sharing, and every person deserves the chance to grow.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ 5. Our Values ════════════════════ -->
+    <section class="section-values" id="values">
+        <div class="container text-center">
+            <div class="section-label animate-fade-up">Core Principles</div>
+            <h2 class="section-title animate-fade-up delay-1">Our Values</h2>
+            <p class="prose mx-auto animate-fade-up delay-2" style="margin-bottom: 2.5rem;">
+                These principles shape every decision we make and every feature we build.
+            </p>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-3 col-md-6">
+                    <div class="value-card animate-fade-up delay-1">
+                        <div class="value-icon vi-1"><i class="bi bi-eye-fill"></i></div>
+                        <h5>Transparency</h5>
+                        <p>Every exchange follows a clear, structured workflow to ensure fairness for all parties.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="value-card animate-fade-up delay-2">
+                        <div class="value-icon vi-2"><i class="bi bi-people-fill"></i></div>
+                        <h5>Community</h5>
+                        <p>We believe in peer-to-peer growth, where collaboration drives collective progress.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="value-card animate-fade-up delay-3">
+                        <div class="value-icon vi-3"><i class="bi bi-shield-check-fill"></i></div>
+                        <h5>Accountability</h5>
+                        <p>Our mutual rating system promotes trust, reliability, and responsible participation.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="value-card animate-fade-up delay-4">
+                        <div class="value-icon vi-4"><i class="bi bi-infinity"></i></div>
+                        <h5>Continuous Learning</h5>
+                        <p>Learning never stops — SkillShare ensures opportunities are always within reach.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- ══════════════ 7. CTA ════════════════════════════ -->
+    <section class="section-cta" id="cta">
+        <div class="cta-inner">
+            <div class="section-label animate-fade-up">Get Started</div>
+            <h2 class="animate-fade-up delay-1">Ready to Start Your Skill Exchange?</h2>
+            <p class="animate-fade-up delay-2">
+                Join a growing community of learners and teachers. No fees, no barriers — just knowledge flowing freely.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap cta-actions animate-fade-up delay-3">
+                <a th:href="@{/register}" class="btn-cta-primary" id="about-join-btn">
+                    <i class="bi bi-person-plus-fill"></i> Join SkillShare
+                </a>
+                <a th:href="@{/}" class="btn-cta-secondary" id="about-explore-btn">
+                    <i class="bi bi-compass-fill"></i> Explore Opportunities
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ Footer ════════════════════════════ -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div>
+                <a th:href="@{/about}" id="footer-about">About</a>
+                <a href="#" id="footer-contact">Contact</a>
+            </div>
+            <div class="footer-divider"></div>
+            <p class="mb-0">&copy; 2026 SkillShare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar shadow on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 10);
+        });
+
+        // Scroll-triggered fade-up animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.animate-fade-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>
