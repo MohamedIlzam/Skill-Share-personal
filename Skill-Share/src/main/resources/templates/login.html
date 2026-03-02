@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — SkillShare</title>
+    <link rel="stylesheet" th:href="@{/css/glass-login.css}">
+    <style>
+        .pw-wrapper {
+            position: relative;
+        }
+
+        .pw-wrapper .form-control {
+            padding-right: 2.8rem;
+        }
+
+        .pw-toggle {
+            position: absolute;
+            right: .75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted, #64748b);
+            padding: 0;
+            line-height: 1;
+            font-size: 1rem;
+            transition: color .2s;
+        }
+
+        .pw-toggle:hover {
+            color: var(--primary, #3b82f6);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Topbar matching home/about pages -->
+    <nav class="auth-topbar">
+        <a th:href="@{/}" class="auth-topbar-brand">&#x21C6; SkillShare</a>
+        <a th:href="@{/}" class="auth-topbar-link">&#8592; Back to Home</a>
+    </nav>
+
+    <div class="page-background">
+        <div class="glass-card" th:classappend="${param.error} ? 'shake-animation'">
+            <div class="card-content">
+                <div class="logo-container">
+                    <img src="/images/logo_ss.png" alt="Skill-Share Logo" class="custom-logo">
+                </div>
+
+                <div class="login-header">
+                    <h3>Welcome back</h3>
+                    <p>Sign in to your SkillShare account</p>
+                </div>
+
+                <div th:if="${param.error}" class="alert alert-error">
+                    Invalid email or password.
+                </div>
+                <div th:if="${param.logout}" class="alert alert-success">
+                    You have been logged out.
+                </div>
+                <div th:if="${param.registered}" class="alert alert-success">
+                    Registration successful! Please log in.
+                </div>
+
+                <form th:action="@{/login}" method="post">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control"
+                            placeholder="username@gmail.com" required autofocus />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="pw-wrapper">
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="Password" required />
+                            <button type="button" class="pw-toggle" id="pw-toggle-btn" aria-label="Show password"
+                                onclick="(function(){
+                                    var i=document.getElementById('password');
+                                    var b=document.getElementById('pw-toggle-btn');
+                                    if(i.type==='password'){i.type='text';b.innerHTML='&#128065;&#65039;';}
+                                    else{i.type='password';b.innerHTML='&#128065;';}
+                                })()">
+                                &#128065;
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Sign in</button>
+                </form>
+
+
+
+                <div class="register-link">
+                    Don't have an account yet? <a th:href="@{/register}">Register for free</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
