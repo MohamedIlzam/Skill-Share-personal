@@ -29,4 +29,7 @@ public class UserProfileUpdateDTO {
     private String location;
 
     private MultipartFile profilePicture;
+
+    private java.util.Set<Long> mainSkillIds;
+    private String mainSkillIdsString;
 }
