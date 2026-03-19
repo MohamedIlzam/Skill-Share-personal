@@ -20,25 +20,45 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ProfileController {
 
     private final UserProfileService userProfileService;
+    private final com.skillshare.skillshare.service.skill.SkillService skillService;
 
     @GetMapping("/profile")
     public String showProfile(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        UserProfileDTO profile = userProfileService.getProfileByUserId(userDetails.getUser().getId());
+        Long userId = userDetails.getUser().getId();
+        UserProfileDTO profile = userProfileService.getProfileByUserId(userId);
+        
+        // Resolve mainSkillIds to actual Skill objects for display
+        java.util.List<com.skillshare.skillshare.model.skill.Skill> mainSkills = new java.util.ArrayList<>();
+        if (profile.getMainSkillIds() != null && !profile.getMainSkillIds().isEmpty()) {
+            for (Long skillId : profile.getMainSkillIds()) {
+                try {
+                    mainSkills.add(skillService.getSkillByIdForUser(userId, skillId));
+                } catch (Exception e) {
+                    // Ignore skills that might have been deleted but still in the profile's mainSkillIds
+                }
+            }
+        }
+        
         model.addAttribute("profile", profile);
+        model.addAttribute("mainSkills", mainSkills);
         return "profile-view";
     }
 
     @GetMapping("/profile/edit")
     public String showEditForm(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        UserProfileDTO profile = userProfileService.getProfileByUserId(userDetails.getUser().getId());
+        Long userId = userDetails.getUser().getId();
+        UserProfileDTO profile = userProfileService.getProfileByUserId(userId);
         
         UserProfileUpdateDTO updateDTO = UserProfileUpdateDTO.builder()
                 .fullName(profile.getFullName())
                 .bio(profile.getBio())
                 .phoneNumber(profile.getPhoneNumber())
                 .location(profile.getLocation())
+                .mainSkillIds(profile.getMainSkillIds())
                 .build();
         
+        // Fetch all user skills for the selection list
+        model.addAttribute("allSkills", skillService.getSkillsByUser(userId));
         model.addAttribute("profileUpdateDTO", updateDTO);
         return "profile-edit";
     }
@@ -48,9 +68,11 @@ public class ProfileController {
             @Valid @ModelAttribute("profileUpdateDTO") UserProfileUpdateDTO updateDTO,
             BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model,
             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
+            model.addAttribute("allSkills", skillService.getSkillsByUser(userDetails.getUser().getId()));
             return "profile-edit";
         }
 

@@ -21,17 +21,24 @@ import java.util.List;
 public class SkillWebController {
 
     private final SkillService skillService;
+    private final com.skillshare.skillshare.service.user.UserProfileService userProfileService;
 
-    public SkillWebController(SkillService skillService) {
+    public SkillWebController(SkillService skillService, com.skillshare.skillshare.service.user.UserProfileService userProfileService) {
         this.skillService = skillService;
+        this.userProfileService = userProfileService;
     }
 
     @GetMapping
     public String showManageSkillsPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        Long userId = userDetails.getUser().getId();
         // Fetch User's Skills securely
-        List<Skill> mySkills = skillService.getSkillsByUser(userDetails.getUser().getId());
+        List<Skill> mySkills = skillService.getSkillsByUser(userId);
+        
+        // Fetch User's Profile to get mainSkillIds
+        com.skillshare.skillshare.dto.user.UserProfileDTO profile = userProfileService.getProfileByUserId(userId);
         
         model.addAttribute("skills", mySkills);
+        model.addAttribute("mainSkillIds", profile.getMainSkillIds());
         model.addAttribute("categories", SkillCategory.values());
         model.addAttribute("proficiencies", SkillProficiency.values());
         
@@ -104,6 +111,21 @@ public class SkillWebController {
             redirectAttributes.addFlashAttribute("errorParam", e.getMessage());
         }
 
+        return "redirect:/skills";
+    }
+
+    @PostMapping("/{id}/toggle-main")
+    public String toggleMainSkill(
+            @PathVariable("id") Long skillId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            userProfileService.toggleMainSkill(userDetails.getUser().getId(), skillId);
+            // No success message needed for a simple toggle, but we could add one
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorParam", e.getMessage());
+        }
         return "redirect:/skills";
     }
 }
