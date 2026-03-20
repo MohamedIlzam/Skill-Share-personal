@@ -15,6 +15,10 @@ public interface SkillService {
     
     Skill getSkillByIdForUser(Long userId, Long skillId);
 
+    // --- Browse / Search ---
+    List<Skill> getAvailableSkills(Long currentUserId);
+    List<Skill> searchAvailableSkills(String query, Long currentUserId);
+
     // --- Update ---
     Skill updateSkill(Long userId, Long skillId, SkillRequest request);
 

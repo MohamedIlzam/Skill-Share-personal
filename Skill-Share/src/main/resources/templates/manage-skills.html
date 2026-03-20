@@ -503,6 +503,7 @@
             </a>
             <div class="d-flex align-items-center gap-2">
                 <a th:href="@{/active-users}" class="nav-link-custom">Discover Users</a>
+                <a th:href="@{/browse}" class="nav-link-custom">Explore</a>
                 <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
                 <a th:href="@{/skills}" class="nav-link-custom active">My Skills</a>
             </div>
@@ -535,9 +536,9 @@
                 <div class="skill-header">
                     <div class="d-flex align-items-center gap-2">
                         <form th:action="@{/skills/{id}/toggle-main(id=${skill.id})}" method="post" class="m-0">
-                            <button type="submit" class="main-skill-toggle" 
-                                    th:classappend="${mainSkillIds.contains(skill.id)} ? 'active' : ''"
-                                    th:title="${mainSkillIds.contains(skill.id)} ? 'Remove from profile highlights' : 'Highlight on profile'">
+                            <button type="submit" class="main-skill-toggle"
+                                th:classappend="${mainSkillIds.contains(skill.id)} ? 'active' : ''"
+                                th:title="${mainSkillIds.contains(skill.id)} ? 'Remove from profile highlights' : 'Highlight on profile'">
                                 <i th:class="${mainSkillIds.contains(skill.id)} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
                             </button>
                         </form>

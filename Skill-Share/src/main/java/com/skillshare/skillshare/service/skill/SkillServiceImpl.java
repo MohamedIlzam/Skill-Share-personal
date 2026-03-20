@@ -78,4 +78,19 @@ public class SkillServiceImpl implements SkillService {
         Skill skill = getSkillByIdForUser(userId, skillId);
         skillRepository.delete(skill);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Skill> getAvailableSkills(Long currentUserId) {
+        return skillRepository.findByOwnerIdNot(currentUserId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Skill> searchAvailableSkills(String query, Long currentUserId) {
+        if (query == null || query.isBlank()) {
+            return getAvailableSkills(currentUserId);
+        }
+        return skillRepository.findByNameContainingIgnoreCaseAndOwnerIdNot(query.trim(), currentUserId);
+    }
 }

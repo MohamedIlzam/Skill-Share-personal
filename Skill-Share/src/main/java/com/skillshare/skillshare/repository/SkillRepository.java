@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Long> {
     
@@ -15,4 +17,12 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     
     // Secure fetch: Fetches a skill ONLY if the given user owns it
     Optional<Skill> findByIdAndOwnerId(Long id, Long ownerId);
+
+    // Feature 3: Browse all skills NOT owned by the current user
+    @EntityGraph(attributePaths = {"owner"})
+    List<Skill> findByOwnerIdNot(Long ownerId);
+
+    // Feature 3: Search skills by name (case-insensitive) NOT owned by the current user
+    @EntityGraph(attributePaths = {"owner"})
+    List<Skill> findByNameContainingIgnoreCaseAndOwnerIdNot(String name, Long ownerId);
 }
