@@ -54,6 +54,7 @@ public class ProfileController {
                 .bio(profile.getBio())
                 .phoneNumber(profile.getPhoneNumber())
                 .location(profile.getLocation())
+                .university(profile.getUniversity())
                 .mainSkillIds(profile.getMainSkillIds())
                 .build();
         
