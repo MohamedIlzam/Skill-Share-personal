@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin" />
     <meta name="description" content="Discover active users and share skills on SkillShare.">
     <title>Active Users — SkillShare</title>
     <!-- Bootstrap CSS -->
@@ -43,47 +44,152 @@
             position: sticky;
             top: 0;
             z-index: 1050;
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-brand-text {
             font-weight: 800;
             font-size: 1.35rem;
-            -webkit-background-clip: text;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             background-clip: text;
+            -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -.02em;
+            text-decoration: none;
         }
 
-        .page-header {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            padding: 4rem 1rem;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 3rem;
+        .nav-link-custom {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .95rem;
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
         }
 
-        .search-container {
-            max-width: 600px;
-            margin: -2rem auto 0;
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 0;
             position: relative;
             z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-select {
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-body);
+            font-weight: 500;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Hero Search Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+            padding: 5rem 1rem 6rem;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1.5" fill="rgba(255,255,255,0.15)"/></svg>') repeat;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: #c7d2fe;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Search Bar Setup */
+        .search-container {
+            max-width: 650px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-box {
+            display: flex;
+            background: #fff;
+            border-radius: 50rem;
+            padding: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
         }
 
         .search-input {
-            border-radius: 50rem;
-            padding: 1rem 1.5rem 1rem 3rem;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-lg);
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.8rem 1.5rem;
             font-size: 1.1rem;
+            color: var(--text-dark);
+            outline: none;
         }
 
-        .search-icon {
-            position: absolute;
-            left: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.2rem;
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-search:hover {
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            color: #fff;
         }
 
         .user-grid {
@@ -95,11 +201,41 @@
             border: 1px solid var(--card-border);
             border-radius: var(--radius);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: 100%;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            animation: cardFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Staggered animation for the first few cards */
+        .user-grid .col:nth-child(1) .user-card {
+            animation-delay: 0.05s;
+        }
+
+        .user-grid .col:nth-child(2) .user-card {
+            animation-delay: 0.15s;
+        }
+
+        .user-grid .col:nth-child(3) .user-card {
+            animation-delay: 0.25s;
+        }
+
+        .user-grid .col:nth-child(4) .user-card {
+            animation-delay: 0.35s;
         }
 
         .user-card:hover {
@@ -203,8 +339,13 @@
             margin-right: 4px;
         }
 
-        .status-available { background-color: #10b981; }
-        .status-unavailable { background-color: #ef4444; }
+        .status-available {
+            background-color: #10b981;
+        }
+
+        .status-unavailable {
+            background-color: #ef4444;
+        }
 
         .pagination-container {
             margin-top: 3rem;
@@ -243,44 +384,102 @@
             font-size: .88rem;
             margin-top: auto;
         }
+
+        .animate-tab {
+            animation: fadeInRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 
 <body class="d-flex flex-column">
+    <!-- Navbar -->
     <nav class="navbar-custom">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a th:href="@{/active-users}" style="text-decoration:none;"><span class="navbar-brand-text"><i
-                        class="bi bi-arrow-left-right me-1"></i>SkillShare</span></a>
-            <div class="d-flex align-items-center gap-3">
-                <a th:href="@{/profile}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-person-circle me-1"></i>My Profile</a>
-                <form th:action="@{/logout}" method="post" style="margin:0;"><button type="submit"
-                        class="btn btn-sm btn-outline-danger rounded-pill"><i
-                            class="bi bi-box-arrow-right me-1"></i>Logout</button></form>
+        <div class="container d-flex align-items-center justify-content-between">
+            <a th:href="@{/home}" class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/active-users}" class="nav-link-custom active">Explore</a>
+                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
+                <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow-1">
-        <header class="page-header">
-            <div class="container">
-                <h1 class="display-4 fw-bold mb-3">Discover Skill Partners</h1>
-                <p class="lead opacity-75">Connect with active users and exchange knowledge today.</p>
-            </div>
-        </header>
+    <!-- Hero Search Banner -->
+    <header class="hero-banner">
+        <div class="container">
+            <h1 class="hero-title">Discover Skill Partners</h1>
+            <p class="hero-subtitle">Connect with active users and exchange knowledge today.</p>
 
+            <div class="search-container">
+                <form th:action="@{/active-users}" method="get" class="search-box" id="searchForm">
+                    <input type="hidden" name="view" value="users">
+                    <input type="text" name="search" class="search-input"
+                        placeholder="Search partners by name or location..." th:value="${search}">
+                    <button type="submit" class="btn-search">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <!-- Provide a clear button if populated -->
+                    <a th:if="${search != null && !search.isEmpty()}" th:href="@{/active-users}"
+                        class="btn btn-light rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                        style="width:45px; height:45px; border:1px solid #e2e8f0; text-decoration: none;"
+                        title="Clear Search">
+                        <i class="bi bi-x-lg text-muted"></i>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filter Bar (UI Mockup) -->
+    <div class="filter-bar">
+        <div class="container d-flex gap-3 overflow-auto pb-2 pb-sm-0">
+            <select name="location" form="searchForm" class="filter-select text-dark" onchange="this.form.submit()">
+                <option value="">All Locations</option>
+                <option value="remote">Remote Services</option>
+            </select>
+
+            <select name="availability" form="searchForm" class="filter-select text-dark" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="AVAILABLE">Available Now</option>
+            </select>
+
+            <div class="ms-auto" style="min-width: 150px;">
+                <select name="sort" form="searchForm" class="filter-select w-100 text-dark"
+                    onchange="this.form.submit()">
+                    <option value="newest">Sort by: Relevance</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 pt-4">
         <div class="container pb-5">
-            <!-- Navigation Tabs -->
-            <div class="row justify-content-center mb-5">
+            <!-- Navigation Tabs (Identical positioning to browse) -->
+            <div class="row justify-content-center mb-5 mt-5">
                 <div class="col-auto">
                     <div class="btn-group rounded-pill p-1 bg-white shadow-sm border">
-                        <a th:href="@{/active-users(view='users')}" 
-                           th:classappend="${activeView == 'users'} ? 'btn-primary' : 'btn-light'"
-                           class="btn rounded-pill px-4 fw-bold">
+                        <a th:href="@{/active-users(view='users')}"
+                            th:classappend="${activeView == 'users'} ? 'btn-primary' : 'btn-light'"
+                            class="btn rounded-pill px-4 fw-bold">
                             <i class="bi bi-people-fill me-2"></i>Find People
                         </a>
-                        <a th:href="@{/active-users(view='skills')}" 
-                           th:classappend="${activeView == 'skills'} ? 'btn-primary' : 'btn-light'"
-                           class="btn rounded-pill px-4 fw-bold">
+                        <a th:href="@{/browse}" class="btn btn-light rounded-pill px-4 fw-bold">
                             <i class="bi bi-lightbulb-fill me-2"></i>Find Skills
                         </a>
                     </div>
@@ -288,23 +487,8 @@
             </div>
 
             <!-- Users Part -->
-            <div th:if="${activeView == 'users'}">
-                <div class="search-container">
-                    <form th:action="@{/active-users}" method="get" id="searchForm">
-                        <input type="hidden" name="view" value="users">
-                        <div class="position-relative">
-                            <i class="bi bi-search search-icon"></i>
-                            <input type="text" name="search" id="searchInput" class="form-control search-input" 
-                                   th:value="${search}" placeholder="Search partners by name or location...">
-                            <button type="button" th:if="${search != null && !search.isEmpty()}" 
-                                    th:onclick="|window.location.href='@{/active-users(view='users')}'|"
-                                    class="position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent me-3 text-muted h5 mb-0" 
-                                    style="z-index: 100;">
-                                <i class="bi bi-x-circle-fill"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <div th:if="${activeView == 'users'}" class="animate-tab">
+
 
                 <div class="user-grid">
                     <!-- Empty Results -->
@@ -312,16 +496,19 @@
                         <i class="bi bi-person-x"></i>
                         <h3>No users found</h3>
                         <p>Try adjusting your search keywords or explore the community later.</p>
-                        <a th:href="@{/active-users(view='users')}" class="btn btn-primary rounded-pill px-4 mt-3">Clear Search</a>
+                        <a th:href="@{/active-users(view='users')}" class="btn btn-primary rounded-pill px-4 mt-3">Clear
+                            Search</a>
                     </div>
 
                     <!-- User Cards Grid -->
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" th:unless="${#lists.isEmpty(users)}">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4"
+                        th:unless="${#lists.isEmpty(users)}">
                         <div class="col" th:each="user : ${users}">
                             <div class="user-card">
                                 <div class="user-card-header">
                                     <div class="user-avatar">
-                                        <img th:if="${user.profilePictureUrl}" th:src="${user.profilePictureUrl}" alt="Avatar">
+                                        <img th:if="${user.profilePictureUrl}" th:src="${user.profilePictureUrl}"
+                                            alt="Avatar">
                                         <i th:unless="${user.profilePictureUrl}" class="bi bi-person-fill"></i>
                                     </div>
                                     <h3 class="user-name" th:text="${user.fullName}">John Doe</h3>
@@ -334,18 +521,23 @@
                                         <span th:text="${user.university}">University</span>
                                     </div>
                                     <div class="mt-2 text-center">
-                                        <span th:class="'status-dot ' + (${user.availabilityStatus.name() == 'AVAILABLE'} ? 'status-available' : 'status-unavailable')"></span>
-                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;" th:text="${user.availabilityStatus}">AVAILABLE</small>
+                                        <span
+                                            th:class="'status-dot ' + (${user.availabilityStatus.name() == 'AVAILABLE'} ? 'status-available' : 'status-unavailable')"></span>
+                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;"
+                                            th:text="${user.availabilityStatus}">AVAILABLE</small>
                                     </div>
                                 </div>
                                 <div class="user-card-body">
-                                    <p class="text-muted small text-center mb-3 line-clamp-2" th:text="${user.bio ?: 'No bio available...'}"></p>
+                                    <p class="text-muted small text-center mb-3 line-clamp-2"
+                                        th:text="${user.bio ?: 'No bio available...'}"></p>
                                     <div class="skill-tags">
-                                        <span th:each="skill : ${user.mainSkills}" class="skill-tag" th:text="${skill}">Skill</span>
+                                        <span th:each="skill : ${user.mainSkills}" class="skill-tag"
+                                            th:text="${skill}">Skill</span>
                                     </div>
                                 </div>
                                 <div class="user-card-footer">
-                                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn-view-profile">View Profile</a>
+                                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn-view-profile">View
+                                        Profile</a>
                                 </div>
                             </div>
                         </div>
@@ -355,14 +547,18 @@
                     <nav th:if="${totalPages > 1}" class="pagination-container d-flex justify-content-center">
                         <ul class="pagination">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link" th:href="@{/active-users(view='users', page=${currentPage - 1}, search=${search})}">Previous</a>
+                                <a class="page-link"
+                                    th:href="@{/active-users(view='users', page=${currentPage - 1}, search=${search})}">Previous</a>
                             </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                 th:classappend="${currentPage == i} ? 'active'">
-                                <a class="page-link" th:href="@{/active-users(view='users', page=${i}, search=${search})}" th:text="${i + 1}">1</a>
+                                <a class="page-link"
+                                    th:href="@{/active-users(view='users', page=${i}, search=${search})}"
+                                    th:text="${i + 1}">1</a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/active-users(view='users', page=${currentPage + 1}, search=${search})}">Next</a>
+                                <a class="page-link"
+                                    th:href="@{/active-users(view='users', page=${currentPage + 1}, search=${search})}">Next</a>
                             </li>
                         </ul>
                     </nav>
