@@ -347,6 +347,12 @@
             background-color: #ef4444;
         }
 
+        .browse-main {
+            background-color: #f8fafc;
+            min-height: calc(100vh - 400px);
+            padding: 3rem 0;
+        }
+
         .pagination-container {
             margin-top: 3rem;
         }
@@ -468,10 +474,10 @@
     </div>
 
     <!-- Main Content -->
-    <main class="flex-grow-1 pt-4">
-        <div class="container pb-5">
-            <!-- Navigation Tabs (Identical positioning to browse) -->
-            <div class="row justify-content-center mb-5 mt-5">
+    <main class="browse-main">
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <div class="row justify-content-center mb-5">
                 <div class="col-auto">
                     <div class="btn-group rounded-pill p-1 bg-white shadow-sm border">
                         <a th:href="@{/active-users(view='users')}"
