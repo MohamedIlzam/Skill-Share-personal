@@ -1,5 +1,6 @@
 package com.skillshare.skillshare.service.user;
 
+import com.skillshare.skillshare.dto.user.PublicUserDTO;
 import com.skillshare.skillshare.dto.user.UserProfileDTO;
 import com.skillshare.skillshare.dto.user.UserProfileUpdateDTO;
 import com.skillshare.skillshare.exception.ResourceNotFoundException;
@@ -7,6 +8,8 @@ import com.skillshare.skillshare.model.user.AvailabilityStatus;
 import com.skillshare.skillshare.model.user.UserProfile;
 import com.skillshare.skillshare.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +48,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         profile.setBio(updateDTO.getBio());
         profile.setPhoneNumber(updateDTO.getPhoneNumber());
         profile.setLocation(updateDTO.getLocation());
+        profile.setUniversity(updateDTO.getUniversity());
 
         if (picture != null && !picture.isEmpty()) {
             validateImage(picture);
@@ -138,6 +142,55 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfileRepository.save(profile);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PublicUserDTO> getActiveUsers(String search, Long currentUserId, Pageable pageable) {
+        Page<UserProfile> profiles = userProfileRepository.searchByKeywordExceptUser(search, currentUserId, pageable);
+        return profiles.map(this::mapToPublicDTO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PublicUserDTO getPublicProfile(Long userId) {
+        UserProfile profile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user ID: " + userId));
+        return mapToPublicDTO(profile);
+    }
+
+    private PublicUserDTO mapToPublicDTO(UserProfile profile) {
+        String bio = profile.getBio();
+        if (bio != null && bio.isBlank()) bio = null;
+        String fullName = profile.getFullName();
+        String location = profile.getLocation();
+        String university = profile.getUniversity();
+        String email = (profile.getUser() != null) ? profile.getUser().getEmail() : null;
+        String phoneNumber = profile.getPhoneNumber();
+        String profilePictureUrl = profile.getProfilePictureUrl();
+        AvailabilityStatus availabilityStatus = profile.getAvailabilityStatus();
+
+        java.util.List<String> skillNames = new java.util.ArrayList<>();
+        if (profile.getMainSkillIds() != null && !profile.getMainSkillIds().isEmpty()) {
+            java.util.List<Long> skillIds = new java.util.ArrayList<>(profile.getMainSkillIds());
+            skillNames = skillRepository.findAllById(skillIds).stream()
+                    .map(com.skillshare.skillshare.model.skill.Skill::getName)
+                    .filter(name -> name != null && !name.isBlank())
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        return PublicUserDTO.builder()
+                .id(profile.getUser() != null ? profile.getUser().getId() : null)
+                .fullName(fullName)
+                .bio(bio)
+                .location(location)
+                .university(university)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .profilePictureUrl(profilePictureUrl)
+                .availabilityStatus(availabilityStatus)
+                .mainSkills(skillNames)
+                .build();
+    }
+
     private void validateImage(MultipartFile file) {
         String contentType = file.getContentType();
         if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png"))) {
@@ -170,6 +223,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .bio(profile.getBio())
                 .phoneNumber(profile.getPhoneNumber())
                 .location(profile.getLocation())
+                .university(profile.getUniversity())
                 .profilePictureUrl(profile.getProfilePictureUrl())
                 .availabilityStatus(profile.getAvailabilityStatus())
                 .mainSkillIds(profile.getMainSkillIds())
