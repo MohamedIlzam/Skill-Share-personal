@@ -1,7 +1,6 @@
 package com.skillshare.skillshare.service.skill;
 
 import com.skillshare.skillshare.dto.skill.SkillRequest;
-import com.skillshare.skillshare.exception.AccessDeniedException;
 import com.skillshare.skillshare.exception.ResourceNotFoundException;
 import com.skillshare.skillshare.model.skill.Skill;
 import com.skillshare.skillshare.model.user.User;
@@ -10,6 +9,8 @@ import com.skillshare.skillshare.model.skill.SkillProficiency;
 import com.skillshare.skillshare.repository.SkillRepository;
 import com.skillshare.skillshare.repository.SkillSpecifications;
 import com.skillshare.skillshare.repository.UserRepository;
+import com.skillshare.skillshare.repository.UserProfileRepository;
+import com.skillshare.skillshare.model.user.UserProfile;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,12 @@ public class SkillServiceImpl implements SkillService {
 
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
 
-    public SkillServiceImpl(SkillRepository skillRepository, UserRepository userRepository) {
+    public SkillServiceImpl(SkillRepository skillRepository, UserRepository userRepository, UserProfileRepository userProfileRepository) {
         this.skillRepository = skillRepository;
         this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     @Override
@@ -91,20 +94,35 @@ public class SkillServiceImpl implements SkillService {
         Specification<Skill> spec = Specification.where(SkillSpecifications.excludeOwner(currentUserId))
                 .and(SkillSpecifications.hasName(keyword))
                 .and(SkillSpecifications.hasCategory(category))
-                .and(SkillSpecifications.hasProficiency(proficiency));
+                .and(SkillSpecifications.hasProficiency(proficiency))
+                .and(SkillSpecifications.isOwnerAvailable());
 
         // Let the DB execute the initial filter and sort natively by creation time
         List<Skill> skills = skillRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"));
 
+        // Populate mainSkill status for each skill to differentiate "Offered" vs "Unavailable"
+        if (!skills.isEmpty()) {
+            java.util.Set<Long> userIds = skills.stream()
+                    .map(s -> s.getOwner().getId())
+                    .collect(java.util.stream.Collectors.toSet());
+            
+            List<UserProfile> profiles = userProfileRepository.findAllByUserIdIn(userIds);
+            java.util.Map<Long, java.util.Set<Long>> userToMainSkillsMap = profiles.stream()
+                    .collect(java.util.stream.Collectors.toMap(p -> p.getUser().getId(), UserProfile::getMainSkillIds));
+
+            for (Skill skill : skills) {
+                java.util.Set<Long> mainSkillIds = userToMainSkillsMap.get(skill.getOwner().getId());
+                if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {
+                    skill.setMainSkill(true);
+                }
+            }
+        }
+
         // If 'Highest Proficiency' sort requested, safely post-sort Java enum ordinals
         if ("proficiency".equalsIgnoreCase(sortBy)) {
-            skills.sort((s1, s2) -> {
-                // Descending ordinal ensures Advanced > Intermediate > Beginner
-                int profCompare = s2.getProficiency().compareTo(s1.getProficiency());
-                if (profCompare != 0) return profCompare;
-                // Secondary check ensures ties show the newest first
-                return s2.getCreatedAt().compareTo(s1.getCreatedAt()); 
-            });
+            skills.sort((a, b) -> b.getProficiency().ordinal() - a.getProficiency().ordinal());
+        } else if ("lowest-proficiency".equalsIgnoreCase(sortBy)) {
+            skills.sort((a, b) -> a.getProficiency().ordinal() - b.getProficiency().ordinal());
         }
         return skills;
     }

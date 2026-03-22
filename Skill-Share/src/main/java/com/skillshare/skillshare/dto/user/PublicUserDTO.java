@@ -23,4 +23,5 @@ public class PublicUserDTO {
     private String profilePictureUrl;
     private AvailabilityStatus availabilityStatus;
     private List<String> mainSkills; // Names of the main skills
+    private List<String> otherSkills; // Names of other skills
 }

@@ -168,13 +168,22 @@ public class UserProfileServiceImpl implements UserProfileService {
         String profilePictureUrl = profile.getProfilePictureUrl();
         AvailabilityStatus availabilityStatus = profile.getAvailabilityStatus();
 
-        java.util.List<String> skillNames = new java.util.ArrayList<>();
-        if (profile.getMainSkillIds() != null && !profile.getMainSkillIds().isEmpty()) {
-            java.util.List<Long> skillIds = new java.util.ArrayList<>(profile.getMainSkillIds());
-            skillNames = skillRepository.findAllById(skillIds).stream()
-                    .map(com.skillshare.skillshare.model.skill.Skill::getName)
-                    .filter(name -> name != null && !name.isBlank())
-                    .collect(java.util.stream.Collectors.toList());
+        java.util.List<String> mainSkillNames = new java.util.ArrayList<>();
+        java.util.List<String> otherSkillNames = new java.util.ArrayList<>();
+
+        if (profile.getUser() != null) {
+            java.util.List<com.skillshare.skillshare.model.skill.Skill> allSkills = 
+                    skillRepository.findAllByOwnerId(profile.getUser().getId());
+            
+            java.util.Set<Long> mainSkillIds = profile.getMainSkillIds();
+
+            for (com.skillshare.skillshare.model.skill.Skill skill : allSkills) {
+                if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {
+                    mainSkillNames.add(skill.getName());
+                } else {
+                    otherSkillNames.add(skill.getName());
+                }
+            }
         }
 
         return PublicUserDTO.builder()
@@ -187,7 +196,8 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .phoneNumber(phoneNumber)
                 .profilePictureUrl(profilePictureUrl)
                 .availabilityStatus(availabilityStatus)
-                .mainSkills(skillNames)
+                .mainSkills(mainSkillNames)
+                .otherSkills(otherSkillNames)
                 .build();
     }
 

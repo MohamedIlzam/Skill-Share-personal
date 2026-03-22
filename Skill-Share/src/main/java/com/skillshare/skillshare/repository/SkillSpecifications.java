@@ -26,4 +26,9 @@ public class SkillSpecifications {
     public static Specification<Skill> excludeOwner(Long ownerId) {
         return (root, query, cb) -> cb.notEqual(root.get("owner").get("id"), ownerId);
     }
+
+    public static Specification<Skill> isOwnerAvailable() {
+        return (root, query, cb) -> cb.equal(root.get("owner").get("profile").get("availabilityStatus"), 
+                com.skillshare.skillshare.model.user.AvailabilityStatus.AVAILABLE);
+    }
 }

@@ -33,6 +33,9 @@ public class Skill {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    @Transient
+    private boolean mainSkill;
+
     // Default constructor for JPA
     protected Skill() {}
 
@@ -88,4 +91,7 @@ public class Skill {
     public User getOwner() { return owner; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+
+    public boolean isMainSkill() { return mainSkill; }
+    public void setMainSkill(boolean mainSkill) { this.mainSkill = mainSkill; }
 }

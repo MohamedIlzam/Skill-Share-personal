@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
     Optional<UserProfile> findByUserId(Long userId);
+    java.util.List<UserProfile> findAllByUserIdIn(java.util.Collection<Long> userIds);
     
     @org.springframework.data.jpa.repository.Query("SELECT p FROM UserProfile p WHERE " +
            "(:search IS NULL OR :search = '' " +
