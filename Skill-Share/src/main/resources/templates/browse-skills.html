@@ -365,6 +365,12 @@
             border: 1px solid #fecaca;
         }
 
+        .badge-EXPERT {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+        }
+
         .skill-row-actions {
             flex-shrink: 0;
             display: flex;
@@ -426,9 +432,9 @@
     <!-- Navbar -->
     <nav class="navbar-custom">
         <div class="container d-flex align-items-center justify-content-between">
-            <a th:href="@{/home}" class="navbar-brand-text">
+            <span class="navbar-brand-text">
                 <i class="bi bi-arrow-left-right me-1"></i>SkillShare
-            </a>
+            </span>
             <div class="d-flex align-items-center gap-2">
                 <a th:href="@{/browse}" class="nav-link-custom active">Explore</a>
                 <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
@@ -450,6 +456,13 @@
                     <button type="submit" class="btn-search">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
+                    <!-- Provide a clear button if populated -->
+                    <a th:if="${searchQuery != null && !searchQuery.isEmpty()}" th:href="@{/browse}"
+                        class="btn btn-light rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                        style="width:45px; height:45px; border:1px solid #e2e8f0; text-decoration: none;"
+                        title="Clear Search">
+                        <i class="bi bi-x-lg text-muted"></i>
+                    </a>
                 </form>
             </div>
         </div>
@@ -475,6 +488,8 @@
                     onchange="this.form.submit()">
                     <option value="newest" th:selected="${selectedSort == 'newest'}">Sort by: Relevance</option>
                     <option value="proficiency" th:selected="${selectedSort == 'proficiency'}">Sort by: Highest
+                        Proficiency</option>
+                    <option value="lowest-proficiency" th:selected="${selectedSort == 'lowest-proficiency'}">Sort by: Lowest
                         Proficiency</option>
                 </select>
             </div>
@@ -502,9 +517,7 @@
             <div class="section-header">
                 <div>
                     <h2 class="section-title">
-                        <span th:if="${searchQuery == null}">Explore Active Skills</span>
-                        <span th:if="${searchQuery != null}"
-                            th:text="'Results for \'' + ${searchQuery} + '\''">Results</span>
+                        <span th:text="${resultsMessage}">Explore Active Skills</span>
                     </h2>
                     <p class="text-muted mb-0" th:text="${skills.size()} + ' skills available'"></p>
                 </div>
@@ -525,13 +538,28 @@
 
                     <!-- Left: User Avatar -->
                     <div class="user-avatar-small">
-                        <i class="bi bi-person-fill"></i>
+                        <img th:if="${skill.owner.profile != null && skill.owner.profile.profilePictureUrl != null}"
+                             th:src="${skill.owner.profile.profilePictureUrl}"
+                             alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <i th:unless="${skill.owner.profile != null && skill.owner.profile.profilePictureUrl != null}"
+                           class="bi bi-person-fill"></i>
                     </div>
 
                     <!-- Middle: Data -->
                     <div class="skill-row-body">
-                        <h4 class="skill-title" th:text="${skill.name}">Skill Name</h4>
-                        <div class="skill-owner" th:text="'Offered by ' + ${skill.owner.fullName}">User Name</div>
+                        <h4 class="skill-title">
+                            <span th:text="${skill.name}">Skill Name</span>
+                            <i th:if="${skill.mainSkill}" class="bi bi-star-fill text-warning ms-1" title="Offered for exchange"></i>
+                        </h4>
+                        
+                        <div class="skill-owner" th:if="${skill.mainSkill}">
+                            <i class="bi bi-person-check-fill text-success me-1"></i>
+                            Offered by <span th:text="${skill.owner.fullName}">User Name</span>
+                        </div>
+                        <div class="skill-owner text-danger" th:unless="${skill.mainSkill}">
+                            <i class="bi bi-dash-circle-fill me-1"></i>
+                            Skill not available
+                        </div>
 
                         <div class="d-flex flex-wrap gap-2">
                             <span class="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-pill"
@@ -546,7 +574,9 @@
 
                     <!-- Right: Actions -->
                     <div class="skill-row-actions">
-                        <a href="#" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Connect</a>
+                        <a href="#" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" th:if="${skill.mainSkill}">Connect</a>
+                        <button class="btn btn-outline-secondary rounded-pill px-4 fw-bold shadow-sm" th:unless="${skill.mainSkill}" disabled>Not Available</button>
+                        
                         <button class="btn btn-light rounded-circle text-muted border"
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-bookmark"></i>

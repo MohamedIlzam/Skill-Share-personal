@@ -48,6 +48,7 @@
         .navbar-brand-text {
             font-weight: 800;
             font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -252,8 +253,9 @@
 <body>
     <nav class="navbar-custom">
         <div class="container d-flex justify-content-between align-items-center">
-            <a th:href="@{/active-users}" style="text-decoration:none;"><span class="navbar-brand-text"><i
-                        class="bi bi-arrow-left-right me-1"></i>SkillShare</span></a>
+            <span class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </span>
             <div class="d-flex align-items-center gap-3">
                 <a th:href="@{/profile}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-person-circle me-1"></i>My Profile</a>
                 <a th:href="@{/active-users}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-people-fill me-1"></i>All Users</a>
@@ -323,8 +325,17 @@
                             <span th:text="${skill}" class="fw-bold">Skill Name</span>
                         </div>
                     </div>
-                    <div class="bio-box py-3" th:if="${#lists.isEmpty(profile.mainSkills)}">
+                    <div class="bio-box py-3 mb-4" th:if="${#lists.isEmpty(profile.mainSkills)}">
                         <p class="mb-0 text-muted small italic">No skills highlighted yet.</p>
+                    </div>
+
+                    <div class="section-title" th:if="${not #lists.isEmpty(profile.otherSkills)}">Other Skills</div>
+                    <div class="d-flex flex-wrap gap-2 mb-4" th:if="${not #lists.isEmpty(profile.otherSkills)}">
+                        <div th:each="skill : ${profile.otherSkills}" class="badge rounded-pill px-3 py-2 border d-flex align-items-center gap-2" 
+                             style="background: #f8fafc; color: var(--text-muted); border-color: var(--card-border) !important;">
+                            <i class="bi bi-patch-check text-primary" style="font-size: 0.8rem;"></i>
+                            <span th:text="${skill}">Skill Name</span>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-4 border-top">
