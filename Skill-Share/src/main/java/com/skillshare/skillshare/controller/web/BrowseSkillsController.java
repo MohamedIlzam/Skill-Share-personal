@@ -45,12 +45,33 @@ public class BrowseSkillsController {
         model.addAttribute("selectedProficiency", proficiency);
         model.addAttribute("selectedSort", sort);
         
+        // Build a descriptive results message
+        StringBuilder message = new StringBuilder();
+        boolean hasFilters = org.springframework.util.StringUtils.hasText(query) || category != null || proficiency != null;
+        
+        if (!hasFilters) {
+            message.append("Explore Active Skills");
+        } else {
+            message.append("Results");
+            if (org.springframework.util.StringUtils.hasText(query)) {
+                message.append(" for '").append(query).append("'");
+            }
+            if (category != null) {
+                message.append(" in ").append(category);
+            }
+            if (proficiency != null) {
+                message.append(" (").append(proficiency).append(")");
+            }
+        }
+        model.addAttribute("resultsMessage", message.toString());
+        
         // Pass enum values specifically omitting 'EXPERT' from UI browsing.
         model.addAttribute("categories", SkillCategory.values());
         model.addAttribute("proficiencies", new SkillProficiency[]{
                 SkillProficiency.BEGINNER, 
                 SkillProficiency.INTERMEDIATE, 
-                SkillProficiency.ADVANCED
+                SkillProficiency.ADVANCED,
+                SkillProficiency.EXPERT
         });
 
         return "browse-skills";

@@ -45,6 +45,7 @@ public class ActiveUsersController {
         }
 
         model.addAttribute("search", search);
+        model.addAttribute("resultsMessage", org.springframework.util.StringUtils.hasText(search) ? "Results for '" + search + "'" : "All Active Users");
         model.addAttribute("activeView", view);
 
         return "active-users";

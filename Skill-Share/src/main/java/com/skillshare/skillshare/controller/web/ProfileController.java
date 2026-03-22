@@ -27,20 +27,24 @@ public class ProfileController {
         Long userId = userDetails.getUser().getId();
         UserProfileDTO profile = userProfileService.getProfileByUserId(userId);
         
-        // Resolve mainSkillIds to actual Skill objects for display
+        // Fetch all user skills and partition them
+        java.util.List<com.skillshare.skillshare.model.skill.Skill> allSkills = skillService.getSkillsByUser(userId);
         java.util.List<com.skillshare.skillshare.model.skill.Skill> mainSkills = new java.util.ArrayList<>();
-        if (profile.getMainSkillIds() != null && !profile.getMainSkillIds().isEmpty()) {
-            for (Long skillId : profile.getMainSkillIds()) {
-                try {
-                    mainSkills.add(skillService.getSkillByIdForUser(userId, skillId));
-                } catch (Exception e) {
-                    // Ignore skills that might have been deleted but still in the profile's mainSkillIds
-                }
+        java.util.List<com.skillshare.skillshare.model.skill.Skill> otherSkills = new java.util.ArrayList<>();
+        
+        java.util.Set<Long> mainSkillIds = profile.getMainSkillIds();
+        
+        for (com.skillshare.skillshare.model.skill.Skill skill : allSkills) {
+            if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {
+                mainSkills.add(skill);
+            } else {
+                otherSkills.add(skill);
             }
         }
         
         model.addAttribute("profile", profile);
         model.addAttribute("mainSkills", mainSkills);
+        model.addAttribute("otherSkills", otherSkills);
         return "profile-view";
     }
 
