@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
+    public String home(java.security.Principal principal) {
+        if (principal != null) {
+            return "redirect:/active-users";
+        }
         return "home";
     }
 

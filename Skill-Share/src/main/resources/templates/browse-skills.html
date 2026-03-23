@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin" />
+    <title>Browse Skills — SkillShare</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Design Tokens & Universal Styles ... */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #93c5fd;
+            --primary-subtle: #eff6ff;
+            --accent: #6366f1;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: rgba(148, 163, 184, .15);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, .07), 0 2px 4px rgba(0, 0, 0, .04);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, .08), 0 4px 8px rgba(0, 0, 0, .04);
+            --radius: 1rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-body);
+            background: var(--bg-light);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navbar ... */
+        .navbar-custom {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--card-border);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand-text {
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -.02em;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .95rem;
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        /* Hero Search Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+            padding: 5rem 1rem 6rem;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1.5" fill="rgba(255,255,255,0.15)"/></svg>') repeat;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: #c7d2fe;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Search Bar Setup */
+        .search-container {
+            max-width: 650px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-box {
+            display: flex;
+            background: #fff;
+            border-radius: 50rem;
+            padding: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-search:hover {
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            color: #fff;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-select {
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-body);
+            font-weight: 500;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Main Content Grid */
+        .browse-main {
+            padding: 4rem 1rem;
+            flex-grow: 1;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Horizontal Skill Row */
+        .skill-row {
+            background: #fff;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            /* Ensures invisible before animation */
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .skill-row:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .skill-row:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .skill-row:nth-child(3) {
+            animation-delay: 0.25s;
+        }
+
+        .skill-row:nth-child(4) {
+            animation-delay: 0.35s;
+        }
+
+        .skill-row:nth-child(5) {
+            animation-delay: 0.45s;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .skill-row:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+
+        /* Category Color Identifiers on the left side */
+        .skill-row::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+        }
+
+        .border-PROGRAMMING::before {
+            background: linear-gradient(to bottom, #0284c7, #38bdf8);
+        }
+
+        .border-DESIGN::before {
+            background: linear-gradient(to bottom, #db2777, #f472b6);
+        }
+
+        .border-LANGUAGE::before {
+            background: linear-gradient(to bottom, #d97706, #fbbf24);
+        }
+
+        .border-BUSINESS::before {
+            background: linear-gradient(to bottom, #16a34a, #4ade80);
+        }
+
+        .border-ACADEMIC::before {
+            background: linear-gradient(to bottom, #9333ea, #c084fc);
+        }
+
+        .border-COMMUNICATION::before {
+            background: linear-gradient(to bottom, #ea580c, #fb923c);
+        }
+
+        .border-OTHER::before {
+            background: linear-gradient(to bottom, #475569, #94a3b8);
+        }
+
+        .user-avatar-small {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--primary-subtle);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .skill-row-body {
+            flex-grow: 1;
+            min-width: 0;
+            /* Prevents flex overflow */
+        }
+
+        .skill-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .skill-owner {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .badge-BEGINNER {
+            background: #eff6ff;
+            color: #3b82f6;
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-INTERMEDIATE {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-ADVANCED {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .badge-EXPERT {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+        }
+
+        .skill-row-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .animate-tab {
+            animation: fadeInRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .skill-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .skill-row-actions {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar-custom">
+        <div class="container d-flex align-items-center justify-content-between">
+            <span class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/browse}" class="nav-link-custom active">Explore</a>
+                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
+                <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Search Banner -->
+    <header class="hero-banner">
+        <div class="container">
+            <h1 class="hero-title">Find the perfect skill for your next project</h1>
+            <p class="hero-subtitle">Discover thousands of talented individuals ready to share their expertise.</p>
+
+            <div class="search-container">
+                <form th:action="@{/browse}" method="get" class="search-box" id="browseForm">
+                    <input type="text" name="q" class="search-input"
+                        placeholder="e.g. Graphic Design, Public Speaking..." th:value="${searchQuery}">
+                    <button type="submit" class="btn-search">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <!-- Provide a clear button if populated -->
+                    <a th:if="${searchQuery != null && !searchQuery.isEmpty()}" th:href="@{/browse}"
+                        class="btn btn-light rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                        style="width:45px; height:45px; border:1px solid #e2e8f0; text-decoration: none;"
+                        title="Clear Search">
+                        <i class="bi bi-x-lg text-muted"></i>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="container d-flex gap-3 overflow-auto pb-2 pb-sm-0">
+            <select name="category" form="browseForm" class="filter-select text-dark" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"
+                    th:selected="${cat == selectedCategory}"></option>
+            </select>
+
+            <select name="proficiency" form="browseForm" class="filter-select text-dark" onchange="this.form.submit()">
+                <option value="">All Proficiencies</option>
+                <option th:each="prof : ${proficiencies}" th:value="${prof}" th:text="${prof}"
+                    th:selected="${prof == selectedProficiency}"></option>
+            </select>
+
+            <div class="ms-auto" style="min-width: 150px;">
+                <select name="sort" form="browseForm" class="filter-select w-100 text-dark"
+                    onchange="this.form.submit()">
+                    <option value="newest" th:selected="${selectedSort == 'newest'}">Sort by: Relevance</option>
+                    <option value="proficiency" th:selected="${selectedSort == 'proficiency'}">Sort by: Highest
+                        Proficiency</option>
+                    <option value="lowest-proficiency" th:selected="${selectedSort == 'lowest-proficiency'}">Sort by: Lowest
+                        Proficiency</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="browse-main">
+        <div class="container">
+
+            <!-- Shared Navigation Tabs -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-auto">
+                    <div class="btn-group rounded-pill p-1 bg-white shadow-sm border">
+                        <a th:href="@{/active-users}" class="btn btn-light rounded-pill px-4 fw-bold">
+                            <i class="bi bi-people-fill me-2"></i>Find People
+                        </a>
+                        <a th:href="@{/browse}" class="btn btn-primary rounded-pill px-4 fw-bold">
+                            <i class="bi bi-lightbulb-fill me-2"></i>Find Skills
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <span th:text="${resultsMessage}">Explore Active Skills</span>
+                    </h2>
+                    <p class="text-muted mb-0" th:text="${skills.size()} + ' skills available'"></p>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state animate-tab" th:if="${#lists.isEmpty(skills)}">
+                <i class="bi bi-search empty-icon"></i>
+                <h3 class="fw-bold text-dark">No matching skills found</h3>
+                <p class="text-muted">We couldn't find any active skills matching your search criteria.</p>
+                <a th:href="@{/browse}" class="btn btn-outline-primary rounded-pill mt-2 fw-bold px-4">Clear Filters</a>
+            </div>
+
+            <!-- Horizontal List -->
+            <div class="d-flex flex-column gap-3 animate-tab" th:if="${not #lists.isEmpty(skills)}">
+
+                <div class="skill-row" th:each="skill : ${skills}" th:classappend="'border-' + ${skill.category}">
+
+                    <!-- Left: User Avatar -->
+                    <div class="user-avatar-small">
+                        <img th:if="${skill.owner.profile != null && skill.owner.profile.profilePictureUrl != null}"
+                             th:src="${skill.owner.profile.profilePictureUrl}"
+                             alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <i th:unless="${skill.owner.profile != null && skill.owner.profile.profilePictureUrl != null}"
+                           class="bi bi-person-fill"></i>
+                    </div>
+
+                    <!-- Middle: Data -->
+                    <div class="skill-row-body">
+                        <h4 class="skill-title">
+                            <span th:text="${skill.name}">Skill Name</span>
+                            <i th:if="${skill.mainSkill}" class="bi bi-star-fill text-warning ms-1" title="Offered for exchange"></i>
+                        </h4>
+                        
+                        <div class="skill-owner" th:if="${skill.mainSkill}">
+                            <i class="bi bi-person-check-fill text-success me-1"></i>
+                            Offered by <span th:text="${skill.owner.fullName}">User Name</span>
+                        </div>
+                        <div class="skill-owner text-danger" th:unless="${skill.mainSkill}">
+                            <i class="bi bi-dash-circle-fill me-1"></i>
+                            Skill not available
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-pill"
+                                th:text="${skill.category}">TECH</span>
+                            <span class="badge shadow-sm px-3 py-2 rounded-pill"
+                                th:classappend="'badge-' + ${skill.proficiency}">
+                                <i class="bi bi-star-fill me-1"></i> <span
+                                    th:text="${skill.proficiency}">Intermediate</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Actions -->
+                    <div class="skill-row-actions">
+                        <a href="#" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" th:if="${skill.mainSkill}">Connect</a>
+                        <button class="btn btn-outline-secondary rounded-pill px-4 fw-bold shadow-sm" th:unless="${skill.mainSkill}" disabled>Not Available</button>
+                        
+                        <button class="btn btn-light rounded-circle text-muted border"
+                            style="width: 40px; height: 40px;">
+                            <i class="bi bi-bookmark"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-center py-4 text-white-50 mt-auto">
+        <small>&copy; 2026 SkillShare Marketplace. All rights reserved.</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

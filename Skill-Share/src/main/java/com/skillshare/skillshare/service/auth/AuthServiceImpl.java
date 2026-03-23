@@ -2,6 +2,7 @@ package com.skillshare.skillshare.service.auth;
 
 import com.skillshare.skillshare.exception.ResourceConflictException;
 import com.skillshare.skillshare.model.user.User;
+import com.skillshare.skillshare.model.user.UserProfile;
 import com.skillshare.skillshare.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,10 @@ public class AuthServiceImpl implements AuthService {
         String hash = passwordEncoder.encode(rawPassword);
         User user = User.register(fullName, normalizedEmail, hash);
         
+        // Create profile during registration (Step 1 requirement)
+        UserProfile profile = new UserProfile(user, fullName);
+        user.setProfile(profile);
+
         return userRepository.save(user);
     }
 }

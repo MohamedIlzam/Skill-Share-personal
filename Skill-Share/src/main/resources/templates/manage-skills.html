@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Skills — SkillShare</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* ── Design Tokens ── */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #93c5fd;
+            --primary-subtle: #eff6ff;
+            --accent: #6366f1;
+            --danger: #ef4444;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: rgba(148, 163, 184, .15);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, .07), 0 2px 4px rgba(0, 0, 0, .04);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, .08), 0 4px 8px rgba(0, 0, 0, .04);
+            --radius: 1rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-body);
+            background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 50%, #eff6ff 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative Background Orbs */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .3;
+            z-index: -1;
+        }
+
+        body::before {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-light);
+            top: -100px;
+            left: -100px;
+        }
+
+        body::after {
+            width: 300px;
+            height: 300px;
+            background: #c4b5fd;
+            bottom: -50px;
+            right: -50px;
+        }
+
+        /* ── Navbar ── */
+        .navbar-custom {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--card-border);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand-text {
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -.02em;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .95rem;
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        /* ── Main Layout ── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            margin-top: 3rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -.02em;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .btn-add-skill {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .75rem 1.7rem;
+            font-size: .95rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 50rem;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, .35);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .btn-add-skill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, .45);
+        }
+
+        /* ── Skill Cards Grid ── */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform .3s ease, box-shadow .3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp .5s ease forwards;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Card Top: Name & Badges */
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .skill-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1.2;
+            word-break: break-word;
+            padding-right: 0.5rem;
+        }
+
+        .category-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.35rem 0.65rem;
+            border-radius: 50rem;
+            white-space: nowrap;
+        }
+
+        /* Dynamic Category Colors */
+        .cat-PROGRAMMING {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .cat-DESIGN {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .cat-LANGUAGE {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .cat-BUSINESS {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .cat-ACADEMIC {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .cat-COMMUNICATION {
+            background: #ffedd5;
+            color: #ea580c;
+        }
+
+        .cat-OTHER {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        /* Proficiency Level bar */
+        .proficiency-container {
+            margin-top: auto;
+            margin-bottom: 1.2rem;
+        }
+
+        .proficiency-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .skill-bar-bg {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 50rem;
+            overflow: hidden;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 50rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .prof-BEGINNER {
+            width: 25%;
+        }
+
+        .prof-INTERMEDIATE {
+            width: 50%;
+        }
+
+        .prof-ADVANCED {
+            width: 75%;
+        }
+
+        .prof-EXPERT {
+            width: 100%;
+        }
+
+        /* Main Skill Toggle */
+        .main-skill-toggle {
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #d1d5db;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .main-skill-toggle:hover {
+            transform: scale(1.1);
+            color: #fbbf24;
+        }
+
+        .main-skill-toggle.active {
+            color: #fbbf24;
+            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.4));
+        }
+
+        /* Card Actions */
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 1rem;
+        }
+
+        .btn-card-action {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .btn-edit {
+            color: var(--primary);
+            border: 1px solid var(--primary-light);
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-subtle);
+        }
+
+        .btn-delete {
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+        }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px dashed var(--card-border);
+            border-radius: var(--radius);
+            margin-bottom: 4rem;
+        }
+
+        .empty-icon {
+            font-size: 3.5rem;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+        }
+
+        /* ── Modals Redesign ── */
+        .modal-content {
+            border: none;
+            border-radius: calc(var(--radius) * 1.2);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.5rem;
+            background: var(--bg-light);
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--card-border);
+            padding: 1.5rem;
+            background: var(--bg-light);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control,
+        .form-select {
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--card-border);
+            border-radius: 0.6rem;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .02);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .18);
+        }
+
+        /* ── Custom Radio Buttons ── */
+        .btn-prof {
+            border: 1.5px solid var(--primary-light);
+            color: var(--text-muted);
+            background: #fff;
+            padding: 0.6rem 0;
+            transition: all 0.2s;
+        }
+
+        .btn-prof:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .btn-check:checked+.btn-prof {
+            background: var(--primary-subtle);
+            color: var(--primary-dark);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+            font-weight: 700 !important;
+        }
+
+        /* ── Alerts ── */
+        .alert-custom {
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: fadeUp 0.4s ease forwards;
+            border: 1px solid transparent;
+        }
+
+        .alert-success-custom {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+
+        .alert-error-custom {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar-custom">
+        <div class="container d-flex align-items-center justify-content-between">
+            <span class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/active-users}" class="nav-link-custom">Discover Users</a>
+                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
+                <a th:href="@{/skills}" class="nav-link-custom active">My Skills</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container flex-grow-1">
+
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Manage Your Skills</h1>
+                <p class="page-subtitle">Showcase what you know to the SkillShare community.</p>
+            </div>
+            <button class="btn-add-skill" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                <i class="bi bi-plus-lg"></i> Add New Skill
+            </button>
+        </div>
+
+        <div th:if="${successParam}" class="alert-custom alert-success-custom mb-4">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span th:text="${successParam}">Success message!</span>
+        </div>
+        <div th:if="${errorParam}" class="alert-custom alert-error-custom mb-4">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <span th:text="${errorParam}">Error message!</span>
+        </div>
+
+        <div class="skills-grid" th:if="${not #lists.isEmpty(skills)}">
+            <div class="skill-card" th:each="skill : ${skills}">
+                <div class="skill-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <form th:action="@{/skills/{id}/toggle-main(id=${skill.id})}" method="post" class="m-0">
+                            <button type="submit" class="main-skill-toggle"
+                                th:classappend="${mainSkillIds.contains(skill.id)} ? 'active' : ''"
+                                th:title="${mainSkillIds.contains(skill.id)} ? 'Remove from profile highlights' : 'Highlight on profile'">
+                                <i th:class="${mainSkillIds.contains(skill.id)} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
+                            </button>
+                        </form>
+                        <h3 class="skill-name" th:text="${skill.name}">Skill Name</h3>
+                    </div>
+                    <span class="category-badge" th:classappend="'cat-' + ${skill.category}"
+                        th:text="${skill.category}">TECH</span>
+                </div>
+
+                <div class="proficiency-container">
+                    <div class="proficiency-label">
+                        <span>Proficiency</span>
+                        <span th:text="${skill.proficiency}">Intermediate</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" th:classappend="'prof-' + ${skill.proficiency}"></div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-card-action btn-edit" data-bs-toggle="modal" data-bs-target="#editSkillModal"
+                        th:data-id="${skill.id}" th:data-name="${skill.name}" th:data-category="${skill.category}"
+                        th:data-proficiency="${skill.proficiency}" onclick="populateEditModal(this)">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
+                    <!-- Delete Form -->
+                    <form th:action="@{/skills/{id}/delete(id=${skill.id})}" method="post"
+                        class="flex-grow-1 d-flex m-0"
+                        onsubmit="return confirm('Are you sure you want to delete this skill?');">
+                        <button type="submit" class="btn-card-action btn-delete w-100">
+                            <i class="bi bi-trash3-fill"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${#lists.isEmpty(skills)}">
+            <i class="bi bi-stars empty-icon"></i>
+            <h3 class="fw-bold fs-4 text-dark mb-2">No skills added yet</h3>
+            <p class="text-muted mb-4">Start exchanging knowledge by adding your first skill to your profile.</p>
+            <button class="btn-add-skill" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                <i class="bi bi-plus-lg"></i> Add New Skill
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ═══ Add Skill Modal ══════════════════════════════ -->
+    <div class="modal fade" id="addSkillModal" tabindex="-1" aria-hidden="true"
+        th:classappend="${openAddModal} ? 'show' : ''" th:style="${openAddModal} ? 'display:block;' : ''">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-lg me-2 text-primary"></i>Add a New Skill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Form binds to the DTO -->
+                <form th:action="@{/skills/add}" method="post" th:object="${newSkillRequest}">
+                    <div class="modal-body">
+                        <!-- Skill Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Skill Name</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}"
+                                placeholder="e.g. Graphic Design, Python, Public Speaking" required maxlength="100">
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" th:field="*{category}" required>
+                                <option value="" disabled selected>Select a category...</option>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">Category
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Proficiency -->
+                        <div class="mb-2">
+                            <label class="form-label d-block mb-2">Proficiency Level</label>
+                            <div class="d-flex gap-2">
+                                <input type="radio" class="btn-check" name="proficiency" id="prof-beg" value="BEGINNER"
+                                    th:field="*{proficiency}" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="prof-beg">Beginner</label>
+
+                                <input type="radio" class="btn-check" name="proficiency" id="prof-int"
+                                    value="INTERMEDIATE" th:field="*{proficiency}" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="prof-int">Intermediate</label>
+
+                                <input type="radio" class="btn-check" name="proficiency" id="prof-adv" value="ADVANCED"
+                                    th:field="*{proficiency}" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="prof-adv">Advanced</label>
+
+                                <input type="radio" class="btn-check" name="proficiency" id="prof-exp" value="EXPERT"
+                                    th:field="*{proficiency}" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="prof-exp">Expert</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                            style="font-weight:600;">Cancel</button>
+                        <button type="submit" class="btn-add-skill shadow-none m-0 px-4">Save Skill</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show" th:if="${openAddModal}"></div>
+
+    <!-- ═══ Edit Skill Modal ═════════════════════════════ -->
+    <div class="modal fade" id="editSkillModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit Skill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editSkillForm" method="post" th:action="@{/skills/edit}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Skill Name</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" required maxlength="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit-category" class="form-label">Category</label>
+                            <select class="form-select" id="edit-category" name="category" required>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label d-block mb-2">Proficiency Level</label>
+                            <div class="d-flex gap-2">
+                                <input type="radio" class="btn-check" name="proficiency" id="edit-prof-beg"
+                                    value="BEGINNER" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="edit-prof-beg">Beginner</label>
+
+                                <input type="radio" class="btn-check" name="proficiency" id="edit-prof-int"
+                                    value="INTERMEDIATE" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="edit-prof-int">Intermediate</label>
+
+                                <input type="radio" class="btn-check" name="proficiency" id="edit-prof-adv"
+                                    value="ADVANCED" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="edit-prof-adv">Advanced</label>
+
+                                <input type="radio" class="btn-check" name="proficiency" id="edit-prof-exp"
+                                    value="EXPERT" required>
+                                <label class="btn btn-prof flex-fill fw-semibold rounded-pill"
+                                    for="edit-prof-exp">Expert</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                            style="font-weight:600;">Cancel</button>
+                        <button type="submit" class="btn-add-skill shadow-none m-0 px-4">Update Skill</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function populateEditModal(button) {
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const category = button.getAttribute('data-category');
+            const proficiency = button.getAttribute('data-proficiency');
+
+            // Set the form action dynamically to include the skill ID
+            const form = document.getElementById('editSkillForm');
+            form.action = '/skills/' + id + '/edit';
+
+            // Populate the inputs
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-category').value = category;
+
+            // Check the correct proficiency radio pill
+            const editProfRadios = form.querySelectorAll('input[name="proficiency"]');
+            editProfRadios.forEach(radio => {
+                if (radio.value === proficiency) {
+                    radio.checked = true;
+                }
+            });
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert-custom');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+
+</html>

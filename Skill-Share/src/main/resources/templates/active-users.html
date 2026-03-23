@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin" />
+    <meta name="description" content="Discover active users and share skills on SkillShare.">
+    <title>Active Users — SkillShare</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #93c5fd;
+            --primary-subtle: #eff6ff;
+            --accent: #6366f1;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: rgba(148, 163, 184, .15);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, .08), 0 4px 8px rgba(0, 0, 0, .04);
+            --radius: 1rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-body);
+            background: var(--bg-light);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--card-border);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand-text {
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -.02em;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .95rem;
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-select {
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-body);
+            font-weight: 500;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Hero Search Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+            padding: 5rem 1rem 6rem;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1.5" fill="rgba(255,255,255,0.15)"/></svg>') repeat;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: #c7d2fe;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Search Bar Setup */
+        .search-container {
+            max-width: 650px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-box {
+            display: flex;
+            background: #fff;
+            border-radius: 50rem;
+            padding: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-search:hover {
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            color: #fff;
+        }
+
+        .user-grid {
+            padding: 2rem 0 5rem;
+        }
+
+        .user-card {
+            background: #fff;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: cardFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Staggered animation for the first few cards */
+        .user-grid .col:nth-child(1) .user-card {
+            animation-delay: 0.05s;
+        }
+
+        .user-grid .col:nth-child(2) .user-card {
+            animation-delay: 0.15s;
+        }
+
+        .user-grid .col:nth-child(3) .user-card {
+            animation-delay: 0.25s;
+        }
+
+        .user-grid .col:nth-child(4) .user-card {
+            animation-delay: 0.35s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-card-header {
+            padding: 2rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: var(--primary-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            overflow: hidden;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 1px var(--card-border);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+            font-size: 1.2rem;
+        }
+
+        .user-location {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .user-card-body {
+            padding: 1rem 1.5rem;
+            flex-grow: 1;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .skill-tag {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-card-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--card-border);
+            text-align: center;
+        }
+
+        .btn-view-profile {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            border-radius: 50rem;
+            padding: 0.6rem 1.5rem;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .btn-view-profile:hover {
+            transform: scale(1.02);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .status-available {
+            background-color: #10b981;
+        }
+
+        .status-unavailable {
+            background-color: #ef4444;
+        }
+
+        .browse-main {
+            background-color: #f8fafc;
+            min-height: calc(100vh - 400px);
+            padding: 3rem 0;
+        }
+
+        .pagination-container {
+            margin-top: 3rem;
+        }
+
+        .page-link {
+            border-radius: 0.5rem;
+            margin: 0 0.25rem;
+            color: var(--text-body);
+            border-color: var(--card-border);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .empty-state {
+            padding: 5rem 1rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: var(--primary-light);
+        }
+
+        .footer {
+            background: var(--text-dark);
+            color: #94a3b8;
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: .88rem;
+            margin-top: auto;
+        }
+
+        .animate-tab {
+            animation: fadeInRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column">
+    <!-- Navbar -->
+    <nav class="navbar-custom">
+        <div class="container d-flex align-items-center justify-content-between">
+            <span class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/active-users}" class="nav-link-custom active">Explore</a>
+                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
+                <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Search Banner -->
+    <header class="hero-banner">
+        <div class="container">
+            <h1 class="hero-title">Discover Skill Partners</h1>
+            <p class="hero-subtitle">Connect with active users and exchange knowledge today.</p>
+
+            <div class="search-container">
+                <form th:action="@{/active-users}" method="get" class="search-box" id="searchForm">
+                    <input type="hidden" name="view" value="users">
+                    <input type="text" name="search" class="search-input"
+                        placeholder="Search partners by name or location..." th:value="${search}">
+                    <button type="submit" class="btn-search">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <!-- Provide a clear button if populated -->
+                    <a th:if="${search != null && !search.isEmpty()}" th:href="@{/active-users}"
+                        class="btn btn-light rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                        style="width:45px; height:45px; border:1px solid #e2e8f0; text-decoration: none;"
+                        title="Clear Search">
+                        <i class="bi bi-x-lg text-muted"></i>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filter Bar (UI Mockup) -->
+    <div class="filter-bar">
+        <div class="container d-flex gap-3 overflow-auto pb-2 pb-sm-0">
+            <select name="location" form="searchForm" class="filter-select text-dark" onchange="this.form.submit()">
+                <option value="">All Locations</option>
+                <option value="remote">Remote Services</option>
+            </select>
+
+            <select name="availability" form="searchForm" class="filter-select text-dark" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="AVAILABLE">Available Now</option>
+            </select>
+
+            <div class="ms-auto" style="min-width: 150px;">
+                <select name="sort" form="searchForm" class="filter-select w-100 text-dark"
+                    onchange="this.form.submit()">
+                    <option value="newest">Sort by: Relevance</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="browse-main">
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-auto">
+                    <div class="btn-group rounded-pill p-1 bg-white shadow-sm border">
+                        <a th:href="@{/active-users(view='users')}"
+                            th:classappend="${activeView == 'users'} ? 'btn-primary' : 'btn-light'"
+                            class="btn rounded-pill px-4 fw-bold">
+                            <i class="bi bi-people-fill me-2"></i>Find People
+                        </a>
+                        <a th:href="@{/browse}" class="btn btn-light rounded-pill px-4 fw-bold">
+                            <i class="bi bi-lightbulb-fill me-2"></i>Find Skills
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Part -->
+            <div th:if="${activeView == 'users'}" class="animate-tab">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h2 class="fs-4 fw-bold text-dark mb-0" th:text="${resultsMessage}">All Active Users</h2>
+                        <p class="text-muted small mb-0" th:text="${totalItems} + ' members found'"></p>
+                    </div>
+                </div>
+
+                <div class="user-grid">
+                    <!-- Empty Results -->
+                    <div th:if="${#lists.isEmpty(users)}" class="empty-state">
+                        <i class="bi bi-person-x"></i>
+                        <h3>No users found</h3>
+                        <p>Try adjusting your search keywords or explore the community later.</p>
+                        <a th:href="@{/active-users(view='users')}" class="btn btn-primary rounded-pill px-4 mt-3">Clear
+                            Search</a>
+                    </div>
+
+                    <!-- User Cards Grid -->
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4"
+                        th:unless="${#lists.isEmpty(users)}">
+                        <div class="col" th:each="user : ${users}">
+                            <div class="user-card">
+                                <div class="user-card-header">
+                                    <div class="user-avatar">
+                                        <img th:if="${user.profilePictureUrl}" th:src="${user.profilePictureUrl}"
+                                            alt="Avatar">
+                                        <i th:unless="${user.profilePictureUrl}" class="bi bi-person-fill"></i>
+                                    </div>
+                                    <h3 class="user-name" th:text="${user.fullName}">John Doe</h3>
+                                    <div class="user-location">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        <span th:text="${user.location ?: 'Remote'}">Location</span>
+                                    </div>
+                                    <div class="user-location mt-1" th:if="${user.university}">
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                        <span th:text="${user.university}">University</span>
+                                    </div>
+                                    <div class="mt-2 text-center">
+                                        <span
+                                            th:class="'status-dot ' + (${user.availabilityStatus.name() == 'AVAILABLE'} ? 'status-available' : 'status-unavailable')"></span>
+                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;"
+                                            th:text="${user.availabilityStatus}">AVAILABLE</small>
+                                    </div>
+                                </div>
+                                <div class="user-card-body">
+                                    <p class="text-muted small text-center mb-3 line-clamp-2"
+                                        th:text="${user.bio ?: 'No bio available...'}"></p>
+                                    <div class="skill-tags">
+                                        <span th:each="skill : ${user.mainSkills}" class="skill-tag"
+                                            th:text="${skill}">Skill</span>
+                                    </div>
+                                </div>
+                                <div class="user-card-footer">
+                                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn-view-profile">View
+                                        Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav th:if="${totalPages > 1}" class="pagination-container d-flex justify-content-center">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/active-users(view='users', page=${currentPage - 1}, search=${search})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${currentPage == i} ? 'active'">
+                                <a class="page-link"
+                                    th:href="@{/active-users(view='users', page=${i}, search=${search})}"
+                                    th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/active-users(view='users', page=${currentPage + 1}, search=${search})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Skills Part (Placeholder for future development) -->
+            <div th:if="${activeView == 'skills'}" class="py-5">
+                <div class="empty-state">
+                    <i class="bi bi-lightbulb"></i>
+                    <h2 class="fw-bold text-dark mt-4">Discover Skills</h2>
+                    <p class="lead">A central hub to explore all available expertise in our community.</p>
+                    <div class="alert alert-info d-inline-block rounded-pill px-4 mt-3">
+                        <i class="bi bi-info-circle me-2"></i>This feature is coming soon! Stay tuned.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 SkillShare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

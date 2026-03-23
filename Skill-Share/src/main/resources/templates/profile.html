@@ -366,6 +366,18 @@
             color: #dc2626;
         }
 
+        .btn-action-secondary {
+            color: var(--primary);
+            background: var(--primary-subtle);
+            border: 1px solid transparent;
+        }
+
+        .btn-action-secondary:hover {
+            background: #dbeafe;
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
         /* ── Footer ──────────────────────────────────── */
         .footer {
             background: var(--text-dark);
@@ -484,11 +496,16 @@
                     <div class="card-divider"></div>
 
                     <!-- Actions -->
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <button type="button" class="btn-action btn-action-primary" id="explore-btn" disabled
-                            style="opacity:.6;cursor:not-allowed;">
-                            <i class="bi bi-compass-fill"></i> Explore Skills
-                        </button>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <a th:href="@{/skills}" class="btn-action btn-action-primary" id="manage-skills-btn">
+                                <i class="bi bi-tools"></i> Manage My Skills
+                            </a>
+                            <button type="button" class="btn-action btn-action-secondary" id="explore-btn" disabled
+                                style="opacity:.6;cursor:not-allowed;">
+                                <i class="bi bi-compass-fill"></i> Explore Skills
+                            </button>
+                        </div>
                         <form th:action="@{/logout}" method="post" style="margin:0;">
                             <button type="submit" class="btn-action btn-action-ghost" id="profile-logout-btn">
                                 <i class="bi bi-box-arrow-right"></i> Log out
