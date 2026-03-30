@@ -11,9 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.skillshare.skillshare.model.skill.SkillCategory;
 import com.skillshare.skillshare.model.skill.SkillProficiency;
+import com.skillshare.skillshare.service.exchange.ExchangeRequestService;
+import com.skillshare.skillshare.dto.exchange.ExchangeRequestResponseDTO;
+import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
 
 // ... other imports
 
@@ -22,9 +27,11 @@ import com.skillshare.skillshare.model.skill.SkillProficiency;
 public class BrowseSkillsController {
 
     private final SkillService skillService;
+    private final ExchangeRequestService exchangeRequestService;
 
-    public BrowseSkillsController(SkillService skillService) {
+    public BrowseSkillsController(SkillService skillService, ExchangeRequestService exchangeRequestService) {
         this.skillService = skillService;
+        this.exchangeRequestService = exchangeRequestService;
     }
 
     @GetMapping
@@ -39,7 +46,13 @@ public class BrowseSkillsController {
         
         List<Skill> skills = skillService.getFilteredSkills(currentUserId, query, category, proficiency, sort);
 
+        Set<Long> requestedSkillIds = exchangeRequestService.getOutgoingRequests(currentUserId).stream()
+                .filter(req -> req.getStatus() == ExchangeRequestStatus.PENDING || req.getStatus() == ExchangeRequestStatus.ACCEPTED)
+                .map(ExchangeRequestResponseDTO::getSkillId)
+                .collect(Collectors.toSet());
+
         model.addAttribute("skills", skills);
+        model.addAttribute("requestedSkillIds", requestedSkillIds);
         model.addAttribute("searchQuery", query);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("selectedProficiency", proficiency);
