@@ -124,7 +124,7 @@
                 <i class="bi bi-arrow-left-right me-1"></i>SkillShare
             </span>
             <div class="d-flex align-items-center gap-2">
-                <a th:href="@{/browse}" class="nav-link-custom">Explore</a>
+                <a th:href="@{/active-users}" class="nav-link-custom">Explore</a>
                 <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
                 <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
                 <a th:href="@{/requests}" class="nav-link-custom active">Requests</a>
@@ -154,6 +154,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link rounded-pill fw-bold" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
                     Sent Requests
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                    Past Exchanges
                 </button>
             </li>
         </ul>
@@ -225,6 +230,40 @@
                                     <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
                                 </form>
                             </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Past Exchanges (History) -->
+            <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                <div th:if="${#lists.isEmpty(completedExchanges)}" class="text-center py-5 text-muted">
+                    <i class="bi bi-clock-history fs-1"></i>
+                    <h5 class="mt-3">No past exchanges yet</h5>
+                    <p>Completed exchanges will appear here for your reference.</p>
+                </div>
+
+                <div th:each="exchange : ${completedExchanges}" class="request-card border-success-subtle">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="status-badge status-COMPLETED">
+                                    <i class="bi bi-check-circle-fill"></i> Completed
+                                </span>
+                                <small class="text-muted border-start ps-2" th:text="${#temporals.format(exchange.updatedAt, 'dd MMM yyyy')}">Date</small>
+                            </div>
+                            <h4 class="fw-bold mb-1 text-dark" th:text="${exchange.skillName}">Skill Name</h4>
+                            
+                            <p class="mb-0 text-muted">
+                                Exchange Partner: 
+                                <strong class="text-dark" th:if="${exchange.requesterId == currentUserId}" th:text="${exchange.skillOwnerName}">Provider</strong>
+                                <strong class="text-dark" th:if="${exchange.requesterId != currentUserId}" th:text="${exchange.requesterName}">Receiver</strong>
+                            </p>
+                        </div>
+                        <div class="bg-light rounded p-2 text-center border" style="min-width: 100px;">
+                            <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.6rem;">Your Role</small>
+                            <span class="badge bg-primary rounded-pill px-2 py-1" th:if="${exchange.requesterId == currentUserId}">Receiver</span>
+                            <span class="badge bg-info rounded-pill px-2 py-1 text-dark" th:if="${exchange.requesterId != currentUserId}">Provider</span>
                         </div>
                     </div>
                 </div>
