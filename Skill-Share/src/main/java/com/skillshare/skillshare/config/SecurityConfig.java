@@ -15,7 +15,7 @@ public class SecurityConfig {
                 http
                                 // Disable CSRF purely for API (swagger testing) endpoints, keep enabled for
                                 // everything else (web forms)
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/ws/**"))
 
                                 .authorizeHttpRequests(auth -> auth
                                                 // Public endpoints
