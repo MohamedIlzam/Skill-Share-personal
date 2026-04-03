@@ -14,6 +14,9 @@ public interface ExchangeRequestRepository extends JpaRepository<ExchangeRequest
 
     List<ExchangeRequest> findBySkillOwnerIdOrderByCreatedAtDesc(Long skillOwnerId);
 
+    @Query("SELECT e FROM ExchangeRequest e WHERE (e.requester.id = :userId OR e.skillOwner.id = :userId) AND e.status = :status ORDER BY e.updatedAt DESC")
+    List<ExchangeRequest> findExchangeHistoryByUserIdAndStatus(@Param("userId") Long userId, @Param("status") ExchangeRequestStatus status);
+
     @Query("SELECT COUNT(e) > 0 FROM ExchangeRequest e WHERE e.requester.id = :requesterId " +
             "AND e.selectedSkill.id = :skillId " +
             "AND e.status IN (:statuses)")

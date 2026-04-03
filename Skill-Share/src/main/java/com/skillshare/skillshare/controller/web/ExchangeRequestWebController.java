@@ -29,9 +29,12 @@ public class ExchangeRequestWebController {
         Long userId = userDetails.getUser().getId();
         List<ExchangeRequestResponseDTO> incomingRequests = exchangeRequestService.getIncomingRequests(userId);
         List<ExchangeRequestResponseDTO> outgoingRequests = exchangeRequestService.getOutgoingRequests(userId);
+        List<ExchangeRequestResponseDTO> completedExchanges = exchangeRequestService.getCompletedExchangesHistory(userId);
 
         model.addAttribute("incomingRequests", incomingRequests);
         model.addAttribute("outgoingRequests", outgoingRequests);
+        model.addAttribute("completedExchanges", completedExchanges);
+        model.addAttribute("currentUserId", userId);
 
         return "exchange-requests";
     }

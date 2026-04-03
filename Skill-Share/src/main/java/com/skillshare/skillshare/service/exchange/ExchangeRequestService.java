@@ -94,6 +94,14 @@ public class ExchangeRequestService {
         return mapToDTO(exchangeRequestRepository.save(request));
     }
 
+    @Transactional(readOnly = true)
+    public List<ExchangeRequestResponseDTO> getCompletedExchangesHistory(Long userId) {
+        return exchangeRequestRepository.findExchangeHistoryByUserIdAndStatus(userId, ExchangeRequestStatus.COMPLETED)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     private ExchangeRequest getRequestForOwner(Long requestId, Long skillOwnerId) {
         ExchangeRequest request = exchangeRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exchange request not found"));
