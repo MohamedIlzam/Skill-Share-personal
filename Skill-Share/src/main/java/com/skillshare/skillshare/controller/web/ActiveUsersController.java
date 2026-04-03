@@ -2,6 +2,7 @@ package com.skillshare.skillshare.controller.web;
 
 import com.skillshare.skillshare.dto.user.PublicUserDTO;
 import com.skillshare.skillshare.security.CustomUserDetails;
+import com.skillshare.skillshare.service.exchange.ExchangeRatingService;
 import com.skillshare.skillshare.service.user.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ActiveUsersController {
 
     private final UserProfileService userProfileService;
+    private final ExchangeRatingService exchangeRatingService;
 
     @GetMapping("/active-users")
     public String listActiveUsers(
@@ -61,9 +63,10 @@ public class ActiveUsersController {
         if (userDetails != null && userDetails.getUser().getId().equals(userId)) {
             return "redirect:/profile";
         }
-        
         PublicUserDTO publicProfile = userProfileService.getPublicProfile(userId);
         model.addAttribute("profile", publicProfile);
+        model.addAttribute("ratingSummary", exchangeRatingService.getUserRatingSummary(userId));
+        model.addAttribute("userReviews", exchangeRatingService.getUserReviews(userId));
         
         return "public-profile";
     }

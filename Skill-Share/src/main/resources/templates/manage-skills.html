@@ -539,7 +539,7 @@
                             <button type="submit" class="main-skill-toggle"
                                 th:classappend="${mainSkillIds.contains(skill.id)} ? 'active' : ''"
                                 th:title="${mainSkillIds.contains(skill.id)} ? 'Remove from profile highlights' : 'Highlight on profile'">
-                                <i th:class="${mainSkillIds.contains(skill.id)} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
+                                <i th:class="${mainSkillIds.contains(skill.id)} ? 'bi bi-pin-angle-fill text-success' : 'bi bi-pin-angle text-secondary'"></i>
                             </button>
                         </form>
                         <h3 class="skill-name" th:text="${skill.name}">Skill Name</h3>

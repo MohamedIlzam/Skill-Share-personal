@@ -571,7 +571,7 @@
                     <div class="skill-row-body">
                         <h4 class="skill-title">
                             <span th:text="${skill.name}">Skill Name</span>
-                            <i th:if="${skill.mainSkill}" class="bi bi-star-fill text-warning ms-1"
+                            <i th:if="${skill.mainSkill}" class="bi bi-pin-angle-fill text-success ms-1"
                                 title="Offered for exchange"></i>
                         </h4>
 
@@ -589,7 +589,7 @@
                                 th:text="${skill.category}">TECH</span>
                             <span class="badge shadow-sm px-3 py-2 rounded-pill"
                                 th:classappend="'badge-' + ${skill.proficiency}">
-                                <i class="bi bi-star-fill me-1"></i> <span
+                                <i class="bi bi-bar-chart-fill me-1"></i> <span
                                     th:text="${skill.proficiency}">Intermediate</span>
                             </span>
                         </div>
