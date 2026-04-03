@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- CSRF tokens for AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <style>
         :root {
@@ -97,6 +101,17 @@
             border-radius: 50rem;
             font-weight: 600;
             padding: 0.5rem 1.25rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-action:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
@@ -163,18 +178,21 @@
                             </p>
                             <small class="text-muted" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
                         </div>
-                        <div class="d-flex gap-2" th:if="${req.status.name() == 'PENDING'}">
-                            <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post">
-                                <button type="submit" class="btn btn-success btn-action"><i class="bi bi-check-lg me-1"></i>Accept</button>
-                            </form>
-                            <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post">
-                                <button type="submit" class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg me-1"></i>Reject</button>
-                            </form>
-                        </div>
-                        <div class="d-flex gap-2" th:if="${req.status.name() == 'ACCEPTED'}">
-                            <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
-                                <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
-                            </form>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary btn-action chat-btn" data-bs-toggle="modal" data-bs-target="#chatModal" th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.requesterName}"><i class="bi bi-chat-dots me-1"></i>Chat</button>
+                            <th:block th:if="${req.status.name() == 'PENDING'}">
+                                <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-success btn-action"><i class="bi bi-check-lg me-1"></i>Accept</button>
+                                </form>
+                                <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg me-1"></i>Reject</button>
+                                </form>
+                            </th:block>
+                            <th:block th:if="${req.status.name() == 'ACCEPTED'}">
+                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
+                                </form>
+                            </th:block>
                         </div>
                     </div>
                 </div>
@@ -200,10 +218,13 @@
                             </p>
                             <small class="text-muted" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
                         </div>
-                        <div class="d-flex gap-2" th:if="${req.status.name() == 'ACCEPTED'}">
-                            <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
-                                <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
-                            </form>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary btn-action chat-btn" data-bs-toggle="modal" data-bs-target="#chatModal" th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.skillOwnerName}"><i class="bi bi-chat-dots me-1"></i>Chat</button>
+                            <th:block th:if="${req.status.name() == 'ACCEPTED'}">
+                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
+                                </form>
+                            </th:block>
                         </div>
                     </div>
                 </div>
@@ -215,6 +236,198 @@
         <small>&copy; 2026 SkillShare Marketplace. All rights reserved.</small>
     </footer>
 
+    <!-- Chat Modal -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border-radius: 1rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 80vh; max-height: 800px; display: flex; flex-direction: column;">
+                
+                <!-- Header -->
+                <div class="modal-header border-bottom px-4 py-3 bg-light" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="chatModalSkillName">Skill Name</h5>
+                        <small class="text-muted" id="chatModalPartnerName">Exchange with Partner</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Body -->
+                <div class="modal-body p-4 bg-light flex-grow-1" id="chatBody" style="overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="text-center w-100 my-auto text-muted" id="chatLoading">
+                        <div class="spinner-border text-primary mb-2" role="status"></div>
+                        <p>Loading messages...</p>
+                    </div>
+                    <div class="text-center w-100 my-auto text-muted d-none" id="chatEmpty">
+                        <i class="bi bi-chat-dots fs-1 mb-2"></i>
+                        <p>No messages yet. Say hello!</p>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="modal-footer border-top p-3 bg-white" style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                    <form id="chatForm" class="w-100 d-flex gap-2 m-0" onsubmit="event.preventDefault(); sendChatMessage();">
+                        <input type="hidden" id="currentChatRequestId">
+                        <input type="text" class="form-control rounded-pill px-4" id="chatInputMessage" placeholder="Type a message..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" id="chatSendBtn">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inject Current User ID into page for JS side -->
+    <meta id="currentUserIdMeta" th:content="${#authentication.principal.user.id}" />
+
+    <style>
+        .msg-bubble { max-width: 80%; padding: 0.75rem 1.25rem; border-radius: 1rem; position: relative; word-wrap: break-word; }
+        .msg-own { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
+        .msg-other { background: #fff; color: var(--text-dark); align-self: flex-start; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(148, 163, 184, .2); }
+        .msg-time { font-size: 0.75rem; opacity: 0.8; margin-top: 0.25rem; display: block; }
+        .msg-own .msg-time { color: rgba(255,255,255,0.8); text-align: right; }
+        .msg-other .msg-time { color: var(--text-muted); }
+        .participant-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .msg-other .participant-name { color: var(--primary-dark); }
+        
+        @keyframes popupMsg {
+            0% { opacity: 0; transform: translateY(15px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .msg-animate { animation: popupMsg 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const chatModalEl = document.getElementById('chatModal');
+        const chatBody = document.getElementById('chatBody');
+        const chatLoading = document.getElementById('chatLoading');
+        const chatEmpty = document.getElementById('chatEmpty');
+        const chatInputMessage = document.getElementById('chatInputMessage');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const currentChatRequestId = document.getElementById('currentChatRequestId');
+        
+        let currentUserId = document.getElementById('currentUserIdMeta').content;
+
+        if (chatModalEl) {
+            chatModalEl.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const reqId = button.getAttribute('data-request-id');
+                const skillName = button.getAttribute('data-skill-name');
+                const partnerName = button.getAttribute('data-partner-name');
+
+                document.getElementById('chatModalSkillName').textContent = skillName;
+                document.getElementById('chatModalPartnerName').textContent = 'Exchange with ' + partnerName;
+                currentChatRequestId.value = reqId;
+
+                // Reset UI
+                chatInputMessage.value = '';
+                chatLoading.classList.remove('d-none');
+                chatEmpty.classList.add('d-none');
+                
+                // Clear old messages
+                const oldMessages = chatBody.querySelectorAll('.msg-bubble');
+                oldMessages.forEach(el => el.remove());
+
+                // Fetch messages
+                fetch(`/api/requests/${reqId}/messages`)
+                    .then(response => response.json())
+                    .then(data => {
+                        chatLoading.classList.add('d-none');
+                        if (data.length === 0) {
+                            chatEmpty.classList.remove('d-none');
+                        } else {
+                            data.forEach(msg => appendMessage(msg, false));
+                            scrollToBottom();
+                        }
+                    })
+                    .catch(err => {
+                        chatLoading.classList.add('d-none');
+                        console.error('Error fetching messages:', err);
+                        alert('Could not load messages. Please try again.');
+                    });
+            });
+            
+            chatModalEl.addEventListener('shown.bs.modal', function () {
+                chatInputMessage.focus();
+            });
+        }
+
+        function appendMessage(msg, animate = false) {
+            const isOwn = (msg.senderId == currentUserId);
+            
+            const div = document.createElement('div');
+            div.className = `msg-bubble shadow-sm ${isOwn ? 'msg-own' : 'msg-other'} ${animate ? 'msg-animate' : ''}`;
+            
+            let html = '';
+            if (!isOwn) {
+                html += `<div class="participant-name">${msg.senderName}</div>`;
+            }
+            
+            // Format time safely
+            let displayTime = '';
+            if (msg.createdAt) {
+                const date = new Date(msg.createdAt);
+                displayTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
+            }
+            
+            html += `<div>${escapeHtml(msg.content)}</div>`;
+            html += `<span class="msg-time">${displayTime}</span>`;
+            
+            div.innerHTML = html;
+            chatBody.appendChild(div);
+        }
+
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function escapeHtml(unsafe) {
+            return (unsafe || '').replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        function sendChatMessage() {
+            const reqId = currentChatRequestId.value;
+            const content = chatInputMessage.value.trim();
+            if (!content) return;
+
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+            chatSendBtn.disabled = true;
+
+            const payload = { content: content };
+
+            fetch(`/api/requests/${reqId}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                chatSendBtn.disabled = false;
+                if (!response.ok) {
+                    throw new Error('Failed to send');
+                }
+                return response.json();
+            })
+            .then(msg => {
+                chatEmpty.classList.add('d-none');
+                appendMessage(msg, true);
+                chatInputMessage.value = '';
+                scrollToBottom();
+            })
+            .catch(err => {
+                chatSendBtn.disabled = false;
+                console.error(err);
+                alert('Could not send message.');
+            });
+        }
+    </script>
 </body>
 </html>

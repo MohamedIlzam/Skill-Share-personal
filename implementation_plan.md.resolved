@@ -1,0 +1,82 @@
+# Skill Exchange Request Feature Implementation Plan
+
+The goal is to implement a feature that allows users to request skills from other users and manage these requests (accept/reject), as per the user stories.
+
+## Proposed Changes
+
+### Model & Repository
+#### [NEW] `com.skillshare.skillshare.model.exchange.ExchangeRequestStatus.java`
+- Enum representing the request status: `PENDING`, `ACCEPTED`, `REJECTED`, `COMPLETED`.
+
+#### [NEW] `com.skillshare.skillshare.model.exchange.ExchangeRequest.java`
+- JPA Entity containing:
+  - `Long id`
+  - `User requester` (ManyToOne)
+  - `User skillOwner` (ManyToOne)
+  - `Skill selectedSkill` (ManyToOne)
+  - `String message` (Optional)
+  - `ExchangeRequestStatus status`
+  - `Instant createdAt`, `Instant updatedAt`
+  - Proper constraints to prevent duplicate requests (requester, skillOwner, selectedSkill combination).
+
+#### [NEW] `com.skillshare.skillshare.repository.ExchangeRequestRepository.java`
+- Spring Data JPA Repository for `ExchangeRequest`.
+- Methods to find by `requester` and `skillOwner`.
+- Method to check if a pending/accepted request already exists for a specific user, owner, and skill.
+
+### DTOs
+#### [NEW] `com.skillshare.skillshare.dto.exchange.ExchangeRequestCreateDTO.java`
+- DTO containing `skillId`, `message`.
+
+#### [NEW] `com.skillshare.skillshare.dto.exchange.ExchangeRequestResponseDTO.java`
+- DTO returning request details (id, requester name, skill owner name, skill name, message, status, createdAt).
+
+### Services
+#### [NEW] `com.skillshare.skillshare.service.exchange.ExchangeRequestService.java`
+- Service interface and implementation for handling business logic:
+  - `createRequest(Long requesterId, ExchangeRequestCreateDTO dto)`
+    - Validates skill exists and belongs to someone else.
+    - Prevents duplicates.
+  - `getIncomingRequests(Long skillOwnerId)`
+  - `getOutgoingRequests(Long requesterId)`
+  - `acceptRequest(Long requestId, Long skillOwnerId)`
+  - `rejectRequest(Long requestId, Long skillOwnerId)`
+  - `completeRequest(Long requestId, Long userId)` (updates status to COMPLETED if user is participant)
+
+### Web Controllers & Routing
+#### [NEW] `com.skillshare.skillshare.controller.web.ExchangeRequestWebController.java`
+- Handles routing for requests management:
+  - `GET /requests` (Dashboard to show sent and received requests)
+  - `POST /requests/create`
+  - `POST /requests/{id}/accept`
+  - `POST /requests/{id}/reject`
+  - `POST /requests/{id}/complete`
+
+### Views (Thymeleaf)
+#### [MODIFY] [src/main/resources/templates/browse-skills.html](file:///c:/Users/jadav/Desktop/SE_Project/Skill-Share/Skill-Share/src/main/resources/templates/browse-skills.html)
+- Add a "Request Exchange" button to each skill (excluding the user's own skills).
+- Add a modal or form to submit the request with an optional message.
+
+#### [NEW] `src/main/resources/templates/exchange-requests.html`
+- A new page with two sections/tabs:
+  - "Received Requests": Lists incoming requests with options to Accept/Reject (if PENDING) or Mark as Completed (if ACCEPTED).
+  - "Sent Requests": Lists outgoing requests and their statuses, with option to Mark as Completed (if ACCEPTED).
+
+## Verification Plan
+
+### Automated Tests
+Currently, there seem to be no comprehensive automated service tests, only a default start test and maybe some smoke tests (`DbSmokeTest Runner` from earlier chats). I can add backend unit tests for `ExchangeRequestService` to verify the logic.
+- We will create `ExchangeRequestServiceTest` mapping to the 10 scenarios in the user story (duplicate prevention, self-request prevention, status updates, owner authorization).
+
+### Manual Verification
+1. Run the Spring Boot application locally.
+2. Login with User A (or register).
+3. Create a Skill for User A.
+4. Login with User B.
+5. Browse skills, find User A's skill, and request an exchange with a message.
+6. Verify duplicate requests are blocked.
+7. Login with User A, navigate to "My Requests", and accept the request.
+8. Login with User B, check "My Requests" to see the "ACCEPTED" status.
+9. Verify unauthorized users cannot process requests they don't own.
+10. Login with User B or User A, find the ACCEPTED request, and click "Mark as Completed".
+11. Verify the status updates to COMPLETED and cannot be completed again.
