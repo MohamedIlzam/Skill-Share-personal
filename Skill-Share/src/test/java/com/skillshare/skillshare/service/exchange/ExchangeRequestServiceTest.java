@@ -46,20 +46,14 @@ class ExchangeRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        requester = new User();
+        requester = User.register("John Doe", "john@test.com", "hash");
         ReflectionTestUtils.setField(requester, "id", 1L);
-        ReflectionTestUtils.setField(requester, "firstName", "John");
-        ReflectionTestUtils.setField(requester, "lastName", "Doe");
 
-        skillOwner = new User();
+        skillOwner = User.register("Jane Smith", "jane@test.com", "hash");
         ReflectionTestUtils.setField(skillOwner, "id", 2L);
-        ReflectionTestUtils.setField(skillOwner, "firstName", "Jane");
-        ReflectionTestUtils.setField(skillOwner, "lastName", "Smith");
 
-        skill = new Skill();
+        skill = new Skill("Java Programming", com.skillshare.skillshare.model.skill.SkillCategory.PROGRAMMING, com.skillshare.skillshare.model.skill.SkillProficiency.BEGINNER, skillOwner);
         ReflectionTestUtils.setField(skill, "id", 100L);
-        ReflectionTestUtils.setField(skill, "name", "Java Programming");
-        skill.setOwner(skillOwner);
 
         createDTO = new ExchangeRequestCreateDTO();
         createDTO.setSkillId(100L);

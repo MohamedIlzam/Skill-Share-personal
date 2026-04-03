@@ -16,11 +16,10 @@ class ExchangeRequestTest {
 
     @BeforeEach
     void setUp() {
-        requester = new User();
+        requester = User.register("Requester", "requester@test.com", "hash");
         // Assuming we wouldn't set ID here as it's not strictly needed for Entity unit tests if we don't rely on it inside the entity.
-        skillOwner = new User();
-        skill = new Skill();
-        skill.setOwner(skillOwner);
+        skillOwner = User.register("Skill Owner", "owner@test.com", "hash");
+        skill = new Skill("Test Skill", com.skillshare.skillshare.model.skill.SkillCategory.PROGRAMMING, com.skillshare.skillshare.model.skill.SkillProficiency.BEGINNER, skillOwner);
         
         exchangeRequest = new ExchangeRequest(requester, skillOwner, skill, "I want to learn this");
     }
