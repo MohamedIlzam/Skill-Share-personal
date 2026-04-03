@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Requests — SkillShare</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- CSRF tokens for AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #93c5fd;
+            --primary-subtle: #eff6ff;
+            --accent: #6366f1;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-body);
+            background: var(--bg-light);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(148, 163, 184, .15);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        .navbar-brand-text {
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .95rem;
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        .request-card {
+            background: #fff;
+            border: 1px solid rgba(148, 163, 184, .15);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
+            transition: transform 0.2s;
+        }
+
+        .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
+
+        .status-badge {
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 50rem;
+        }
+
+        .status-PENDING { background: #fef3c7; color: #d97706; }
+        .status-ACCEPTED { background: #dcfce7; color: #15803d; }
+        .status-REJECTED { background: #fee2e2; color: #b91c1c; }
+        .status-COMPLETED { background: #e0e7ff; color: #4338ca; }
+
+        .btn-action {
+            border-radius: 50rem;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-action:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar-custom">
+        <div class="container d-flex align-items-center justify-content-between">
+            <span class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/browse}" class="nav-link-custom">Explore</a>
+                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
+                <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
+                <a th:href="@{/requests}" class="nav-link-custom active">Requests</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5 flex-grow-1">
+        
+        <h2 class="fw-bold text-dark mb-4">Exchange Requests</h2>
+
+        <div th:if="${successParam}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successParam}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorParam}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorParam}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <ul class="nav nav-pills mb-4" id="request-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-bold" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
+                    Received Requests
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
+                    Sent Requests
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="request-tabs-content">
+            <!-- Received Requests -->
+            <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox-fill fs-1"></i>
+                    <h5 class="mt-3">No received requests</h5>
+                    <p>You haven't received any exchange requests yet.</p>
+                </div>
+
+                <div th:each="req : ${incomingRequests}" class="request-card">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <span class="status-badge" th:classappend="'status-' + ${req.status}" th:text="${req.status}">PENDING</span>
+                            <h4 class="fw-bold mt-2 text-dark" th:text="${req.skillName}">Graphic Design</h4>
+                            <p class="mb-1 text-muted">Requested by: <strong class="text-dark" th:text="${req.requesterName}">User</strong></p>
+                            <p class="mb-2" th:if="${req.message != null && !req.message.isEmpty()}">
+                                <i class="bi bi-chat-left-text text-primary me-2"></i><span th:text="${req.message}">Message here</span>
+                            </p>
+                            <small class="text-muted" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary btn-action chat-btn" data-bs-toggle="modal" data-bs-target="#chatModal" th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.requesterName}"><i class="bi bi-chat-dots me-1"></i>Chat</button>
+                            <th:block th:if="${req.status.name() == 'PENDING'}">
+                                <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-success btn-action"><i class="bi bi-check-lg me-1"></i>Accept</button>
+                                </form>
+                                <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg me-1"></i>Reject</button>
+                                </form>
+                            </th:block>
+                            <th:block th:if="${req.status.name() == 'ACCEPTED'}">
+                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
+                                </form>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sent Requests -->
+            <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center py-5 text-muted">
+                    <i class="bi bi-send-fill fs-1"></i>
+                    <h5 class="mt-3">No sent requests</h5>
+                    <p>You haven't sent any exchange requests yet.</p>
+                    <a th:href="@{/browse}" class="btn btn-primary rounded-pill mt-2">Browse Skills</a>
+                </div>
+
+                <div th:each="req : ${outgoingRequests}" class="request-card">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <span class="status-badge" th:classappend="'status-' + ${req.status}" th:text="${req.status}">PENDING</span>
+                            <h4 class="fw-bold mt-2 text-dark" th:text="${req.skillName}">Public Speaking</h4>
+                            <p class="mb-1 text-muted">Owner: <strong class="text-dark" th:text="${req.skillOwnerName}">Instructor</strong></p>
+                            <p class="mb-2" th:if="${req.message != null && !req.message.isEmpty()}">
+                                <i class="bi bi-chat-left-text text-primary me-2"></i><span th:text="${req.message}">Message here</span>
+                            </p>
+                            <small class="text-muted" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary btn-action chat-btn" data-bs-toggle="modal" data-bs-target="#chatModal" th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.skillOwnerName}"><i class="bi bi-chat-dots me-1"></i>Chat</button>
+                            <th:block th:if="${req.status.name() == 'ACCEPTED'}">
+                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
+                                    <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
+                                </form>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-center py-4 text-white-50 mt-auto">
+        <small>&copy; 2026 SkillShare Marketplace. All rights reserved.</small>
+    </footer>
+
+    <!-- Chat Modal -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border-radius: 1rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 80vh; max-height: 800px; display: flex; flex-direction: column;">
+                
+                <!-- Header -->
+                <div class="modal-header border-bottom px-4 py-3 bg-light" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="chatModalSkillName">Skill Name</h5>
+                        <small class="text-muted" id="chatModalPartnerName">Exchange with Partner</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Body -->
+                <div class="modal-body p-4 bg-light flex-grow-1" id="chatBody" style="overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="text-center w-100 my-auto text-muted" id="chatLoading">
+                        <div class="spinner-border text-primary mb-2" role="status"></div>
+                        <p>Loading messages...</p>
+                    </div>
+                    <div class="text-center w-100 my-auto text-muted d-none" id="chatEmpty">
+                        <i class="bi bi-chat-dots fs-1 mb-2"></i>
+                        <p>No messages yet. Say hello!</p>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="modal-footer border-top p-3 bg-white" style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                    <form id="chatForm" class="w-100 d-flex gap-2 m-0" onsubmit="event.preventDefault(); sendChatMessage();">
+                        <input type="hidden" id="currentChatRequestId">
+                        <input type="text" class="form-control rounded-pill px-4" id="chatInputMessage" placeholder="Type a message..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" id="chatSendBtn">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inject Current User ID into page for JS side -->
+    <meta id="currentUserIdMeta" th:content="${#authentication.principal.user.id}" />
+
+    <style>
+        .msg-bubble { max-width: 80%; padding: 0.75rem 1.25rem; border-radius: 1rem; position: relative; word-wrap: break-word; }
+        .msg-own { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
+        .msg-other { background: #fff; color: var(--text-dark); align-self: flex-start; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(148, 163, 184, .2); }
+        .msg-time { font-size: 0.75rem; opacity: 0.8; margin-top: 0.25rem; display: block; }
+        .msg-own .msg-time { color: rgba(255,255,255,0.8); text-align: right; }
+        .msg-other .msg-time { color: var(--text-muted); }
+        .participant-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .msg-other .participant-name { color: var(--primary-dark); }
+        
+        @keyframes popupMsg {
+            0% { opacity: 0; transform: translateY(15px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .msg-animate { animation: popupMsg 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const chatModalEl = document.getElementById('chatModal');
+        const chatBody = document.getElementById('chatBody');
+        const chatLoading = document.getElementById('chatLoading');
+        const chatEmpty = document.getElementById('chatEmpty');
+        const chatInputMessage = document.getElementById('chatInputMessage');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const currentChatRequestId = document.getElementById('currentChatRequestId');
+        
+        let currentUserId = document.getElementById('currentUserIdMeta').content;
+
+        if (chatModalEl) {
+            chatModalEl.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const reqId = button.getAttribute('data-request-id');
+                const skillName = button.getAttribute('data-skill-name');
+                const partnerName = button.getAttribute('data-partner-name');
+
+                document.getElementById('chatModalSkillName').textContent = skillName;
+                document.getElementById('chatModalPartnerName').textContent = 'Exchange with ' + partnerName;
+                currentChatRequestId.value = reqId;
+
+                // Reset UI
+                chatInputMessage.value = '';
+                chatLoading.classList.remove('d-none');
+                chatEmpty.classList.add('d-none');
+                
+                // Clear old messages
+                const oldMessages = chatBody.querySelectorAll('.msg-bubble');
+                oldMessages.forEach(el => el.remove());
+
+                // Fetch messages
+                fetch(`/api/requests/${reqId}/messages`)
+                    .then(response => response.json())
+                    .then(data => {
+                        chatLoading.classList.add('d-none');
+                        if (data.length === 0) {
+                            chatEmpty.classList.remove('d-none');
+                        } else {
+                            data.forEach(msg => appendMessage(msg, false));
+                            scrollToBottom();
+                        }
+                    })
+                    .catch(err => {
+                        chatLoading.classList.add('d-none');
+                        console.error('Error fetching messages:', err);
+                        alert('Could not load messages. Please try again.');
+                    });
+            });
+            
+            chatModalEl.addEventListener('shown.bs.modal', function () {
+                chatInputMessage.focus();
+            });
+        }
+
+        function appendMessage(msg, animate = false) {
+            const isOwn = (msg.senderId == currentUserId);
+            
+            const div = document.createElement('div');
+            div.className = `msg-bubble shadow-sm ${isOwn ? 'msg-own' : 'msg-other'} ${animate ? 'msg-animate' : ''}`;
+            
+            let html = '';
+            if (!isOwn) {
+                html += `<div class="participant-name">${msg.senderName}</div>`;
+            }
+            
+            // Format time safely
+            let displayTime = '';
+            if (msg.createdAt) {
+                const date = new Date(msg.createdAt);
+                displayTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
+            }
+            
+            html += `<div>${escapeHtml(msg.content)}</div>`;
+            html += `<span class="msg-time">${displayTime}</span>`;
+            
+            div.innerHTML = html;
+            chatBody.appendChild(div);
+        }
+
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function escapeHtml(unsafe) {
+            return (unsafe || '').replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        function sendChatMessage() {
+            const reqId = currentChatRequestId.value;
+            const content = chatInputMessage.value.trim();
+            if (!content) return;
+
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+            chatSendBtn.disabled = true;
+
+            const payload = { content: content };
+
+            fetch(`/api/requests/${reqId}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                chatSendBtn.disabled = false;
+                if (!response.ok) {
+                    throw new Error('Failed to send');
+                }
+                return response.json();
+            })
+            .then(msg => {
+                chatEmpty.classList.add('d-none');
+                appendMessage(msg, true);
+                chatInputMessage.value = '';
+                scrollToBottom();
+            })
+            .catch(err => {
+                chatSendBtn.disabled = false;
+                console.error(err);
+                alert('Could not send message.');
+            });
+        }
+    </script>
+</body>
+</html>
