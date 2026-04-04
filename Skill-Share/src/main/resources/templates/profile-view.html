@@ -448,6 +448,9 @@
                             <a th:href="@{/profile/exchanges}" class="btn-custom btn-light-primary">
                                 <i class="bi bi-clock-history"></i> Past Exchanges
                             </a>
+                            <a th:href="@{/ratings/user/{id}(id=${profile.id})}" class="btn-custom btn-light-primary">
+                                <i class="bi bi-chat-right-quote"></i> View Reviews
+                            </a>
                         </div>
                         <a th:href="@{/active-users}" class="btn-custom btn-outline"><i class="bi bi-house"></i>Back to Directory</a>
                     </div>

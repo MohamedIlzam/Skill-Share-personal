@@ -393,6 +393,9 @@
                             <button class="btn-custom btn-primary-gradient" th:if="${profile.availabilityStatus.name() == 'AVAILABLE'}">
                                 <i class="bi bi-chat-left-text-fill"></i> Request Exchange
                             </button>
+                            <a th:href="@{/ratings/user/{id}(id=${profile.id})}" class="btn-custom btn-outline" th:if="${ratingSummary.totalRatings > 0}">
+                                <i class="bi bi-chat-right-quote"></i> View Reviews
+                            </a>
                             <button class="btn-custom btn-outline" disabled th:unless="${profile.availabilityStatus.name() == 'AVAILABLE'}">
                                 <i class="bi bi-clock-history"></i> Currently Unavailable
                             </button>
