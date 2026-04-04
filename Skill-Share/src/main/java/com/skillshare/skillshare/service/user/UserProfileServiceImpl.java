@@ -7,7 +7,10 @@ import com.skillshare.skillshare.exception.ResourceNotFoundException;
 import com.skillshare.skillshare.model.user.AvailabilityStatus;
 import com.skillshare.skillshare.model.user.UserProfile;
 import com.skillshare.skillshare.repository.UserProfileRepository;
+import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final com.skillshare.skillshare.repository.UserRepository userRepository;
     private final com.skillshare.skillshare.repository.SkillRepository skillRepository;
+    private final ExchangeRatingRepository exchangeRatingRepository;
     private static final String UPLOAD_DIRECTORY = "src/main/resources/static/images/profiles/";
 
     @Override
@@ -186,6 +190,16 @@ public class UserProfileServiceImpl implements UserProfileService {
             }
         }
 
+        Double averageRating = null;
+        Long totalRatings = 0L;
+        if (profile.getUser() != null) {
+            Double avg = exchangeRatingRepository.getAverageRatingForUser(profile.getUser().getId());
+            totalRatings = exchangeRatingRepository.countRatingsForUser(profile.getUser().getId());
+            if (avg != null && avg > 0) {
+                averageRating = new BigDecimal(avg).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            }
+        }
+
         return PublicUserDTO.builder()
                 .id(profile.getUser() != null ? profile.getUser().getId() : null)
                 .fullName(fullName)
@@ -198,6 +212,8 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .availabilityStatus(availabilityStatus)
                 .mainSkills(mainSkillNames)
                 .otherSkills(otherSkillNames)
+                .averageRating(averageRating)
+                .totalRatings(totalRatings)
                 .build();
     }
 

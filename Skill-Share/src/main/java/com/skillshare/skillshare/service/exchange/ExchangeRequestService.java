@@ -8,6 +8,7 @@ import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
 import com.skillshare.skillshare.model.skill.Skill;
 import com.skillshare.skillshare.model.user.User;
 import com.skillshare.skillshare.repository.ExchangeRequestRepository;
+import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import com.skillshare.skillshare.repository.SkillRepository;
 import com.skillshare.skillshare.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,16 @@ import java.util.stream.Collectors;
 public class ExchangeRequestService {
 
     private final ExchangeRequestRepository exchangeRequestRepository;
+    private final ExchangeRatingRepository exchangeRatingRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
 
     public ExchangeRequestService(ExchangeRequestRepository exchangeRequestRepository,
+            ExchangeRatingRepository exchangeRatingRepository,
             SkillRepository skillRepository,
             UserRepository userRepository) {
         this.exchangeRequestRepository = exchangeRequestRepository;
+        this.exchangeRatingRepository = exchangeRatingRepository;
         this.skillRepository = skillRepository;
         this.userRepository = userRepository;
     }
@@ -94,6 +98,14 @@ public class ExchangeRequestService {
         return mapToDTO(exchangeRequestRepository.save(request));
     }
 
+    @Transactional(readOnly = true)
+    public List<ExchangeRequestResponseDTO> getCompletedExchangesHistory(Long userId) {
+        return exchangeRequestRepository.findExchangeHistoryByUserIdAndStatus(userId, ExchangeRequestStatus.COMPLETED)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     private ExchangeRequest getRequestForOwner(Long requestId, Long skillOwnerId) {
         ExchangeRequest request = exchangeRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exchange request not found"));
@@ -106,6 +118,11 @@ public class ExchangeRequestService {
     }
 
     private ExchangeRequestResponseDTO mapToDTO(ExchangeRequest request) {
+        boolean isRated = false;
+        if (request.getStatus() == ExchangeRequestStatus.COMPLETED) {
+            isRated = exchangeRatingRepository.existsByExchangeIdAndRaterId(request.getId(), request.getRequester().getId());
+        }
+
         return new ExchangeRequestResponseDTO(
                 request.getId(),
                 request.getRequester().getId(),
@@ -117,6 +134,7 @@ public class ExchangeRequestService {
                 request.getMessage(),
                 request.getStatus(),
                 request.getCreatedAt(),
-                request.getUpdatedAt());
+                request.getUpdatedAt(),
+                isRated);
     }
 }

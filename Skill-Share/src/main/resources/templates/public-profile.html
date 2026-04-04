@@ -71,8 +71,13 @@
 
         .profile-card-hero {
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            padding: 3rem 2rem 4rem;
-            text-align: center;
+            padding: 3rem 2.5rem 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            text-align: left;
         }
 
         .profile-avatar-container {
@@ -270,19 +275,44 @@
         <div class="container" style="max-width: 900px;">
             <div class="profile-card">
                 <div class="profile-card-hero">
-                    <div class="profile-avatar-container">
-                        <div class="profile-avatar">
-                            <img th:if="${profile.profilePictureUrl}" th:src="${profile.profilePictureUrl}"
-                                alt="Avatar">
-                            <i th:unless="${profile.profilePictureUrl}" class="bi bi-person-fill"></i>
+                    <div class="d-flex align-items-center gap-4 flex-wrap">
+                        <div class="profile-avatar-container m-0 flex-shrink-0" style="width: 120px; height: 120px;">
+                            <div class="profile-avatar w-100 h-100 m-0">
+                                <img th:if="${profile.profilePictureUrl}" th:src="${profile.profilePictureUrl}" alt="Avatar">
+                                <i th:unless="${profile.profilePictureUrl}" class="bi bi-person-fill"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 th:text="${profile.fullName}" style="text-align: left;">John Doe</h2>
+                            <p th:text="${profile.email}" class="mb-2" style="text-align: left; color: rgba(255, 255, 255, 0.85); font-weight: 500; font-size: 1.1rem; margin-top: -0.25rem;">john@example.com</p>
+                            
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <div th:class="'status-badge m-0 ' + (${profile.availabilityStatus.name() == 'AVAILABLE'} ? 'status-available' : 'status-unavailable')">
+                                    <i th:class="'bi ' + (${profile.availabilityStatus.name() == 'AVAILABLE'} ? 'bi-circle-fill' : 'bi-dash-circle-fill')"></i>
+                                    <span th:text="${profile.availabilityStatus}">AVAILABLE</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <h2 th:text="${profile.fullName}">John Doe</h2>
-                    <p th:text="${profile.email}" style="color: rgba(255, 255, 255, 0.85); font-weight: 500; font-size: 1.1rem; margin-top: -0.25rem;">john@example.com</p>
                     
-                    <div th:class="'status-badge ' + (${profile.availabilityStatus.name() == 'AVAILABLE'} ? 'status-available' : 'status-unavailable')">
-                        <i th:class="'bi ' + (${profile.availabilityStatus.name() == 'AVAILABLE'} ? 'bi-circle-fill' : 'bi-dash-circle-fill')"></i>
-                        <span th:text="${profile.availabilityStatus}">AVAILABLE</span>
+                    <div th:if="${ratingSummary.totalRatings > 0}" class="d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); min-width: 140px; backdrop-filter: blur(4px);">
+                        <div class="display-6 fw-bold text-white mb-1 d-flex align-items-center">
+                            <i class="bi bi-star-fill text-warning me-2" style="font-size: 1.5rem;"></i>
+                            <span th:text="${ratingSummary.averageRating}">4.5</span>
+                        </div>
+                        <div class="text-white" style="font-size: 0.85rem; font-weight: 500;">
+                            <span th:text="${ratingSummary.totalRatings}">0</span> Reviews
+                        </div>
+                    </div>
+
+                    <div th:if="${ratingSummary.totalRatings == 0}" class="d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm" style="background: rgba(255,255,255,0.08); border: 1px dashed rgba(255,255,255,0.25); min-width: 140px; backdrop-filter: blur(4px);">
+                        <div class="display-6 fw-bold text-white-50 mb-1 d-flex align-items-center">
+                            <i class="bi bi-star text-white-50 me-2" style="font-size: 1.5rem;"></i>
+                            <span>0.0</span>
+                        </div>
+                        <div class="text-white-50" style="font-size: 0.85rem; font-weight: 500;">
+                            No ratings yet
+                        </div>
                     </div>
                 </div>
 
@@ -321,7 +351,7 @@
                     <div class="d-flex flex-wrap gap-2 mb-4" th:if="${not #lists.isEmpty(profile.mainSkills)}">
                         <div th:each="skill : ${profile.mainSkills}" class="badge rounded-pill px-3 py-2 border d-flex align-items-center gap-2" 
                              style="background: #fff; color: var(--text-dark); border-color: var(--primary-light) !important;">
-                            <i class="bi bi-star-fill text-warning" style="font-size: 0.8rem;"></i>
+                            <i class="bi bi-pin-angle-fill text-success" style="font-size: 0.8rem;"></i>
                             <span th:text="${skill}" class="fw-bold">Skill Name</span>
                         </div>
                     </div>
@@ -338,11 +368,34 @@
                         </div>
                     </div>
 
+                    <div th:if="${not #lists.isEmpty(userReviews)}">
+                        <div class="section-title mt-4 mb-3">Recent Reviews</div>
+                        <div th:each="review : ${userReviews}" class="d-flex gap-3 mb-3 p-3 bg-white rounded-4 border shadow-sm" th:if="${not #strings.isEmpty(review.reviewMessage)}">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary border" style="width: 48px; height: 48px; flex-shrink: 0; overflow: hidden;">
+                                <img th:if="${review.raterProfilePictureUrl}" th:src="${review.raterProfilePictureUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                                <i th:unless="${review.raterProfilePictureUrl}" class="bi bi-person-fill fs-4"></i>
+                            </div>
+                            <div class="w-100">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <strong class="text-dark" th:text="${review.raterName}">User</strong>
+                                        <span class="badge bg-warning text-dark border border-warning" style="font-size: 0.70rem;"><i class="bi bi-star-fill me-1"></i>[[${review.ratingScore}]] / 5</span>
+                                    </div>
+                                    <small class="text-muted fw-bold" th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}"></small>
+                                </div>
+                                <p class="mb-0 mt-2 text-body" th:text="${review.reviewMessage}" style="font-size: 0.95rem; line-height: 1.5;"></p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-4 border-top">
                         <div class="d-flex gap-3">
                             <button class="btn-custom btn-primary-gradient" th:if="${profile.availabilityStatus.name() == 'AVAILABLE'}">
                                 <i class="bi bi-chat-left-text-fill"></i> Request Exchange
                             </button>
+                            <a th:href="@{/ratings/user/{id}(id=${profile.id})}" class="btn-custom btn-outline" th:if="${ratingSummary.totalRatings > 0}">
+                                <i class="bi bi-chat-right-quote"></i> View Reviews
+                            </a>
                             <button class="btn-custom btn-outline" disabled th:unless="${profile.availabilityStatus.name() == 'AVAILABLE'}">
                                 <i class="bi bi-clock-history"></i> Currently Unavailable
                             </button>

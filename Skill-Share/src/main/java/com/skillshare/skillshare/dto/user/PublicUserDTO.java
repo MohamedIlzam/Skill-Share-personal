@@ -22,6 +22,8 @@ public class PublicUserDTO {
     private String phoneNumber;
     private String profilePictureUrl;
     private AvailabilityStatus availabilityStatus;
-    private List<String> mainSkills; // Names of the main skills
-    private List<String> otherSkills; // Names of other skills
+    private List<String> mainSkills;
+    private List<String> otherSkills;
+    private Double averageRating;
+    private Long totalRatings;
 }

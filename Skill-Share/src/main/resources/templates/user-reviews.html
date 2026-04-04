@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="User Reviews — See what others are saying.">
+    <title th:text="${profile.fullName + ' - Reviews | SkillShare'}">User Reviews — SkillShare</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #93c5fd;
+            --primary-subtle: #eff6ff;
+            --accent: #6366f1;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: rgba(148, 163, 184, .15);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, .08), 0 4px 8px rgba(0, 0, 0, .04);
+            --radius: 1rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-body);
+            background: var(--bg-light);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--card-border);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        .nav-link-custom {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .95rem;
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: color .2s, background .2s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        .navbar-brand-text {
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -.02em;
+        }
+
+        .reviews-page {
+            padding: 3rem 1rem 4rem;
+            background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 50%, #eff6ff 100%);
+            min-height: calc(100vh - 140px);
+        }
+
+        .reviews-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .user-header-card {
+            background: #fff;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-subtle);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            overflow: hidden;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .rating-badge {
+            background: #fffbeb;
+            color: #b45309;
+            padding: 0.5rem 1rem;
+            border-radius: 50rem;
+            font-weight: 700;
+            border: 1px solid #fde68a;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-card {
+            background: #fff;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+
+        .rater-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .rater-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pagination-container {
+            margin-top: 2rem;
+        }
+
+        .page-link-custom {
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            color: var(--text-body);
+            border: 1px solid var(--card-border);
+            text-decoration: none;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .page-link-custom:hover:not(.disabled) {
+            background: var(--primary-subtle);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        .page-link-custom.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .page-link-custom.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: #fff;
+            border-radius: var(--radius);
+            border: 2px dashed var(--card-border);
+        }
+
+        .btn-custom {
+            border-radius: 50rem;
+            padding: 0.7rem 1.8rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-outline {
+            border: 1.5px solid var(--card-border);
+            background: #fff;
+            color: var(--text-body);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background: var(--text-dark);
+            color: #94a3b8;
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: .88rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand-text">
+                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/active-users}" class="nav-link-custom">Explore</a>
+                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
+                <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
+                <a th:href="@{/requests}" class="nav-link-custom">Requests</a>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <form th:action="@{/logout}" method="post"><button type="submit"
+                        class="btn btn-sm btn-outline-danger rounded-pill"><i
+                            class="bi bi-box-arrow-right me-1"></i>Logout</button></form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="reviews-page">
+        <div class="reviews-container">
+            <!-- User Header -->
+            <div class="user-header-card">
+                <div class="user-avatar">
+                    <img th:if="${profile.profilePictureUrl}" th:src="${profile.profilePictureUrl}" alt="Avatar">
+                    <i th:unless="${profile.profilePictureUrl}" class="bi bi-person-fill"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h2 class="mb-1 fw-bold" th:text="${profile.fullName}">John Doe</h2>
+                    <p class="text-muted mb-2" th:text="${profile.university}">University Name</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rating-badge">
+                            <i class="bi bi-star-fill"></i>
+                            <span th:text="${profile.averageRating ?: '0.0'}">4.5</span>
+                        </div>
+                        <span class="text-muted fw-medium" th:text="${totalItems + ' Reviews'}">12 Reviews</span>
+                    </div>
+                </div>
+                <div>
+                     <a th:href="@{/profile/{id}(id=${profile.id})}" class="btn-custom btn-outline">
+                        <i class="bi bi-person"></i> View Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reviews List -->
+            <div th:if="${not #lists.isEmpty(reviewsPage.content)}">
+                <div th:each="review : ${reviewsPage.content}" class="review-card d-flex gap-3">
+                    <div class="rater-avatar">
+                        <img th:if="${review.raterProfilePictureUrl}" th:src="${review.raterProfilePictureUrl}" alt="Rater">
+                        <i th:unless="${review.raterProfilePictureUrl}" class="bi bi-person-fill fs-4 text-secondary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong class="text-dark" th:text="${review.raterName}">User Name</strong>
+                                <div class="text-warning mt-1" style="font-size: 0.85rem;">
+                                    <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                                       th:class="${i <= review.ratingScore} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
+                                </div>
+                            </div>
+                            <small class="text-muted fw-bold" th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}">Date</small>
+                        </div>
+                        <p class="mb-0 text-body" th:text="${review.reviewMessage}" style="line-height: 1.6;"></p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${totalPages > 1}" class="pagination-container d-flex justify-content-between align-items-center bg-white p-3 rounded-4 border shadow-sm">
+                    <div class="text-muted small fw-medium">
+                        Showing [[${currentPage * reviewsPage.size + 1}]] - [[${T(java.lang.Math).min((currentPage + 1) * reviewsPage.size, totalItems)}]] of [[${totalItems}]]
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/ratings/user/{id}(id=${profile.id}, page=${currentPage - 1})}" 
+                           th:class="'page-link-custom ' + (${currentPage == 0} ? 'disabled' : '')"
+                           th:attr="aria-disabled=${currentPage == 0}">
+                           <i class="bi bi-chevron-left me-1"></i> Previous
+                        </a>
+                        <a th:href="@{/ratings/user/{id}(id=${profile.id}, page=${currentPage + 1})}" 
+                           th:class="'page-link-custom ' + (${currentPage + 1 == totalPages} ? 'disabled' : '')"
+                           th:attr="aria-disabled=${currentPage + 1 == totalPages}">
+                           Next <i class="bi bi-chevron-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(reviewsPage.content)}" class="empty-state">
+                <i class="bi bi-chat-left-dots text-muted display-4 mb-3 d-block"></i>
+                <h4 class="fw-bold text-dark">No reviews yet</h4>
+                <p class="text-muted">This user hasn't received any feedback from skill exchanges yet.</p>
+                <a th:href="@{/active-users}" class="btn-custom btn-outline mt-2">Explore Active Users</a>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <a th:href="@{/active-users}" class="btn btn-link text-muted text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Directory
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 SkillShare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

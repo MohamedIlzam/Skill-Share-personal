@@ -3,6 +3,7 @@ package com.skillshare.skillshare.controller.web;
 import com.skillshare.skillshare.dto.user.UserProfileDTO;
 import com.skillshare.skillshare.dto.user.UserProfileUpdateDTO;
 import com.skillshare.skillshare.security.CustomUserDetails;
+import com.skillshare.skillshare.service.exchange.ExchangeRatingService;
 import com.skillshare.skillshare.service.user.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequiredArgsConstructor
 public class ProfileController {
-
     private final UserProfileService userProfileService;
     private final com.skillshare.skillshare.service.skill.SkillService skillService;
+    private final ExchangeRatingService exchangeRatingService;
 
     @GetMapping("/profile")
     public String showProfile(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -41,10 +42,11 @@ public class ProfileController {
                 otherSkills.add(skill);
             }
         }
-        
         model.addAttribute("profile", profile);
         model.addAttribute("mainSkills", mainSkills);
         model.addAttribute("otherSkills", otherSkills);
+        model.addAttribute("ratingSummary", exchangeRatingService.getUserRatingSummary(userId));
+        model.addAttribute("userReviews", exchangeRatingService.getUserReviews(userId));
         return "profile-view";
     }
 
