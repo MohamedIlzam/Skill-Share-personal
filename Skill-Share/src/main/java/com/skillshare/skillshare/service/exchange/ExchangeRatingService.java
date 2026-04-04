@@ -10,6 +10,10 @@ import com.skillshare.skillshare.model.user.User;
 import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,5 +103,25 @@ public class ExchangeRatingService {
             dto.setCreatedAt(r.getCreatedAt());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RatingResponseDTO> getPaginatedUserReviews(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<ExchangeRating> ratingsPage = ratingRepository.findByRatedUserId(userId, pageable);
+        
+        return ratingsPage.map(r -> {
+            RatingResponseDTO dto = new RatingResponseDTO();
+            dto.setId(r.getId());
+            dto.setRaterId(r.getRater().getId());
+            dto.setRaterName(r.getRater().getFullName());
+            if (r.getRater().getProfile() != null) {
+                dto.setRaterProfilePictureUrl(r.getRater().getProfile().getProfilePictureUrl());
+            }
+            dto.setRatingScore(r.getRatingScore());
+            dto.setReviewMessage(r.getReviewMessage());
+            dto.setCreatedAt(r.getCreatedAt());
+            return dto;
+        });
     }
 }

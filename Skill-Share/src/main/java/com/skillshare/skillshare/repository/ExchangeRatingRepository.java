@@ -18,4 +18,6 @@ public interface ExchangeRatingRepository extends JpaRepository<ExchangeRating, 
     Long countRatingsForUser(@Param("userId") Long userId);
 
     List<ExchangeRating> findByRatedUserIdOrderByCreatedAtDesc(Long ratedUserId);
+    
+    org.springframework.data.domain.Page<ExchangeRating> findByRatedUserId(Long ratedUserId, org.springframework.data.domain.Pageable pageable);
 }
