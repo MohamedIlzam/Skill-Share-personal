@@ -3,10 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="view-transition" content="same-origin" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SkillShare">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="apple-touch-icon" href="/icons/icon-512.png">
+    <link rel="manifest" href="/manifest.json">
     <title>Login — SkillShare</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" th:href="@{/css/glass-login.css}">
+    <link rel="stylesheet" th:href="@{/css/pwa.css}">
     <style>
         .pw-wrapper {
             position: relative;
@@ -105,6 +113,17 @@
             </div>
         </div>
     </div>
+    <div id="ios-install-prompt">
+        <div class="d-flex align-items-center gap-3">
+            <img src="/icons/icon-512.png" width="45" height="45" style="border-radius: 10px;">
+            <div class="flex-grow-1">
+                <h6 class="mb-0 fw-bold">Install SkillShare</h6>
+                <p class="mb-0 small text-muted">Tap <i class="bi bi-share"></i> and then "Add to Home Screen" to use it as an app.</p>
+            </div>
+            <button class="btn-close" onclick="document.getElementById('ios-install-prompt').style.display='none'"></button>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/pwa.js}"></script>
 </body>
-
 </html>
