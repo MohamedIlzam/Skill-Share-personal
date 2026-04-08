@@ -3,6 +3,7 @@ package com.skillshare.skillshare.controller.web;
 import com.skillshare.skillshare.dto.user.PublicUserDTO;
 import com.skillshare.skillshare.security.CustomUserDetails;
 import com.skillshare.skillshare.service.exchange.ExchangeRatingService;
+import com.skillshare.skillshare.service.skill.SkillService;
 import com.skillshare.skillshare.service.user.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ public class ActiveUsersController {
 
     private final UserProfileService userProfileService;
     private final ExchangeRatingService exchangeRatingService;
+    private final SkillService skillService;
 
     @GetMapping("/active-users")
     public String listActiveUsers(
@@ -67,6 +69,12 @@ public class ActiveUsersController {
         model.addAttribute("profile", publicProfile);
         model.addAttribute("ratingSummary", exchangeRatingService.getUserRatingSummary(userId));
         model.addAttribute("userReviews", exchangeRatingService.getUserReviews(userId));
+
+        java.util.Set<Long> mainSkillIds = userProfileService.getProfileByUserId(userId).getMainSkillIds();
+        java.util.List<com.skillshare.skillshare.model.skill.Skill> availableSkills = skillService.getSkillsByUser(userId).stream()
+                .filter(skill -> mainSkillIds != null && mainSkillIds.contains(skill.getId()))
+                .collect(java.util.stream.Collectors.toList());
+        model.addAttribute("availableSkills", availableSkills);
         
         return "public-profile";
     }
