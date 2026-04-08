@@ -1,0 +1,98 @@
+/* PWA App Shell stylesheet */
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --ios-nav-height: 50px;
+    --ios-tabbar-height: 65px;
+}
+
+body.pwa-standalone {
+    background-color: var(--bg-light);
+    margin: 0;
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: calc(var(--safe-area-inset-bottom) + var(--ios-tabbar-height));
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Standalone adjustments */
+@media all and (display-mode: standalone) {
+    .navbar-custom {
+        padding-top: var(--safe-area-inset-top);
+        position: fixed;
+        width: 100%;
+        top: 0;
+    }
+
+    body {
+        padding-top: calc(70px + var(--safe-area-inset-top));
+    }
+}
+
+/* Bottom Tab Bar for iOS PWA */
+.pwa-tabbar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--ios-tabbar-height) + var(--safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    z-index: 2000;
+    padding-bottom: var(--safe-area-inset-bottom);
+    justify-content: space-around;
+    align-items: center;
+}
+
+@media all and (display-mode: standalone) {
+    .pwa-tabbar {
+        display: flex;
+    }
+    
+    .footer {
+        display: none; /* Hide footer in standalone mode to use tabbar */
+    }
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.tab-item.active {
+    color: var(--primary);
+}
+
+.tab-item i {
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+/* Install Prompt styling */
+#ios-install-prompt {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 3000;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

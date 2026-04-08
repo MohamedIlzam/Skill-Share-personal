@@ -6,6 +6,7 @@ import com.skillshare.skillshare.model.exchange.ExchangeRequest;
 import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
 import com.skillshare.skillshare.model.skill.Skill;
 import com.skillshare.skillshare.model.user.User;
+import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.SkillRepository;
 import com.skillshare.skillshare.repository.UserRepository;
@@ -35,6 +36,9 @@ class ExchangeRequestServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ExchangeRatingRepository exchangeRatingRepository;
 
     @InjectMocks
     private ExchangeRequestService exchangeRequestService;
