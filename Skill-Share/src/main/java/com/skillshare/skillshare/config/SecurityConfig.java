@@ -10,8 +10,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    private final com.skillshare.skillshare.security.CustomAuthenticationSuccessHandler successHandler;
+
+    public SecurityConfig(com.skillshare.skillshare.security.CustomAuthenticationSuccessHandler successHandler) {
+        this.successHandler = successHandler;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 // Disable CSRF purely for API (swagger testing) endpoints, keep enabled for
                                 // everything else (web forms)
@@ -32,13 +38,15 @@ public class SecurityConfig {
                                                                 "/js/**",
                                                                 "/images/**")
                                                 .permitAll()
+                                                // Admin endpoints
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 // Protected endpoints (everything else including /profile)
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .usernameParameter("email") // Login via email
                                                 .passwordParameter("password")
-                                                .defaultSuccessUrl("/active-users", true)
+                                                .successHandler(successHandler)
                                                 .failureUrl("/login?error")
                                                 .permitAll())
                                 .logout(logout -> logout

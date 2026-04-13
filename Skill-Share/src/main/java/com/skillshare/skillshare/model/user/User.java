@@ -31,6 +31,10 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserStatus status = UserStatus.ACTIVE;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -82,6 +86,8 @@ public class User {
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
     public Role getRole() { return role; }
+    public UserStatus getStatus() { return status; }
+    public void setStatus(UserStatus status) { this.status = status; }
     public UserProfile getProfile() { return profile; }
     public void setProfile(UserProfile profile) { this.profile = profile; }
     public Instant getCreatedAt() { return createdAt; }
