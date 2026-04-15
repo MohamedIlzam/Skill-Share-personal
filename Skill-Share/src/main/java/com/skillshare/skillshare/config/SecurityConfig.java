@@ -11,9 +11,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final com.skillshare.skillshare.security.CustomAuthenticationSuccessHandler successHandler;
+    private final com.skillshare.skillshare.security.CustomAuthenticationFailureHandler failureHandler;
 
-    public SecurityConfig(com.skillshare.skillshare.security.CustomAuthenticationSuccessHandler successHandler) {
+    public SecurityConfig(com.skillshare.skillshare.security.CustomAuthenticationSuccessHandler successHandler,
+                          com.skillshare.skillshare.security.CustomAuthenticationFailureHandler failureHandler) {
         this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
     }
 
     @Bean
@@ -47,7 +50,7 @@ public class SecurityConfig {
                                                 .usernameParameter("email") // Login via email
                                                 .passwordParameter("password")
                                                 .successHandler(successHandler)
-                                                .failureUrl("/login?error")
+                                                .failureHandler(failureHandler)
                                                 .permitAll())
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")

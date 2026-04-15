@@ -71,6 +71,9 @@
                 <div th:if="${param.error}" class="alert alert-error">
                     Invalid email or password.
                 </div>
+                <div th:if="${param.disabled}" class="alert alert-error">
+                    Your account has been deactivated.
+                </div>
                 <div th:if="${param.logout}" class="alert alert-success">
                     You have been logged out.
                 </div>
