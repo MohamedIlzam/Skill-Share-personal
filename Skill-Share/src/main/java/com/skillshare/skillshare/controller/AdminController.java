@@ -3,6 +3,7 @@ package com.skillshare.skillshare.controller;
 import com.skillshare.skillshare.model.message.SystemMessage;
 import com.skillshare.skillshare.model.user.User;
 import com.skillshare.skillshare.model.user.UserStatus;
+import com.skillshare.skillshare.model.user.Role;
 import com.skillshare.skillshare.repository.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -52,6 +53,12 @@ public class AdminController {
         } else {
             users = userRepository.findAll();
         }
+        
+        // Filter out administrators so they do not show up on the admin pages
+        users = users.stream()
+                .filter(u -> u.getRole() != Role.ADMIN)
+                .collect(java.util.stream.Collectors.toList());
+
         model.addAttribute("users", users);
         model.addAttribute("searchQuery", query);
         return "admin-users";
