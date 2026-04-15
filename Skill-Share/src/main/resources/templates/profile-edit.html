@@ -62,6 +62,16 @@
     <main class="edit-page">
         <div class="container" style="max-width: 650px;">
             <div class="edit-card">
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <h2 class="header-title">
                     <i class="bi bi-pencil-square text-primary"></i>
                     Update Your Profile
@@ -136,6 +146,38 @@
                     <div class="d-flex gap-3 pt-3">
                         <button type="submit" class="btn-custom btn-primary-gradient flex-grow-1">Save Profile Changes</button>
                         <a th:href="@{/profile}" class="btn-custom btn-cancel">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="edit-card mt-4">
+                <h2 class="header-title">
+                    <i class="bi bi-shield-lock text-primary"></i>
+                    Change Password
+                </h2>
+
+                <form th:action="@{/profile/password}" th:object="${changePasswordDTO}" method="post">
+                    <div class="mb-4">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" th:field="*{currentPassword}" class="form-control" th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid' : ''" placeholder="Enter current password">
+                        <div class="error-message" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" th:field="*{newPassword}" class="form-control" th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid' : ''" placeholder="Enter new password">
+                        <div class="error-message" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                        <div class="form-text mt-2">Password must be at least 8 characters long.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" th:field="*{confirmPassword}" class="form-control" th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''" placeholder="Confirm new password">
+                        <div class="error-message" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                    </div>
+
+                    <div class="d-flex pt-3">
+                        <button type="submit" class="btn-custom btn-primary-gradient">Update Password</button>
                     </div>
                 </form>
             </div>

@@ -92,4 +92,8 @@ public class User {
     public void setProfile(UserProfile profile) { this.profile = profile; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+
+    public void updatePassword(String newPasswordHash) {
+        this.passwordHash = requireNonBlank(newPasswordHash, "newPasswordHash");
+    }
 }

@@ -35,4 +35,26 @@ public class AuthServiceImpl implements AuthService {
 
         return userRepository.save(user);
     }
+
+    @Override
+    public void changePassword(Long userId, com.skillshare.skillshare.dto.auth.ChangePasswordDTO request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new com.skillshare.skillshare.exception.ResourceNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Incorrect current password.");
+        }
+
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("New password cannot be the same as the current password.");
+        }
+
+        if (!request.isPasswordMatch()) {
+            throw new IllegalArgumentException("New password and confirm password do not match.");
+        }
+
+        String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
+        user.updatePassword(encodedNewPassword);
+        userRepository.save(user);
+    }
 }

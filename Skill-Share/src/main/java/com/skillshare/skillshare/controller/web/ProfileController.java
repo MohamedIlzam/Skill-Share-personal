@@ -22,6 +22,7 @@ public class ProfileController {
     private final UserProfileService userProfileService;
     private final com.skillshare.skillshare.service.skill.SkillService skillService;
     private final ExchangeRatingService exchangeRatingService;
+    private final com.skillshare.skillshare.service.auth.AuthService authService;
 
     @GetMapping("/profile")
     public String showProfile(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -67,6 +68,11 @@ public class ProfileController {
         // Fetch all user skills for the selection list
         model.addAttribute("allSkills", skillService.getSkillsByUser(userId));
         model.addAttribute("profileUpdateDTO", updateDTO);
+        
+        if (!model.containsAttribute("changePasswordDTO")) {
+             model.addAttribute("changePasswordDTO", new com.skillshare.skillshare.dto.auth.ChangePasswordDTO());
+        }
+        
         return "profile-edit";
     }
 
@@ -98,6 +104,31 @@ public class ProfileController {
     public String toggleAvailability(@AuthenticationPrincipal CustomUserDetails userDetails, RedirectAttributes redirectAttributes) {
         userProfileService.toggleAvailability(userDetails.getUser().getId());
         redirectAttributes.addFlashAttribute("successMessage", "Availability status updated!");
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/password")
+    public String changePassword(
+            @Valid @ModelAttribute("changePasswordDTO") com.skillshare.skillshare.dto.auth.ChangePasswordDTO changePasswordDTO,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+                
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO);
+            return "redirect:/profile/edit";
+        }
+
+        try {
+            authService.changePassword(userDetails.getUser().getId(), changePasswordDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "Password changed successfully!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO);
+            return "redirect:/profile/edit";
+        }
+
         return "redirect:/profile";
     }
 }
