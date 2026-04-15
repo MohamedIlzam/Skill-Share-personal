@@ -31,4 +31,9 @@ public class SkillSpecifications {
         return (root, query, cb) -> cb.equal(root.get("owner").get("profile").get("availabilityStatus"), 
                 com.skillshare.skillshare.model.user.AvailabilityStatus.AVAILABLE);
     }
+
+    public static Specification<Skill> excludeAdmins() {
+        return (root, query, cb) -> cb.notEqual(root.get("owner").get("role"), 
+                com.skillshare.skillshare.model.user.Role.ADMIN);
+    }
 }

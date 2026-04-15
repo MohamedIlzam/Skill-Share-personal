@@ -23,6 +23,7 @@ public class ActiveUsersController {
     private final UserProfileService userProfileService;
     private final ExchangeRatingService exchangeRatingService;
     private final SkillService skillService;
+    private final com.skillshare.skillshare.repository.UserRepository userRepository;
 
     @GetMapping("/active-users")
     public String listActiveUsers(
@@ -66,6 +67,13 @@ public class ActiveUsersController {
             return "redirect:/profile";
         }
         PublicUserDTO publicProfile = userProfileService.getPublicProfile(userId);
+        
+        // Prevent viewing profiles of administrators
+        com.skillshare.skillshare.model.user.User targetUser = userRepository.findById(userId).orElseThrow();
+        if (targetUser.getRole() == com.skillshare.skillshare.model.user.Role.ADMIN) {
+             throw new com.skillshare.skillshare.exception.ResourceNotFoundException("User not found with ID: " + userId);
+        }
+
         model.addAttribute("profile", publicProfile);
         model.addAttribute("ratingSummary", exchangeRatingService.getUserRatingSummary(userId));
         model.addAttribute("userReviews", exchangeRatingService.getUserReviews(userId));
