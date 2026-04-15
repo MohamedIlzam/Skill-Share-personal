@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import com.skillshare.skillshare.model.skill.Skill;
 
 @Controller
 @RequestMapping("/admin")
@@ -62,13 +63,12 @@ public class AdminController {
         model.addAttribute("userProfile", user.getProfile());
         model.addAttribute("targetUser", user);
         
-        // Count skills logically
-        long skillsCount = skillRepository.findAllByOwnerId(id).size();
-        model.addAttribute("skillsCount", skillsCount);
+        List<Skill> userSkills = skillRepository.findAllByOwnerId(id);
+        model.addAttribute("skillsCount", userSkills.size());
+        model.addAttribute("userSkills", userSkills);
 
-        // Fetch ratings logic
-        // This is simplified based on existing repositories. Assume we have a method or just handle it if needed.
-        // Actually, we can just get average from service if we had one. Let's just pass user.
+        Long totalRatings = exchangeRatingRepository.countRatingsForUser(id);
+        model.addAttribute("totalRatings", totalRatings != null ? totalRatings : 0L);
 
         return "admin-user-profile";
     }

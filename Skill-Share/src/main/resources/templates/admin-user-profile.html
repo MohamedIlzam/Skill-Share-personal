@@ -77,7 +77,7 @@
                             <span class="text-muted small text-uppercase">Listed Skills</span>
                         </div>
                         <div class="stat-box">
-                            <h3 class="fw-bold fs-4 mb-0" th:text="${targetUser.profile != null ? targetUser.profile.totalRatings : 0}">0</h3>
+                            <h3 class="fw-bold fs-4 mb-0" th:text="${totalRatings}">0</h3>
                             <span class="text-muted small text-uppercase">Total Ratings</span>
                         </div>
                     </div>
@@ -93,8 +93,8 @@
                         <div class="mt-4">
                             <h6 class="fw-bold">Offered Skills Summary</h6>
                             <div>
-                                <span th:if="${userProfile == null || userProfile.mainSkills.isEmpty()}" class="text-muted fst-italic">No skills listed.</span>
-                                <span th:each="skill : ${userProfile != null ? userProfile.mainSkills : null}" class="badge bg-light text-dark border me-2 mb-2 p-2 px-3 rounded-pill" th:text="${skill}">Skill</span>
+                                <span th:if="${#lists.isEmpty(userSkills)}" class="text-muted fst-italic">No skills listed.</span>
+                                <span th:each="skill : ${userSkills}" class="badge bg-light text-dark border me-2 mb-2 p-2 px-3 rounded-pill" th:text="${skill.name}">Skill</span>
                             </div>
                         </div>
                     </div>
