@@ -40,18 +40,25 @@ public class BrowseSkillsController {
                                @RequestParam(name = "category", required = false) SkillCategory category,
                                @RequestParam(name = "proficiency", required = false) SkillProficiency proficiency,
                                @RequestParam(name = "sort", defaultValue = "newest") String sort,
+                               @RequestParam(value = "page", defaultValue = "0") int page,
+                               @RequestParam(value = "size", defaultValue = "13") int size,
                                Model model) {
         
         Long currentUserId = userDetails.getUser().getId();
         
-        List<Skill> skills = skillService.getFilteredSkills(currentUserId, query, category, proficiency, sort);
+        org.springframework.data.domain.Page<Skill> skillPage = skillService.getFilteredSkills(
+            currentUserId, query, category, proficiency, sort, org.springframework.data.domain.PageRequest.of(page, size)
+        );
 
         Set<Long> requestedSkillIds = exchangeRequestService.getOutgoingRequests(currentUserId).stream()
                 .filter(req -> req.getStatus() == ExchangeRequestStatus.PENDING || req.getStatus() == ExchangeRequestStatus.ACCEPTED)
                 .map(ExchangeRequestResponseDTO::getSkillId)
                 .collect(Collectors.toSet());
 
-        model.addAttribute("skills", skills);
+        model.addAttribute("skills", skillPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", skillPage.getTotalPages());
+        model.addAttribute("totalItems", skillPage.getTotalElements());
         model.addAttribute("requestedSkillIds", requestedSkillIds);
         model.addAttribute("searchQuery", query);
         model.addAttribute("selectedCategory", category);

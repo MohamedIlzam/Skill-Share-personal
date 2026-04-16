@@ -5,6 +5,9 @@ import com.skillshare.skillshare.model.skill.Skill;
 import com.skillshare.skillshare.model.skill.SkillCategory;
 import com.skillshare.skillshare.model.skill.SkillProficiency;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface SkillService {
@@ -18,7 +21,7 @@ public interface SkillService {
     Skill getSkillByIdForUser(Long userId, Long skillId);
 
     // --- Browse / Search (Feature 3 & 5) ---
-    List<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy);
+    Page<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy, Pageable pageable);
 
     // --- Update ---
     Skill updateSkill(Long userId, Long skillId, SkillRequest request);
