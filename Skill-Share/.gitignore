@@ -35,3 +35,7 @@ build/
 # Temporary logs and DB output files
 *.log
 *.txt
+
+# Node / JS
+node_modules/
+package-lock.json

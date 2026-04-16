@@ -89,7 +89,7 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy) {
+    public org.springframework.data.domain.Page<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy, org.springframework.data.domain.Pageable pageable) {
         // Chain the specifications naturally
         Specification<Skill> spec = Specification.where(SkillSpecifications.excludeOwner(currentUserId))
                 .and(SkillSpecifications.hasName(keyword))
@@ -124,6 +124,10 @@ public class SkillServiceImpl implements SkillService {
         } else if ("lowest-proficiency".equalsIgnoreCase(sortBy)) {
             skills.sort((a, b) -> a.getProficiency().ordinal() - b.getProficiency().ordinal());
         }
-        return skills;
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), skills.size());
+        List<Skill> pagedList = start > skills.size() ? new java.util.ArrayList<>() : skills.subList(start, end);
+        return new org.springframework.data.domain.PageImpl<>(pagedList, pageable, skills.size());
     }
 }

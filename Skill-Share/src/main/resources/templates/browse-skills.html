@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="view-transition" content="same-origin" />
@@ -626,6 +627,26 @@
                 </div>
 
             </div>
+
+            <!-- Pagination -->
+            <nav th:if="${totalPages > 1}" class="pagination-container d-flex justify-content-center mt-5">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="@{/browse(page=${currentPage - 1}, q=${searchQuery}, category=${selectedCategory != null ? selectedCategory : ''}, proficiency=${selectedProficiency != null ? selectedProficiency : ''}, sort=${selectedSort != null ? selectedSort : ''})}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link"
+                            th:href="@{/browse(page=${i}, q=${searchQuery}, category=${selectedCategory != null ? selectedCategory : ''}, proficiency=${selectedProficiency != null ? selectedProficiency : ''}, sort=${selectedSort != null ? selectedSort : ''})}"
+                            th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="@{/browse(page=${currentPage + 1}, q=${searchQuery}, category=${selectedCategory != null ? selectedCategory : ''}, proficiency=${selectedProficiency != null ? selectedProficiency : ''}, sort=${selectedSort != null ? selectedSort : ''})}">Next</a>
+                    </li>
+                </ul>
+            </nav>
 
         </div>
     </main>
