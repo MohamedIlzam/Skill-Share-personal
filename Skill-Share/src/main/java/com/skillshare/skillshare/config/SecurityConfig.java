@@ -4,10 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final com.skillshare.skillshare.security.CustomAuthenticationSuccessHandler successHandler;
@@ -44,7 +46,7 @@ public class SecurityConfig {
                                                                 "/images/**")
                                                 .permitAll()
                                                 // Admin endpoints
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                                                 // Protected endpoints (everything else including /profile)
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form

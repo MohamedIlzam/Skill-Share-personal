@@ -16,6 +16,7 @@ import com.skillshare.skillshare.model.skill.Skill;
 
 @Controller
 @RequestMapping("/admin")
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class AdminController {
 
     private final UserRepository userRepository;
@@ -38,7 +39,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("totalUsers", userRepository.count());
+        model.addAttribute("totalUsers", userRepository.countByRole(Role.USER));
         model.addAttribute("totalSkills", skillRepository.count());
         model.addAttribute("totalExchanges", exchangeRequestRepository.count());
         model.addAttribute("totalRatings", exchangeRatingRepository.count());
@@ -49,7 +50,7 @@ public class AdminController {
     public String users(@RequestParam(required = false) String query, Model model) {
         List<User> users;
         if (query != null && !query.trim().isEmpty()) {
-            users = userRepository.searchByNameOrEmail(query.trim());
+            users = userRepository.findAllByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query.trim(), query.trim());
         } else {
             users = userRepository.findAll();
         }
