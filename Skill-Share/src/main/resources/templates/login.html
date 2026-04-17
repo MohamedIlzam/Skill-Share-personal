@@ -80,6 +80,9 @@
                 <div th:if="${param.registered}" class="alert alert-success">
                     Registration successful! Please log in.
                 </div>
+                <div th:if="${param.resetSuccess}" class="alert alert-success">
+                    Password has been reset successfully. Please log in.
+                </div>
 
                 <form th:action="@{/login}" method="post">
                     <div class="form-group">

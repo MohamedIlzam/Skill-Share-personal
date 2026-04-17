@@ -163,7 +163,7 @@
         <div class="search-container">
             <form th:action="@{/admin/users}" method="get" class="d-flex gap-2">
                 <input type="text" name="query" class="form-control" placeholder="Search by name or email..." th:value="${searchQuery}">
-                <button type="submit" class="btn btn-primary px-4 fw-bold">Search</button>
+                <button type="submit" id="adminSearchBtn" class="btn btn-primary px-4 fw-bold">Search</button>
                 <a th:if="${searchQuery != null && !searchQuery.isEmpty()}" th:href="@{/admin/users}" class="btn btn-outline-secondary px-3">Clear</a>
             </form>
         </div>
