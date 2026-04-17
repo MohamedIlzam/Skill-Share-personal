@@ -8,6 +8,7 @@ import com.skillshare.skillshare.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,9 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${server.port:8080}")
+    private String serverPort;
 
     @Transactional
     public void generateResetToken(String email) {
@@ -41,7 +45,7 @@ public class PasswordResetService {
             // Simulate sending email by logging token
             logger.info("\n========== PASSWORD RESET SIMULATION ==========");
             logger.info("Requested for email: {}", normalizedEmail);
-            logger.info("Reset Link -> http://localhost:8080/reset-password?token={}", resetToken.getToken());
+            logger.info("Reset Link -> http://localhost:{}/reset-password?token={}", serverPort, resetToken.getToken());
             logger.info("===============================================\n");
         } else {
             logger.info("Password reset requested for unregistered email: {}", normalizedEmail);
