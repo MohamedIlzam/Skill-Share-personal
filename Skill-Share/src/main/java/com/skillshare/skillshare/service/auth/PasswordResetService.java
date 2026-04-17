@@ -35,6 +35,13 @@ public class PasswordResetService {
         
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            
+            // SECURITY FIX: Block password reset for deactivated accounts
+            if (user.getStatus() != com.skillshare.skillshare.model.user.UserStatus.ACTIVE) {
+                logger.info("Password reset blocked for inactive user account: {}", normalizedEmail);
+                return; // Silent return to prevent enumeration
+            }
+
             // Delete any existing tokens for this user
             tokenRepository.deleteByUser(user);
             

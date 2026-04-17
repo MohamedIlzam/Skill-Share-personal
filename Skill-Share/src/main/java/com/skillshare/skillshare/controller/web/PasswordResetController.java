@@ -39,10 +39,10 @@ public class PasswordResetController {
     }
 
     @GetMapping("/reset-password")
-    public String showResetPasswordForm(@RequestParam(value = "token", required = false) String token, Model model) {
+    public String showResetPasswordForm(@RequestParam(value = "token", required = false) String token, Model model, RedirectAttributes redirectAttributes) {
         if (token == null || !passwordResetService.validatePasswordResetToken(token)) {
-            model.addAttribute("error", "Invalid or expired password reset token.");
-            return "login"; // Display error on the login page or a generic error page
+            redirectAttributes.addFlashAttribute("error", "Invalid or expired password reset token.");
+            return "redirect:/forgot-password";
         }
 
         ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO();
@@ -69,8 +69,7 @@ public class PasswordResetController {
 
         try {
             passwordResetService.resetPassword(resetPasswordDTO);
-            redirectAttributes.addFlashAttribute("registered", "Password has been reset successfully. Please log in."); // Using existing 'registered' param styling from login.html
-            return "redirect:/login";
+            return "redirect:/login?resetSuccess";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             redirectAttributes.addFlashAttribute("resetPasswordDTO", resetPasswordDTO);
