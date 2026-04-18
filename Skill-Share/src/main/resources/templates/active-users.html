@@ -450,6 +450,8 @@
             <div class="search-container">
                 <form th:action="@{/active-users}" method="get" class="search-box" id="searchForm">
                     <input type="hidden" name="view" value="users">
+                    <input type="hidden" name="page" id="pageInput" th:value="${filterDTO.page}">
+                    <input type="hidden" name="size" th:value="${filterDTO.size}">
                     <input type="text" name="search" class="search-input"
                         placeholder="Search partners by name or location..." th:value="${search}">
                     <button type="submit" class="btn-search">
@@ -467,23 +469,42 @@
         </div>
     </header>
 
-    <!-- Filter Bar (UI Mockup) -->
+    <!-- Filter Bar -->
     <div class="filter-bar">
-        <div class="container d-flex gap-3 overflow-auto pb-2 pb-sm-0">
-            <select name="location" form="searchForm" class="filter-select text-dark" onchange="this.form.submit()">
-                <option value="">All Locations</option>
-                <option value="remote">Remote Services</option>
+        <div class="container d-flex gap-3 overflow-auto pb-2 pb-sm-0 align-items-center">
+            <select name="category" form="searchForm" class="filter-select text-dark" onchange="document.getElementById('pageInput').value=0; this.form.submit()">
+                <option value="">All Categories</option>
+                <option th:each="cat : ${skillCategories}" th:value="${cat.name()}" th:text="${cat.name()}" th:selected="${filterDTO.category == cat.name()}"></option>
             </select>
 
-            <select name="availability" form="searchForm" class="filter-select text-dark" onchange="this.form.submit()">
-                <option value="">All Statuses</option>
-                <option value="AVAILABLE">Available Now</option>
+            <select name="availability" form="searchForm" class="filter-select text-dark" onchange="document.getElementById('pageInput').value=0; this.form.submit()">
+                <option value="" th:selected="${filterDTO.availability == null}">All Statuses</option>
+                <option value="AVAILABLE" th:selected="${filterDTO.availability != null && filterDTO.availability.name() == 'AVAILABLE'}">Available Now</option>
             </select>
+            
+            <select name="minRating" form="searchForm" class="filter-select text-dark" onchange="document.getElementById('pageInput').value=0; this.form.submit()">
+                <option value="">Any Rating</option>
+                <option value="4.0" th:selected="${filterDTO.minRating != null && filterDTO.minRating >= 4.0}">4+ Stars</option>
+                <option value="3.0" th:selected="${filterDTO.minRating != null && filterDTO.minRating >= 3.0 && filterDTO.minRating < 4.0}">3+ Stars</option>
+            </select>
+
+            <div class="form-check form-switch ms-2 d-flex align-items-center mb-0" style="min-width: max-content;">
+                <input class="form-check-input mt-0 me-2" type="checkbox" role="switch" id="sameLocationSwitch" name="sameLocation" value="true" form="searchForm" th:checked="${filterDTO.sameLocation}" onchange="document.getElementById('pageInput').value=0; this.form.submit()">
+                <label class="form-check-label small fw-bold" for="sameLocationSwitch">My Location</label>
+            </div>
+
+            <div class="form-check form-switch ms-2 d-flex align-items-center mb-0" style="min-width: max-content;">
+                <input class="form-check-input mt-0 me-2" type="checkbox" role="switch" id="sameUniversitySwitch" name="sameUniversity" value="true" form="searchForm" th:checked="${filterDTO.sameUniversity}" onchange="document.getElementById('pageInput').value=0; this.form.submit()">
+                <label class="form-check-label small fw-bold" for="sameUniversitySwitch">My Uni</label>
+            </div>
 
             <div class="ms-auto" style="min-width: 150px;">
                 <select name="sort" form="searchForm" class="filter-select w-100 text-dark"
-                    onchange="this.form.submit()">
-                    <option value="newest">Sort by: Relevance</option>
+                    onchange="document.getElementById('pageInput').value=0; this.form.submit()">
+                    <option value="relevance" th:selected="${filterDTO.sort == 'relevance' || filterDTO.sort == null}">Sort: Relevance</option>
+                    <option value="highest_rating" th:selected="${filterDTO.sort == 'highest_rating'}">Highest Rating</option>
+                    <option value="lowest_rating" th:selected="${filterDTO.sort == 'lowest_rating'}">Lowest Rating</option>
+                    <option value="name_asc" th:selected="${filterDTO.sort == 'name_asc'}">Name (A-Z)</option>
                 </select>
             </div>
         </div>
@@ -582,18 +603,18 @@
                     <nav th:if="${totalPages > 1}" class="pagination-container d-flex justify-content-center">
                         <ul class="pagination">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link"
-                                    th:href="@{/active-users(view='users', page=${currentPage - 1}, search=${search})}">Previous</a>
+                                <a class="page-link" href="#"
+                                    th:onclick="'document.getElementById(\'pageInput\').value=' + (${currentPage - 1}) + '; document.getElementById(\'searchForm\').submit(); return false;'">Previous</a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                 th:classappend="${currentPage == i} ? 'active'">
-                                <a class="page-link"
-                                    th:href="@{/active-users(view='users', page=${i}, search=${search})}"
+                                <a class="page-link" href="#"
+                                    th:onclick="'document.getElementById(\'pageInput\').value=' + (${i}) + '; document.getElementById(\'searchForm\').submit(); return false;'"
                                     th:text="${i + 1}">1</a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link"
-                                    th:href="@{/active-users(view='users', page=${currentPage + 1}, search=${search})}">Next</a>
+                                <a class="page-link" href="#"
+                                    th:onclick="'document.getElementById(\'pageInput\').value=' + (${currentPage + 1}) + '; document.getElementById(\'searchForm\').submit(); return false;'">Next</a>
                             </li>
                         </ul>
                     </nav>
