@@ -365,7 +365,14 @@
         <!-- Sidebar: Conversation List -->
         <aside class="conv-sidebar">
             <div class="sidebar-header">
-                <h1 class="fs-4 fw-bold mb-0">Messages</h1>
+                <h1 class="fs-4 fw-bold mb-3">Messages</h1>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0" style="border-radius: 0.75rem 0 0 0.75rem;">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" id="convSearch" class="form-control border-start-0" 
+                           placeholder="Search chats..." style="border-radius: 0 0.75rem 0.75rem 0; background: #fff;">
+                </div>
             </div>
             <div class="conv-list">
                 <!-- If no conversations -->
@@ -488,6 +495,25 @@
         window.onload = () => {
             if (messagesArea) messagesArea.scrollTop = messagesArea.scrollHeight;
         };
+
+        // Client-side conversation filtering
+        const searchInput = document.getElementById('convSearch');
+        const convItems = document.querySelectorAll('.conv-item');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                convItems.forEach(item => {
+                    const name = item.querySelector('.conv-name span').textContent.toLowerCase();
+                    const msg = item.querySelector('.conv-last-msg').textContent.toLowerCase();
+                    if (name.includes(term) || msg.includes(term)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
     </script>
 </body>
 
