@@ -15,6 +15,6 @@ public interface UserProfileService {
     void createMissingProfiles();
     
     // New methods for active users and public profiles
-    Page<PublicUserDTO> getActiveUsers(String search, Long currentUserId, Pageable pageable);
+    Page<PublicUserDTO> getActiveUsers(com.skillshare.skillshare.dto.user.UserFilterDTO filterDTO, Long currentUserId);
     PublicUserDTO getPublicProfile(Long userId);
 }

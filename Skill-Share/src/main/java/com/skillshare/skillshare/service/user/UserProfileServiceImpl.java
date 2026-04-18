@@ -148,9 +148,91 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PublicUserDTO> getActiveUsers(String search, Long currentUserId, Pageable pageable) {
-        Page<UserProfile> profiles = userProfileRepository.searchByKeywordExceptUser(search, currentUserId, pageable);
-        return profiles.map(this::mapToPublicDTO);
+    public Page<PublicUserDTO> getActiveUsers(com.skillshare.skillshare.dto.user.UserFilterDTO filterDTO, Long currentUserId) {
+        java.util.List<UserProfile> profiles = userProfileRepository.searchByKeywordExceptUser(filterDTO.getSearch(), currentUserId);
+
+        // Pre-filter by Skill Category before mapping
+        if (filterDTO.getCategory() != null && !filterDTO.getCategory().isBlank()) {
+            profiles = profiles.stream().filter(p -> {
+                if (p.getUser() == null) return false;
+                return skillRepository.findAllByOwnerId(p.getUser().getId()).stream()
+                        .anyMatch(s -> s.getCategory().name().equalsIgnoreCase(filterDTO.getCategory()) || 
+                                       s.getName().equalsIgnoreCase(filterDTO.getCategory()));
+            }).collect(java.util.stream.Collectors.toList());
+        }
+
+        // Map to DTOs
+        java.util.List<PublicUserDTO> dtoList = profiles.stream()
+                .map(this::mapToPublicDTO)
+                .collect(java.util.stream.Collectors.toList());
+
+        // Setup current user profile for relative filtering
+        UserProfileDTO currentUserProfile = null;
+        if (currentUserId != null && currentUserId != -1L) {
+            try {
+                currentUserProfile = getProfileByUserId(currentUserId);
+            } catch (ResourceNotFoundException e) {
+                // Ignore
+            }
+        }
+        final UserProfileDTO finalCurrentUserProfile = currentUserProfile;
+
+        // Apply remaining filters via Stream API
+        java.util.stream.Stream<PublicUserDTO> stream = dtoList.stream();
+
+        if (filterDTO.getAvailability() != null) {
+            stream = stream.filter(u -> u.getAvailabilityStatus() == filterDTO.getAvailability());
+        }
+
+        if (filterDTO.getMinRating() != null) {
+            stream = stream.filter(u -> u.getAverageRating() != null && u.getAverageRating() >= filterDTO.getMinRating());
+        }
+
+        if (Boolean.TRUE.equals(filterDTO.getSameLocation()) && finalCurrentUserProfile != null && finalCurrentUserProfile.getLocation() != null && !finalCurrentUserProfile.getLocation().isBlank()) {
+            stream = stream.filter(u -> finalCurrentUserProfile.getLocation().equalsIgnoreCase(u.getLocation()));
+        }
+
+        if (Boolean.TRUE.equals(filterDTO.getSameUniversity()) && finalCurrentUserProfile != null && finalCurrentUserProfile.getUniversity() != null && !finalCurrentUserProfile.getUniversity().isBlank()) {
+            stream = stream.filter(u -> finalCurrentUserProfile.getUniversity().equalsIgnoreCase(u.getUniversity()));
+        }
+
+        // Apply custom sorting
+        if ("highest_rating".equals(filterDTO.getSort())) {
+            stream = stream.sorted((a, b) -> {
+                double r1 = a.getAverageRating() != null ? a.getAverageRating() : -1.0;
+                double r2 = b.getAverageRating() != null ? b.getAverageRating() : -1.0;
+                return Double.compare(r2, r1);
+            });
+        } else if ("lowest_rating".equals(filterDTO.getSort())) {
+            stream = stream.sorted((a, b) -> {
+                if (a.getAverageRating() == null && b.getAverageRating() != null) return 1;
+                if (b.getAverageRating() == null && a.getAverageRating() != null) return -1;
+                if (a.getAverageRating() == null && b.getAverageRating() == null) return 0;
+                return Double.compare(a.getAverageRating(), b.getAverageRating());
+            });
+        } else if ("name_asc".equals(filterDTO.getSort())) {
+            stream = stream.sorted(java.util.Comparator.comparing(PublicUserDTO::getFullName, String.CASE_INSENSITIVE_ORDER));
+        }
+
+        java.util.List<PublicUserDTO> filteredList = stream.collect(java.util.stream.Collectors.toList());
+
+        // Perform manual pagination
+        int page = filterDTO.getPage();
+        int size = filterDTO.getSize();
+        if (size <= 0) size = 12; // default
+        if (page < 0) page = 0;
+        
+        int start = page * size;
+        int end = Math.min((start + size), filteredList.size());
+
+        java.util.List<PublicUserDTO> pageContent;
+        if (start <= end) {
+            pageContent = filteredList.subList(start, end);
+        } else {
+            pageContent = new java.util.ArrayList<>();
+        }
+
+        return new org.springframework.data.domain.PageImpl<>(pageContent, org.springframework.data.domain.PageRequest.of(page, size), filteredList.size());
     }
 
     @Override
