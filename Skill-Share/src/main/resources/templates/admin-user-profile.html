@@ -80,6 +80,12 @@
                             <h3 class="fw-bold fs-4 mb-0" th:text="${totalRatings}">0</h3>
                             <span class="text-muted small text-uppercase">Total Ratings</span>
                         </div>
+                        <div class="stat-box">
+                            <h3 class="fw-bold fs-4 mb-0">
+                                <span th:text="${averageRating}">0.0</span> <i class="bi bi-star-fill text-warning fs-6"></i>
+                            </h3>
+                            <span class="text-muted small text-uppercase">Avg Rating</span>
+                        </div>
                     </div>
 
                     <div class="text-start border-top pt-3 mt-3 px-md-4">

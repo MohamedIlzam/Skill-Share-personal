@@ -43,7 +43,8 @@ public class SecurityConfig {
                                                                 "/swagger-ui.html",
                                                                 "/css/**",
                                                                 "/js/**",
-                                                                "/images/**")
+                                                                "/images/**",
+                                                                "/access-denied")
                                                 .permitAll()
                                                 // Admin endpoints
                                                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
@@ -59,7 +60,9 @@ public class SecurityConfig {
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/login?logout")
-                                                .permitAll());
+                                                .permitAll())
+                                .exceptionHandling(exception -> exception
+                                                .accessDeniedPage("/access-denied"));
 
                 return http.build();
         }

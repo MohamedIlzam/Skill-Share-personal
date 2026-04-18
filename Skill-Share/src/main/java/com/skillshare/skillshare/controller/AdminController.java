@@ -78,6 +78,9 @@ public class AdminController {
         Long totalRatings = exchangeRatingRepository.countRatingsForUser(id);
         model.addAttribute("totalRatings", totalRatings != null ? totalRatings : 0L);
 
+        Double averageRating = exchangeRatingRepository.getAverageRatingForUser(id);
+        model.addAttribute("averageRating", averageRating != null ? Math.round(averageRating * 10.0) / 10.0 : 0.0);
+
         return "admin-user-profile";
     }
 
