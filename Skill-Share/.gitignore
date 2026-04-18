@@ -35,3 +35,12 @@ build/
 # Temporary logs and DB output files
 *.log
 *.txt
+
+node_modules/
+cypress/reports/
+cypress/videos/
+cypress/screenshots/
+.idea/
+
+.env
+.env.*

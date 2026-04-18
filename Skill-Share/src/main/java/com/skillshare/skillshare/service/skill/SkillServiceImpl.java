@@ -95,7 +95,9 @@ public class SkillServiceImpl implements SkillService {
                 .and(SkillSpecifications.hasName(keyword))
                 .and(SkillSpecifications.hasCategory(category))
                 .and(SkillSpecifications.hasProficiency(proficiency))
-                .and(SkillSpecifications.isOwnerAvailable());
+                .and(SkillSpecifications.isOwnerAvailable())
+                .and(SkillSpecifications.excludeAdmins())
+                .and(SkillSpecifications.isOwnerActive());
 
         // Let the DB execute the initial filter and sort natively by creation time
         List<Skill> skills = skillRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"));

@@ -52,6 +52,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getStatus() == com.skillshare.skillshare.model.user.UserStatus.ACTIVE;
     }
 }

@@ -31,7 +31,12 @@ public class AuthWebController {
     }
 
     @PostMapping("/register")
-    public String registerUserAccount(@ModelAttribute("user") RegisterRequest request, Model model) {
+    public String registerUserAccount(@jakarta.validation.Valid @ModelAttribute("user") RegisterRequest request, 
+                                     org.springframework.validation.BindingResult bindingResult, 
+                                     Model model) {
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
         try {
             authService.registerUser(request.getFullName(), request.getEmail(), request.getPassword());
             return "redirect:/login?registered";

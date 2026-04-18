@@ -71,11 +71,17 @@
                 <div th:if="${param.error}" class="alert alert-error">
                     Invalid email or password.
                 </div>
+                <div th:if="${param.disabled}" class="alert alert-error">
+                    Your account has been deactivated.
+                </div>
                 <div th:if="${param.logout}" class="alert alert-success">
                     You have been logged out.
                 </div>
                 <div th:if="${param.registered}" class="alert alert-success">
                     Registration successful! Please log in.
+                </div>
+                <div th:if="${param.resetSuccess}" class="alert alert-success">
+                    Password has been reset successfully. Please log in.
                 </div>
 
                 <form th:action="@{/login}" method="post">
@@ -109,6 +115,8 @@
 
                 <div class="register-link">
                     Don't have an account yet? <a th:href="@{/register}">Register for free</a>
+                    <br><br>
+                    <a th:href="@{/forgot-password}">Forgot your password?</a>
                 </div>
             </div>
         </div>

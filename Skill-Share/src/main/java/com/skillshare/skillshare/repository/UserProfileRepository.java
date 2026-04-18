@@ -18,7 +18,9 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
            "OR lower(p.fullName) LIKE lower(concat('%', :search, '%')) " +
            "OR lower(p.location) LIKE lower(concat('%', :search, '%')) " +
            "OR lower(p.university) LIKE lower(concat('%', :search, '%'))) " +
-           "AND p.user.id != :currentUserId")
+           "AND p.user.id != :currentUserId " +
+           "AND p.user.status = com.skillshare.skillshare.model.user.UserStatus.ACTIVE " +
+           "AND p.user.role != com.skillshare.skillshare.model.user.Role.ADMIN")
     Page<UserProfile> searchByKeywordExceptUser(@org.springframework.data.repository.query.Param("search") String search, 
                                                 @org.springframework.data.repository.query.Param("currentUserId") Long currentUserId, 
                                                 Pageable pageable);

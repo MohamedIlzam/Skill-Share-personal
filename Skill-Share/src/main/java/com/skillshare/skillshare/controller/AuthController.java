@@ -21,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> registerUser(@jakarta.validation.Valid @RequestBody RegisterRequest request) {
         // Just directly calling the smoke test method for our API test
         User newOrExisting = userService.createForSmokeTest(
                 request.getFullName(),
