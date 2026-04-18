@@ -20,6 +20,7 @@ import java.util.List;
 public class MessagingWebController {
 
     private final ExchangeMessageService exchangeMessageService;
+    private final com.skillshare.skillshare.repository.UserRepository userRepository;
 
     @GetMapping
     public String showConversations(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -50,7 +51,19 @@ public class MessagingWebController {
         ConversationDTO activeConversation = conversations.stream()
                 .filter(c -> c.getOtherUserId().equals(otherUserId))
                 .findFirst()
-                .orElse(null);
+                .orElseGet(() -> {
+                    // If not in the list, fetch the user info manually to show in the header
+                    return userRepository.findById(otherUserId)
+                        .map(u -> {
+                            ConversationDTO dto = new ConversationDTO();
+                            dto.setOtherUserId(u.getId());
+                            dto.setOtherUserName(u.getFullName());
+                            if (u.getProfile() != null) {
+                                dto.setOtherUserProfilePic(u.getProfile().getProfilePictureUrl());
+                            }
+                            return dto;
+                        }).orElse(null);
+                });
         
         model.addAttribute("conversations", conversations);
         model.addAttribute("chatHistory", chatHistory);
