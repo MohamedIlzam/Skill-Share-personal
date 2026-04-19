@@ -61,6 +61,9 @@ public class ActiveUsersController {
         
         // Expose Skill categories for the filter dropdown
         model.addAttribute("skillCategories", com.skillshare.skillshare.model.skill.SkillCategory.values());
+        
+        // Add Top Rated Users for the highlight section
+        model.addAttribute("topRatedUsers", userProfileService.getTopRatedUsers(5));
 
         return "active-users";
     }
