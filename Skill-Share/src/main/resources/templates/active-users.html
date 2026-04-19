@@ -529,7 +529,7 @@
                 </div>
             </div>
 
-            <!-- Top Rated Users Section -->
+            <!-- Top Rated Users Section (Auto-hidden if no rated users exist) -->
             <div th:if="${activeView == 'users' && !#lists.isEmpty(topRatedUsers)}" class="mb-5 animate-tab" style="animation-delay: 0.1s;">
                 <div class="d-flex align-items-center mb-4">
                     <div class="bg-primary-subtle p-2 rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
