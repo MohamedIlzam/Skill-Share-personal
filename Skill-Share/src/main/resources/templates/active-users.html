@@ -555,8 +555,9 @@
                                     <span class="fw-bold text-dark" style="font-size: 0.9rem;">[[${user.averageRating}]]</span>
                                     <span class="text-muted" style="font-size: 0.7rem;">([[${user.totalRatings}]])</span>
                                 </div>
+                                <!-- Action Button -->
                                 <div class="px-3">
-                                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn-view-profile py-1 px-2" style="font-size: 0.75rem;">View Profile</a>
+                                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn-view-profile py-1 px-2" style="font-size: 0.75rem;" th:title="'View ' + ${user.fullName} + '\'s profile'">View Profile</a>
                                 </div>
                             </div>
                         </div>
