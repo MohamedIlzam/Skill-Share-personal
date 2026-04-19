@@ -17,5 +17,11 @@ public interface UserProfileService {
     // New methods for active users and public profiles
     Page<PublicUserDTO> getActiveUsers(com.skillshare.skillshare.dto.user.UserFilterDTO filterDTO, Long currentUserId);
     PublicUserDTO getPublicProfile(Long userId);
+    /**
+     * Fetches a list of top rated users for display in the discovery section.
+     * 
+     * @param limit maximum number of users to retrieve
+     * @return list of PublicUserDTOs populated with rating data
+     */
     java.util.List<PublicUserDTO> getTopRatedUsers(int limit);
 }
