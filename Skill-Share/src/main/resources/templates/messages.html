@@ -445,7 +445,7 @@
                         <span th:text="${#temporals.format(msg.createdAt, 'HH:mm')}">12:30</span>
                         <i th:if="${msg.senderId == activeUserId}" 
                            class="bi" 
-                           th:classappend="${msg.isRead} ? 'bi-check2-all text-primary' : 'bi-check2'"></i>
+                           th:classappend="${msg.read} ? 'bi-check2-all text-primary' : 'bi-check2'"></i>
                     </div>
                 </div>
             </div>
