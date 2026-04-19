@@ -243,6 +243,22 @@ public class UserProfileServiceImpl implements UserProfileService {
         return mapToPublicDTO(profile);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<PublicUserDTO> getTopRatedUsers(int limit) {
+        java.util.List<Long> topUserIds = exchangeRatingRepository.findTopRatedUserIds(org.springframework.data.domain.PageRequest.of(0, limit));
+        return topUserIds.stream()
+                .map(id -> {
+                    try {
+                        return getPublicProfile(id);
+                    } catch (ResourceNotFoundException e) {
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     private PublicUserDTO mapToPublicDTO(UserProfile profile) {
         String bio = profile.getBio();
         if (bio != null && bio.isBlank()) bio = null;
