@@ -18,7 +18,7 @@ public interface SkillService {
     Skill getSkillByIdForUser(Long userId, Long skillId);
 
     // --- Browse / Search (Feature 3 & 5) ---
-    List<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy);
+    List<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy, boolean onlyAvailableOwners);
 
     // --- Update ---
     Skill updateSkill(Long userId, Long skillId, SkillRequest request);
