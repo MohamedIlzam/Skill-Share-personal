@@ -114,7 +114,9 @@ public class SkillServiceImpl implements SkillService {
 
             for (Skill skill : skills) {
                 java.util.Set<Long> mainSkillIds = userToMainSkillsMap.get(skill.getOwner().getId());
-                if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {
+                if (mainSkillIds == null || mainSkillIds.isEmpty()) {
+                    skill.setMainSkill(true);
+                } else if (mainSkillIds.contains(skill.getId())) {
                     skill.setMainSkill(true);
                 }
             }
