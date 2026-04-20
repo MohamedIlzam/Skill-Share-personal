@@ -15,6 +15,17 @@ public class SkillSpecifications {
         };
     }
 
+    public static Specification<Skill> hasNameOrOwnerName(String keyword) {
+        return (root, query, cb) -> {
+            if (!StringUtils.hasText(keyword)) return null;
+            String like = "%" + keyword.toLowerCase().trim() + "%";
+            return cb.or(
+                    cb.like(cb.lower(root.get("name")), like),
+                    cb.like(cb.lower(root.get("owner").get("fullName")), like)
+            );
+        };
+    }
+
     public static Specification<Skill> hasCategory(SkillCategory category) {
         return (root, query, cb) -> category == null ? null : cb.equal(root.get("category"), category);
     }
