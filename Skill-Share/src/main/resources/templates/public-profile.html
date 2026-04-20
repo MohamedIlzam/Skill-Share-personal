@@ -431,6 +431,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/requests/create}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <div class="modal-body">
                         <p class="text-muted mb-4">You are requesting to connect and exchange skills with <strong class="text-dark" th:text="${profile.fullName}">User</strong>.</p>
                         
