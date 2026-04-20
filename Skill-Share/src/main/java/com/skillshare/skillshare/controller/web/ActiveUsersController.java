@@ -52,6 +52,9 @@ public class ActiveUsersController {
             model.addAttribute("currentPage", filterDTO.getPage());
             model.addAttribute("totalPages", userPage.getTotalPages());
             model.addAttribute("totalItems", userPage.getTotalElements());
+
+            // Add top 5 rated users to the highlight section
+            model.addAttribute("topRatedUsers", userProfileService.getTopRatedUsers(5));
         }
 
         model.addAttribute("search", filterDTO.getSearch());
@@ -62,9 +65,6 @@ public class ActiveUsersController {
         // Expose Skill categories for the filter dropdown
         model.addAttribute("skillCategories", com.skillshare.skillshare.model.skill.SkillCategory.values());
         
-        // Add top 5 rated users to the highlight section
-        model.addAttribute("topRatedUsers", userProfileService.getTopRatedUsers(5));
-
         return "active-users";
     }
 
