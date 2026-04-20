@@ -21,6 +21,7 @@ public class MessagingWebController {
 
     private final ExchangeMessageService exchangeMessageService;
     private final com.skillshare.skillshare.repository.UserRepository userRepository;
+    private final com.skillshare.skillshare.repository.ExchangeRequestRepository exchangeRequestRepository;
 
     @GetMapping
     public String showConversations(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -46,6 +47,12 @@ public class MessagingWebController {
         
         List<ConversationDTO> conversations = exchangeMessageService.getUserConversations(userId);
         List<MessageResponseDTO> chatHistory = exchangeMessageService.getChatHistory(userId, otherUserId);
+
+        boolean hasAnyExchange = !exchangeRequestRepository.findAllByRequesterIdAndSkillOwnerId(userId, otherUserId).isEmpty()
+                || !exchangeRequestRepository.findAllByRequesterIdAndSkillOwnerId(otherUserId, userId).isEmpty();
+        if (!hasAnyExchange) {
+            model.addAttribute("warning", "Messaging is only available after an exchange request exists between you and this user.");
+        }
         
         // Fetch specific "Other User" for header display
         ConversationDTO activeConversation = conversations.stream()

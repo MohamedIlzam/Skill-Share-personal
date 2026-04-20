@@ -340,6 +340,14 @@
 </head>
 
 <body>
+    <div th:if="${error}" class="container mt-3">
+        <div class="alert alert-danger" th:text="${error}"></div>
+    </div>
+
+    <div th:if="${warning}" class="container mt-3">
+        <div class="alert alert-warning" th:text="${warning}"></div>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar-custom">
         <div class="container d-flex align-items-center justify-content-between">
@@ -453,6 +461,7 @@
             <!-- Input Form -->
             <div th:if="${activeConversation != null}" class="chat-input-area">
                 <form th:action="@{/messages/send}" method="post" class="input-box">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <input type="hidden" name="recipientId" th:value="${targetUserId}">
                     <input type="text" name="content" class="chat-input" placeholder="Type a message..." required autocomplete="off">
                     <button type="submit" class="btn-send">
