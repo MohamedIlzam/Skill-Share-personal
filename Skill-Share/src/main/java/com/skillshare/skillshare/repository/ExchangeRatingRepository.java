@@ -21,6 +21,11 @@ public interface ExchangeRatingRepository extends JpaRepository<ExchangeRating, 
     
     org.springframework.data.domain.Page<ExchangeRating> findByRatedUserId(Long ratedUserId, org.springframework.data.domain.Pageable pageable);
 
+    org.springframework.data.domain.Page<ExchangeRating> findByRatedUserIdAndRatingScoreGreaterThanEqual(
+            Long ratedUserId,
+            Integer ratingScore,
+            org.springframework.data.domain.Pageable pageable);
+
     /**
      * Retrieves IDs of users with the highest average ratings.
      * Groups by user ID and orders by average score (descending) and total count (descending).
