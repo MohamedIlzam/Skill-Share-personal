@@ -283,6 +283,33 @@
                 </div>
             </div>
 
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 bg-white p-3 rounded-4 border shadow-sm mb-3">
+                <div class="fw-bold text-dark">Filter & Sort</div>
+                <form method="get" th:action="@{/ratings/user/{id}(id=${profile.id})}" class="d-flex flex-wrap gap-2 align-items-center m-0">
+                    <input type="hidden" name="page" value="0">
+                    <input type="hidden" name="size" th:value="${reviewsPage.size}">
+
+                    <select class="form-select form-select-sm" name="minRating" style="min-width: 200px;" aria-label="Filter by rating">
+                        <option th:selected="${selectedMinRating == null}" value="">All ratings</option>
+                        <option th:selected="${selectedMinRating == 5}" value="5">5 stars only</option>
+                        <option th:selected="${selectedMinRating == 4}" value="4">4 stars and above</option>
+                        <option th:selected="${selectedMinRating == 3}" value="3">3 stars and above</option>
+                        <option th:selected="${selectedMinRating == 2}" value="2">2 stars and above</option>
+                        <option th:selected="${selectedMinRating == 1}" value="1">1 star and above</option>
+                    </select>
+
+                    <select class="form-select form-select-sm" name="sort" style="min-width: 200px;" aria-label="Sort reviews">
+                        <option th:selected="${selectedSort == null || selectedSort == 'recent'}" value="recent">Most recent</option>
+                        <option th:selected="${selectedSort == 'highest'}" value="highest">Highest rating</option>
+                        <option th:selected="${selectedSort == 'lowest'}" value="lowest">Lowest rating</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">
+                        Apply
+                    </button>
+                </form>
+            </div>
+
             <!-- Reviews List -->
             <div th:if="${not #lists.isEmpty(reviewsPage.content)}">
                 <div th:each="review : ${reviewsPage.content}" class="review-card d-flex gap-3">
