@@ -42,13 +42,19 @@ public class BrowseSkillsController {
     }
 
     @GetMapping
-    public String browseSkills(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public String browseSkills(@AuthenticationPrincipal com.skillshare.skillshare.security.CustomUserDetails userDetails,
                                @RequestParam(name = "view", defaultValue = "available") String view,
                                @RequestParam(name = "q", required = false) String query,
-                               @RequestParam(name = "category", required = false) SkillCategory category,
-                               @RequestParam(name = "proficiency", required = false) SkillProficiency proficiency,
+                               @RequestParam(name = "category", required = false) com.skillshare.skillshare.model.skill.SkillCategory category,
+                               @RequestParam(name = "proficiency", required = false) com.skillshare.skillshare.model.skill.SkillProficiency proficiency,
                                @RequestParam(name = "sort", defaultValue = "newest") String sort,
+                               jakarta.servlet.http.HttpServletResponse response,
                                Model model) {
+        
+        // Prevent browser caching to ensure bookmark icons are always up-to-date
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         
         Long currentUserId = userDetails.getUser().getId();
 

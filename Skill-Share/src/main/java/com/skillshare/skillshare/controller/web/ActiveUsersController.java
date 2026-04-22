@@ -31,7 +31,13 @@ public class ActiveUsersController {
             @RequestParam(value = "view", defaultValue = "users") String view,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
             Model model) {
+
+        // Prevent browser caching to ensure user status and ratings are always up-to-date
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
 
         if (filterDTO.getPage() < 0) filterDTO.setPage(0);
         if (filterDTO.getSize() <= 0) filterDTO.setSize(12);

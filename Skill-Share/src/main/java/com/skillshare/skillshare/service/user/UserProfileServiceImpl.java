@@ -7,6 +7,8 @@ import com.skillshare.skillshare.exception.ResourceNotFoundException;
 import com.skillshare.skillshare.model.user.AvailabilityStatus;
 import com.skillshare.skillshare.model.user.UserProfile;
 import com.skillshare.skillshare.repository.UserProfileRepository;
+import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
+import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
@@ -32,6 +34,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final com.skillshare.skillshare.repository.UserRepository userRepository;
     private final com.skillshare.skillshare.repository.SkillRepository skillRepository;
     private final ExchangeRatingRepository exchangeRatingRepository;
+    private final ExchangeRequestRepository exchangeRequestRepository;
     private static final String UPLOAD_DIRECTORY = "src/main/resources/static/images/profiles/";
 
     @Override
@@ -89,10 +92,30 @@ public class UserProfileServiceImpl implements UserProfileService {
                 throw new IllegalArgumentException("You can only select up to 5 main skills.");
             }
 
+            // Check for ongoing exchanges before removing skills
+            java.util.Set<Long> skillsToRemove = new java.util.HashSet<>(profile.getMainSkillIds());
+            skillsToRemove.removeAll(selectedSkillIds);
+            
+            for (Long skillId : skillsToRemove) {
+                if (exchangeRequestRepository.existsBySelectedSkillIdAndStatus(skillId, ExchangeRequestStatus.ACCEPTED)) {
+                    com.skillshare.skillshare.model.skill.Skill skill = skillRepository.findById(skillId).orElse(null);
+                    String skillName = skill != null ? skill.getName() : "Unknown Skill";
+                    throw new IllegalStateException("Cannot stop offering '" + skillName + "' while there is an ongoing exchange. Please complete the exchange first.");
+                }
+            }
+
             // Update profile
             profile.getMainSkillIds().clear();
             profile.getMainSkillIds().addAll(selectedSkillIds);
         } else {
+            // Check for ongoing exchanges for ALL current main skills before clearing
+            for (Long skillId : profile.getMainSkillIds()) {
+                if (exchangeRequestRepository.existsBySelectedSkillIdAndStatus(skillId, ExchangeRequestStatus.ACCEPTED)) {
+                    com.skillshare.skillshare.model.skill.Skill skill = skillRepository.findById(skillId).orElse(null);
+                    String skillName = skill != null ? skill.getName() : "Unknown Skill";
+                    throw new IllegalStateException("Cannot stop offering '" + skillName + "' while there is an ongoing exchange. Please complete the exchange first.");
+                }
+            }
             profile.getMainSkillIds().clear();
         }
 
@@ -132,6 +155,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user ID: " + userId));
 
         if (profile.getMainSkillIds().contains(skillId)) {
+            // Check for ongoing exchanges before allowing removal
+            if (exchangeRequestRepository.existsBySelectedSkillIdAndStatus(skillId, ExchangeRequestStatus.ACCEPTED)) {
+                throw new IllegalStateException("Cannot stop offering this skill while there is an ongoing exchange. Please complete the exchange first.");
+            }
             profile.getMainSkillIds().remove(skillId);
         } else {
             // Validate ownership before adding
