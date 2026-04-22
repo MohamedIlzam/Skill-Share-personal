@@ -126,7 +126,6 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            object-fit: cover;
             background: var(--primary-subtle);
             flex-shrink: 0;
             display: flex;
@@ -136,6 +135,16 @@
             color: var(--primary);
             border: 2px solid #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden; /* Added to contain large images */
+            position: relative;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: inherit;
         }
 
         .conv-info {
@@ -329,12 +338,44 @@
             opacity: 0.5;
         }
 
+        .btn-back-mobile {
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--text-dark);
+            text-decoration: none;
+            background: var(--bg-light);
+            margin-right: 0.5rem;
+        }
+
         @media (max-width: 768px) {
-            .messaging-container { margin: 0; border-radius: 0; }
-            .conv-sidebar { width: 80px; }
-            .conv-info, .sidebar-header h1, .sidebar-header .search-box { display: none; }
-            .sidebar-header { padding: 1rem; text-align: center; }
-            .conv-item { padding: 1rem; justify-content: center; }
+            .messaging-container { 
+                margin: 0; 
+                border-radius: 0; 
+                height: calc(100vh - 120px); /* Adjust for navbar and tabbar */
+            }
+            
+            /* Toggle visibility for mobile chat app behavior */
+            .messaging-container.chat-view .conv-sidebar {
+                display: none;
+            }
+            .messaging-container.list-view .chat-pane {
+                display: none;
+            }
+            .messaging-container.list-view .conv-sidebar {
+                width: 100%;
+                display: flex;
+            }
+            
+            .btn-back-mobile {
+                display: flex;
+            }
+            
+            .conv-info { display: block; }
+            .sidebar-header h1 { display: block; }
         }
     </style>
 </head>
@@ -369,7 +410,7 @@
         </div>
     </nav>
 
-    <main class="messaging-container">
+    <main class="messaging-container" th:classappend="${activeConversation != null} ? 'chat-view' : 'list-view'">
         <!-- Sidebar: Conversation List -->
         <aside class="conv-sidebar">
             <div class="sidebar-header">
@@ -422,6 +463,10 @@
 
             <!-- Active Chat Header -->
             <div th:if="${activeConversation != null}" class="chat-header">
+                <!-- Back button for mobile -->
+                <a th:href="@{/messages}" class="btn-back-mobile">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
                 <div class="avatar" style="width: 40px; height: 40px; font-size: 1.2rem;">
                     <img th:if="${activeConversation.otherUserProfilePic}" th:src="${activeConversation.otherUserProfilePic}" alt="Avatar">
                     <span th:unless="${activeConversation.otherUserProfilePic}" th:text="${#strings.substring(activeConversation.otherUserName,0,1)}">U</span>

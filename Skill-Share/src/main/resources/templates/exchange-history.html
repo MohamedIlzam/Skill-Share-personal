@@ -201,10 +201,20 @@
                                 <strong class="text-dark" th:if="${exchange.requesterId != currentUserId}" th:text="${exchange.requesterName}">Receiver</strong>
                             </p>
                         </div>
-                        <div class="bg-light rounded p-3 text-center border" style="min-width: 120px;">
-                            <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.7rem;">Role</small>
-                            <span class="badge bg-primary rounded-pill px-3 py-2" th:if="${exchange.requesterId == currentUserId}">Receiver</span>
-                            <span class="badge bg-info rounded-pill px-3 py-2 text-dark" th:if="${exchange.requesterId != currentUserId}">Provider</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-light rounded p-3 text-center border" style="min-width: 120px;">
+                                <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.7rem;">Role</small>
+                                <span class="badge bg-primary rounded-pill px-3 py-2" th:if="${exchange.requesterId == currentUserId}">Receiver</span>
+                                <span class="badge bg-info rounded-pill px-3 py-2 text-dark" th:if="${exchange.requesterId != currentUserId}">Provider</span>
+                            </div>
+                            <a th:href="@{/profile/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" 
+                               class="btn btn-outline-info rounded-pill px-4 py-2 fw-bold">
+                                <i class="bi bi-person-circle me-1"></i>Profile
+                            </a>
+                            <a th:href="@{/messages/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" 
+                               class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold">
+                                <i class="bi bi-chat-dots me-1"></i>Chat
+                            </a>
                         </div>
                     </div>
                 </div>
