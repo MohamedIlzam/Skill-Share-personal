@@ -10,8 +10,9 @@ public class MessageResponseDTO {
     private String senderProfilePic;
     private String content;
     private Instant createdAt;
+    private boolean isRead;
 
-    public MessageResponseDTO(Long id, Long exchangeRequestId, Long senderId, String senderName, String senderProfilePic, String content, Instant createdAt) {
+    public MessageResponseDTO(Long id, Long exchangeRequestId, Long senderId, String senderName, String senderProfilePic, String content, Instant createdAt, boolean isRead) {
         this.id = id;
         this.exchangeRequestId = exchangeRequestId;
         this.senderId = senderId;
@@ -19,6 +20,7 @@ public class MessageResponseDTO {
         this.senderProfilePic = senderProfilePic;
         this.content = content;
         this.createdAt = createdAt;
+        this.isRead = isRead;
     }
 
     public Long getId() {
@@ -47,5 +49,9 @@ public class MessageResponseDTO {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isRead() {
+        return isRead;
     }
 }

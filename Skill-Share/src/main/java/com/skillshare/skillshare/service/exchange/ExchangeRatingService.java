@@ -106,9 +106,24 @@ public class ExchangeRatingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RatingResponseDTO> getPaginatedUserReviews(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ExchangeRating> ratingsPage = ratingRepository.findByRatedUserId(userId, pageable);
+    public Page<RatingResponseDTO> getPaginatedUserReviews(Long userId, int page, int size, Integer minRating, String sort) {
+        Sort sortSpec;
+        if ("highest".equalsIgnoreCase(sort)) {
+            sortSpec = Sort.by(Sort.Order.desc("ratingScore"), Sort.Order.desc("createdAt"));
+        } else if ("lowest".equalsIgnoreCase(sort)) {
+            sortSpec = Sort.by(Sort.Order.asc("ratingScore"), Sort.Order.desc("createdAt"));
+        } else {
+            sortSpec = Sort.by(Sort.Order.desc("createdAt"));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortSpec);
+
+        Page<ExchangeRating> ratingsPage;
+        if (minRating != null) {
+            ratingsPage = ratingRepository.findByRatedUserIdAndRatingScoreGreaterThanEqual(userId, minRating, pageable);
+        } else {
+            ratingsPage = ratingRepository.findByRatedUserId(userId, pageable);
+        }
         
         return ratingsPage.map(r -> {
             RatingResponseDTO dto = new RatingResponseDTO();

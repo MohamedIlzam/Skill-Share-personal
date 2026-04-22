@@ -26,6 +26,9 @@ public class ExchangeMessage {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
+    private boolean isRead = false;
+
     protected ExchangeMessage() {
     }
 
@@ -59,5 +62,13 @@ public class ExchangeMessage {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 }

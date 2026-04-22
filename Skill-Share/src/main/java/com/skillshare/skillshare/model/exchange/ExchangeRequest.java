@@ -6,8 +6,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "exchange_requests", uniqueConstraints = @UniqueConstraint(name = "uk_active_request", columnNames = {
-        "requester_id", "skill_owner_id", "selected_skill_id", "status" }))
+@Table(name = "exchange_requests")
 public class ExchangeRequest {
 
     @Id

@@ -288,6 +288,7 @@
             top: 0;
             bottom: 0;
             width: 6px;
+            pointer-events: none;
         }
 
         .border-PROGRAMMING::before {
@@ -383,6 +384,8 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            position: relative;
+            z-index: 2;
         }
 
         /* Empty State */
@@ -447,6 +450,7 @@
                 <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
                 <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
                 <a th:href="@{/requests}" class="nav-link-custom">Requests</a>
+                <a th:href="@{/messages}" class="nav-link-custom"><i class="bi bi-chat-fill me-1"></i>Messages</a>
             </div>
             <div class="d-flex align-items-center gap-3">
                 <form th:action="@{/logout}" method="post" style="margin:0;">
@@ -466,13 +470,14 @@
 
             <div class="search-container">
                 <form th:action="@{/browse}" method="get" class="search-box" id="browseForm">
+                    <input type="hidden" name="view" th:value="${selectedView}">
                     <input type="text" name="q" class="search-input"
-                        placeholder="e.g. Graphic Design, Public Speaking..." th:value="${searchQuery}">
+                        placeholder="Search by skill or provider name..." th:value="${searchQuery}">
                     <button type="submit" class="btn-search">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
                     <!-- Provide a clear button if populated -->
-                    <a th:if="${searchQuery != null && !searchQuery.isEmpty()}" th:href="@{/browse}"
+                    <a th:if="${searchQuery != null && !searchQuery.isEmpty()}" th:href="@{/browse(view=${selectedView})}"
                         class="btn btn-light rounded-circle ms-2 d-flex align-items-center justify-content-center"
                         style="width:45px; height:45px; border:1px solid #e2e8f0; text-decoration: none;"
                         title="Clear Search">
@@ -548,16 +553,37 @@
                     <h2 class="section-title">
                         <span th:text="${resultsMessage}">Explore Active Skills</span>
                     </h2>
-                    <p class="text-muted mb-0" th:text="${skills.size()} + ' skills available'"></p>
+                    <p class="text-muted mb-0" th:text="${skills.size()} + ' skills found'"></p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-sm rounded-pill px-3 fw-bold"
+                       th:classappend="${selectedView == 'available'} ? 'btn-primary' : 'btn-outline-primary'"
+                       th:href="@{/browse(view='available', q=${searchQuery}, category=${selectedCategory}, proficiency=${selectedProficiency}, sort=${selectedSort})}">
+                        Available Skills
+                    </a>
+                    <a class="btn btn-sm rounded-pill px-3 fw-bold"
+                       th:classappend="${selectedView == 'all'} ? 'btn-primary' : 'btn-outline-primary'"
+                       th:href="@{/browse(view='all', q=${searchQuery}, category=${selectedCategory}, proficiency=${selectedProficiency}, sort=${selectedSort})}">
+                        All Skills
+                    </a>
+                    <a class="btn btn-sm rounded-pill px-3 fw-bold"
+                       th:classappend="${selectedView == 'bookmarked'} ? 'btn-primary' : 'btn-outline-primary'"
+                       th:href="@{/browse(view='bookmarked', q=${searchQuery}, category=${selectedCategory}, proficiency=${selectedProficiency}, sort=${selectedSort})}">
+                        Bookmarked
+                    </a>
                 </div>
             </div>
 
             <!-- Empty State -->
             <div class="empty-state animate-tab" th:if="${#lists.isEmpty(skills)}">
-                <i class="bi bi-search empty-icon"></i>
-                <h3 class="fw-bold text-dark">No matching skills found</h3>
-                <p class="text-muted">We couldn't find any active skills matching your search criteria.</p>
-                <a th:href="@{/browse}" class="btn btn-outline-primary rounded-pill mt-2 fw-bold px-4">Clear Filters</a>
+                <i class="bi bi-search empty-icon" th:if="${selectedView != 'bookmarked'}"></i>
+                <i class="bi bi-bookmark-x empty-icon" th:if="${selectedView == 'bookmarked'}"></i>
+                <h3 class="fw-bold text-dark" th:if="${selectedView == 'bookmarked'}">No bookmarked skills</h3>
+                <h3 class="fw-bold text-dark" th:if="${selectedView != 'bookmarked'}">No matching skills found</h3>
+                <p class="text-muted" th:if="${selectedView == 'bookmarked'}">You haven't bookmarked any skills yet.</p>
+                <p class="text-muted" th:if="${selectedView == 'available'}">No skills are currently available for exchange.</p>
+                <p class="text-muted" th:if="${selectedView == 'all'}">No skills found in the system.</p>
+                <a th:href="@{/browse(view=${selectedView})}" class="btn btn-outline-primary rounded-pill mt-2 fw-bold px-4">Clear Filters</a>
             </div>
 
             <!-- Horizontal List -->
@@ -617,12 +643,22 @@
                         <button class="btn btn-outline-secondary rounded-pill px-4 fw-bold shadow-sm"
                             th:unless="${skill.mainSkill}" disabled>Not Available</button>
 
-                        <button class="btn btn-light rounded-circle text-muted border"
-                            style="width: 40px; height: 40px;">
-                            <i class="bi bi-bookmark"></i>
-                        </button>
+                        <form th:action="@{/browse/bookmark}" method="post" class="m-0">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <input type="hidden" name="skillId" th:value="${skill.id}">
+                            <input type="hidden" name="view" th:value="${selectedView}">
+                            <input type="hidden" name="q" th:value="${searchQuery}">
+                            <input type="hidden" name="category" th:value="${selectedCategory}">
+                            <input type="hidden" name="proficiency" th:value="${selectedProficiency}">
+                            <input type="hidden" name="sort" th:value="${selectedSort}">
+                            <button type="submit" class="btn btn-light rounded-circle text-muted border"
+                                style="width: 40px; height: 40px;">
+                                <i class="bi"
+                                   th:classappend="${bookmarkedSkillIds.contains(skill.id)} ? ' bi-bookmark-fill text-primary' : ' bi-bookmark'">
+                                </i>
+                            </button>
+                        </form>
                     </div>
-
                 </div>
 
             </div>
@@ -644,6 +680,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/requests/create}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <div class="modal-body">
                         <input type="hidden" name="skillId" id="modalSkillId" value="">
                         <p class="text-muted mb-4">You are requesting to connect and exchange skills for <strong
@@ -674,7 +711,7 @@
             <i class="bi bi-search"></i>
             <span>Browse</span>
         </a>
-        <a th:href="@{/requests}" class="tab-item">
+        <a th:href="@{/messages}" class="tab-item">
             <i class="bi bi-chat-dots-fill"></i>
             <span>Inbox</span>
         </a>

@@ -89,14 +89,18 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy) {
+    public List<Skill> getFilteredSkills(Long currentUserId, String keyword, SkillCategory category, SkillProficiency proficiency, String sortBy, boolean onlyAvailableOwners) {
         // Chain the specifications naturally
         Specification<Skill> spec = Specification.where(SkillSpecifications.excludeOwner(currentUserId))
-                .and(SkillSpecifications.hasName(keyword))
+                .and(SkillSpecifications.hasNameOrOwnerName(keyword))
                 .and(SkillSpecifications.hasCategory(category))
-                .and(SkillSpecifications.hasProficiency(proficiency))
-                .and(SkillSpecifications.isOwnerAvailable())
-                .and(SkillSpecifications.excludeAdmins())
+                .and(SkillSpecifications.hasProficiency(proficiency));
+
+        if (onlyAvailableOwners) {
+            spec = spec.and(SkillSpecifications.isOwnerAvailable());
+        }
+
+        spec = spec.and(SkillSpecifications.excludeAdmins())
                 .and(SkillSpecifications.isOwnerActive());
 
         // Let the DB execute the initial filter and sort natively by creation time
@@ -114,7 +118,9 @@ public class SkillServiceImpl implements SkillService {
 
             for (Skill skill : skills) {
                 java.util.Set<Long> mainSkillIds = userToMainSkillsMap.get(skill.getOwner().getId());
-                if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {
+                if (mainSkillIds == null || mainSkillIds.isEmpty()) {
+                    skill.setMainSkill(true);
+                } else if (mainSkillIds.contains(skill.getId())) {
                     skill.setMainSkill(true);
                 }
             }

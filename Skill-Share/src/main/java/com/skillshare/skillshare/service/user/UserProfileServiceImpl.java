@@ -7,6 +7,8 @@ import com.skillshare.skillshare.exception.ResourceNotFoundException;
 import com.skillshare.skillshare.model.user.AvailabilityStatus;
 import com.skillshare.skillshare.model.user.UserProfile;
 import com.skillshare.skillshare.repository.UserProfileRepository;
+import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
+import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
@@ -32,6 +34,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final com.skillshare.skillshare.repository.UserRepository userRepository;
     private final com.skillshare.skillshare.repository.SkillRepository skillRepository;
     private final ExchangeRatingRepository exchangeRatingRepository;
+    private final ExchangeRequestRepository exchangeRequestRepository;
     private static final String UPLOAD_DIRECTORY = "src/main/resources/static/images/profiles/";
 
     @Override
@@ -89,10 +92,30 @@ public class UserProfileServiceImpl implements UserProfileService {
                 throw new IllegalArgumentException("You can only select up to 5 main skills.");
             }
 
+            // Check for ongoing exchanges before removing skills
+            java.util.Set<Long> skillsToRemove = new java.util.HashSet<>(profile.getMainSkillIds());
+            skillsToRemove.removeAll(selectedSkillIds);
+            
+            for (Long skillId : skillsToRemove) {
+                if (exchangeRequestRepository.existsBySelectedSkillIdAndStatus(skillId, ExchangeRequestStatus.ACCEPTED)) {
+                    com.skillshare.skillshare.model.skill.Skill skill = skillRepository.findById(skillId).orElse(null);
+                    String skillName = skill != null ? skill.getName() : "Unknown Skill";
+                    throw new IllegalStateException("Cannot stop offering '" + skillName + "' while there is an ongoing exchange. Please complete the exchange first.");
+                }
+            }
+
             // Update profile
             profile.getMainSkillIds().clear();
             profile.getMainSkillIds().addAll(selectedSkillIds);
         } else {
+            // Check for ongoing exchanges for ALL current main skills before clearing
+            for (Long skillId : profile.getMainSkillIds()) {
+                if (exchangeRequestRepository.existsBySelectedSkillIdAndStatus(skillId, ExchangeRequestStatus.ACCEPTED)) {
+                    com.skillshare.skillshare.model.skill.Skill skill = skillRepository.findById(skillId).orElse(null);
+                    String skillName = skill != null ? skill.getName() : "Unknown Skill";
+                    throw new IllegalStateException("Cannot stop offering '" + skillName + "' while there is an ongoing exchange. Please complete the exchange first.");
+                }
+            }
             profile.getMainSkillIds().clear();
         }
 
@@ -132,6 +155,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user ID: " + userId));
 
         if (profile.getMainSkillIds().contains(skillId)) {
+            // Check for ongoing exchanges before allowing removal
+            if (exchangeRequestRepository.existsBySelectedSkillIdAndStatus(skillId, ExchangeRequestStatus.ACCEPTED)) {
+                throw new IllegalStateException("Cannot stop offering this skill while there is an ongoing exchange. Please complete the exchange first.");
+            }
             profile.getMainSkillIds().remove(skillId);
         } else {
             // Validate ownership before adding
@@ -148,9 +175,91 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PublicUserDTO> getActiveUsers(String search, Long currentUserId, Pageable pageable) {
-        Page<UserProfile> profiles = userProfileRepository.searchByKeywordExceptUser(search, currentUserId, pageable);
-        return profiles.map(this::mapToPublicDTO);
+    public Page<PublicUserDTO> getActiveUsers(com.skillshare.skillshare.dto.user.UserFilterDTO filterDTO, Long currentUserId) {
+        java.util.List<UserProfile> profiles = userProfileRepository.searchByKeywordExceptUser(filterDTO.getSearch(), currentUserId);
+
+        // Pre-filter by Skill Category before mapping
+        if (filterDTO.getCategory() != null && !filterDTO.getCategory().isBlank()) {
+            profiles = profiles.stream().filter(p -> {
+                if (p.getUser() == null) return false;
+                return skillRepository.findAllByOwnerId(p.getUser().getId()).stream()
+                        .anyMatch(s -> s.getCategory().name().equalsIgnoreCase(filterDTO.getCategory()) || 
+                                       s.getName().equalsIgnoreCase(filterDTO.getCategory()));
+            }).collect(java.util.stream.Collectors.toList());
+        }
+
+        // Map to DTOs
+        java.util.List<PublicUserDTO> dtoList = profiles.stream()
+                .map(this::mapToPublicDTO)
+                .collect(java.util.stream.Collectors.toList());
+
+        // Setup current user profile for relative filtering
+        UserProfileDTO currentUserProfile = null;
+        if (currentUserId != null && currentUserId != -1L) {
+            try {
+                currentUserProfile = getProfileByUserId(currentUserId);
+            } catch (ResourceNotFoundException e) {
+                // Ignore
+            }
+        }
+        final UserProfileDTO finalCurrentUserProfile = currentUserProfile;
+
+        // Apply remaining filters via Stream API
+        java.util.stream.Stream<PublicUserDTO> stream = dtoList.stream();
+
+        if (filterDTO.getAvailability() != null) {
+            stream = stream.filter(u -> u.getAvailabilityStatus() == filterDTO.getAvailability());
+        }
+
+        if (filterDTO.getMinRating() != null) {
+            stream = stream.filter(u -> u.getAverageRating() != null && u.getAverageRating() >= filterDTO.getMinRating());
+        }
+
+        if (Boolean.TRUE.equals(filterDTO.getSameLocation()) && finalCurrentUserProfile != null && finalCurrentUserProfile.getLocation() != null && !finalCurrentUserProfile.getLocation().isBlank()) {
+            stream = stream.filter(u -> finalCurrentUserProfile.getLocation().equalsIgnoreCase(u.getLocation()));
+        }
+
+        if (Boolean.TRUE.equals(filterDTO.getSameUniversity()) && finalCurrentUserProfile != null && finalCurrentUserProfile.getUniversity() != null && !finalCurrentUserProfile.getUniversity().isBlank()) {
+            stream = stream.filter(u -> finalCurrentUserProfile.getUniversity().equalsIgnoreCase(u.getUniversity()));
+        }
+
+        // Apply custom sorting
+        if ("highest_rating".equals(filterDTO.getSort())) {
+            stream = stream.sorted((a, b) -> {
+                double r1 = a.getAverageRating() != null ? a.getAverageRating() : -1.0;
+                double r2 = b.getAverageRating() != null ? b.getAverageRating() : -1.0;
+                return Double.compare(r2, r1);
+            });
+        } else if ("lowest_rating".equals(filterDTO.getSort())) {
+            stream = stream.sorted((a, b) -> {
+                if (a.getAverageRating() == null && b.getAverageRating() != null) return 1;
+                if (b.getAverageRating() == null && a.getAverageRating() != null) return -1;
+                if (a.getAverageRating() == null && b.getAverageRating() == null) return 0;
+                return Double.compare(a.getAverageRating(), b.getAverageRating());
+            });
+        } else if ("name_asc".equals(filterDTO.getSort())) {
+            stream = stream.sorted(java.util.Comparator.comparing(PublicUserDTO::getFullName, String.CASE_INSENSITIVE_ORDER));
+        }
+
+        java.util.List<PublicUserDTO> filteredList = stream.collect(java.util.stream.Collectors.toList());
+
+        // Perform manual pagination
+        int page = filterDTO.getPage();
+        int size = filterDTO.getSize();
+        if (size <= 0) size = 12; // default
+        if (page < 0) page = 0;
+        
+        int start = page * size;
+        int end = Math.min((start + size), filteredList.size());
+
+        java.util.List<PublicUserDTO> pageContent;
+        if (start <= end) {
+            pageContent = filteredList.subList(start, end);
+        } else {
+            pageContent = new java.util.ArrayList<>();
+        }
+
+        return new org.springframework.data.domain.PageImpl<>(pageContent, org.springframework.data.domain.PageRequest.of(page, size), filteredList.size());
     }
 
     @Override
@@ -159,6 +268,26 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserProfile profile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user ID: " + userId));
         return mapToPublicDTO(profile);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<PublicUserDTO> getTopRatedUsers(int limit) {
+        // Fetch IDs ordered by rating performance
+        java.util.List<Long> ratedUserIds = exchangeRatingRepository.findTopRatedUserIds(org.springframework.data.domain.PageRequest.of(0, limit));
+        
+        return ratedUserIds.stream()
+                .map(userId -> {
+                    try {
+                        // Map each ID to a full public profile
+                        return getPublicProfile(userId);
+                    } catch (ResourceNotFoundException e) {
+                        // Log skipped user if profile missing for some reason
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     private PublicUserDTO mapToPublicDTO(UserProfile profile) {

@@ -59,17 +59,21 @@ public class ExchangeRatingWebController {
             @PathVariable("userId") Long userId,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "minRating", required = false) Integer minRating,
+            @RequestParam(value = "sort", defaultValue = "recent") String sort,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
 
         PublicUserDTO publicProfile = userProfileService.getPublicProfile(userId);
-        Page<RatingResponseDTO> reviewsPage = exchangeRatingService.getPaginatedUserReviews(userId, page, size);
+        Page<RatingResponseDTO> reviewsPage = exchangeRatingService.getPaginatedUserReviews(userId, page, size, minRating, sort);
 
         model.addAttribute("profile", publicProfile);
         model.addAttribute("reviewsPage", reviewsPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", reviewsPage.getTotalPages());
         model.addAttribute("totalItems", reviewsPage.getTotalElements());
+        model.addAttribute("selectedMinRating", minRating);
+        model.addAttribute("selectedSort", sort);
         
         return "user-reviews";
     }

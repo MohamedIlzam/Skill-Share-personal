@@ -24,4 +24,13 @@ public interface ExchangeRequestRepository extends JpaRepository<ExchangeRequest
             @Param("requesterId") Long requesterId,
             @Param("skillId") Long skillId,
             @Param("statuses") List<ExchangeRequestStatus> statuses);
+
+    // Used to check if a skill has an ongoing exchange before allowing it to be unmarked as offered
+    boolean existsBySelectedSkillIdAndStatus(Long skillId, ExchangeRequestStatus status);
+
+    // Used by ExchangeMessageService to load conversation participants
+    List<ExchangeRequest> findAllByRequesterIdOrSkillOwnerId(Long requesterId, Long skillOwnerId);
+
+    // Used by ExchangeMessageService to send direct messages
+    List<ExchangeRequest> findAllByRequesterIdAndSkillOwnerId(Long requesterId, Long skillOwnerId);
 }

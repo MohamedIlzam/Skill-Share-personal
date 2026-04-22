@@ -264,6 +264,7 @@
             <div class="d-flex align-items-center gap-3">
                 <a th:href="@{/profile}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-person-circle me-1"></i>My Profile</a>
                 <a th:href="@{/active-users}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-people-fill me-1"></i>All Users</a>
+                <a th:href="@{/messages}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-chat-fill me-1"></i>Messages</a>
                 <form th:action="@{/logout}" method="post" style="margin:0;"><button type="submit"
                         class="btn btn-sm btn-outline-danger rounded-pill"><i
                             class="bi bi-box-arrow-right me-1"></i>Logout</button></form>
@@ -427,6 +428,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/requests/create}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <div class="modal-body">
                         <p class="text-muted mb-4">You are requesting to connect and exchange skills with <strong class="text-dark" th:text="${profile.fullName}">User</strong>.</p>
                         

@@ -3,3 +3,9 @@
 
 # Ignore accidental upload folder at repo root
 /src/
+
+# Ignore accidental nested project folder inside Skill-Share
+Skill-Share/Skill-Share/
+
+# Ignore backup folder created in repo root
+src_backup_march23/

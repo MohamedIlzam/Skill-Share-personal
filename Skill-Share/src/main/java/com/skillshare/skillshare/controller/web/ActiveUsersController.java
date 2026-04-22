@@ -27,32 +27,50 @@ public class ActiveUsersController {
 
     @GetMapping("/active-users")
     public String listActiveUsers(
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "12") int size,
+            com.skillshare.skillshare.dto.user.UserFilterDTO filterDTO,
             @RequestParam(value = "view", defaultValue = "users") String view,
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
             Model model) {
+
+        // Prevent browser caching to ensure user status and ratings are always up-to-date
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        if (filterDTO.getPage() < 0) filterDTO.setPage(0);
+        if (filterDTO.getSize() <= 0) filterDTO.setSize(12);
+
+        // Default to AVAILABLE if the form hasn't been explicitly submitted for availability
+        if (request.getParameter("availability") == null) {
+            filterDTO.setAvailability(com.skillshare.skillshare.model.user.AvailabilityStatus.AVAILABLE);
+        } else if ("".equals(request.getParameter("availability"))) {
+            filterDTO.setAvailability(null);
+        }
 
         Long currentUserId = (userDetails != null) ? userDetails.getUser().getId() : -1L;
         
         if ("users".equals(view)) {
-            Page<PublicUserDTO> userPage = userProfileService.getActiveUsers(
-                    search, 
-                    currentUserId, 
-                    PageRequest.of(page, size, Sort.by("updatedAt").descending())
-            );
+            Page<PublicUserDTO> userPage = userProfileService.getActiveUsers(filterDTO, currentUserId);
 
             model.addAttribute("users", userPage.getContent());
-            model.addAttribute("currentPage", page);
+            model.addAttribute("currentPage", filterDTO.getPage());
             model.addAttribute("totalPages", userPage.getTotalPages());
             model.addAttribute("totalItems", userPage.getTotalElements());
+
+            // Add top 5 rated users to the highlight section
+            model.addAttribute("topRatedUsers", userProfileService.getTopRatedUsers(5));
         }
 
-        model.addAttribute("search", search);
-        model.addAttribute("resultsMessage", org.springframework.util.StringUtils.hasText(search) ? "Results for '" + search + "'" : "All Active Users");
+        model.addAttribute("search", filterDTO.getSearch());
+        model.addAttribute("filterDTO", filterDTO);
+        model.addAttribute("resultsMessage", org.springframework.util.StringUtils.hasText(filterDTO.getSearch()) ? "Results for '" + filterDTO.getSearch() + "'" : "Active Users");
         model.addAttribute("activeView", view);
-
+        
+        // Expose Skill categories for the filter dropdown
+        model.addAttribute("skillCategories", com.skillshare.skillshare.model.skill.SkillCategory.values());
+        
         return "active-users";
     }
 
