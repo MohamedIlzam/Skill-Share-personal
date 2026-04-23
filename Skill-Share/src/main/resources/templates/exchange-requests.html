@@ -137,6 +137,7 @@
                 <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
                 <a th:href="@{/requests}" class="nav-link-custom active">Requests</a>
                 <a th:href="@{/messages}" class="nav-link-custom"><i class="bi bi-chat-fill me-1"></i>Messages</a>
+                <a th:href="@{/system-messages}" class="nav-link-custom"><i class="bi bi-bell-fill me-1"></i>Notifications</a>
             </div>
         </div>
     </nav>
@@ -185,6 +186,7 @@
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                         <div>
                             <span class="status-badge" th:classappend="'status-' + ${req.status}" th:text="${req.status}">PENDING</span>
+                            <span th:if="${!req.requesterActive}" class="badge bg-secondary ms-2"><i class="bi bi-person-x-fill me-1"></i>Requester Inactive</span>
                             <h4 class="fw-bold mt-2 text-dark" th:text="${req.skillName}">Graphic Design</h4>
                             <p class="mb-1 text-muted">Requested by: <strong class="text-dark" th:text="${req.requesterName}">User</strong></p>
                             <p class="mb-2" th:if="${req.message != null && !req.message.isEmpty()}">
@@ -197,7 +199,7 @@
                             <a th:href="@{/messages/{id}(id=${req.requesterId})}" class="btn btn-outline-primary btn-action"><i class="bi bi-chat-dots me-1"></i>Chat</a>
                             <th:block th:if="${req.status.name() == 'PENDING'}">
                                 <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-success btn-action"><i class="bi bi-check-lg me-1"></i>Accept</button>
+                                    <button type="submit" class="btn btn-success btn-action" th:disabled="${!req.requesterActive}"><i class="bi bi-check-lg me-1"></i>Accept</button>
                                 </form>
                                 <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post">
                                     <button type="submit" class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg me-1"></i>Reject</button>
@@ -205,7 +207,7 @@
                             </th:block>
                             <th:block th:if="${req.status.name() == 'ACCEPTED'}">
                                 <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
+                                    <button type="submit" class="btn btn-primary btn-action" th:disabled="${!req.requesterActive}"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
                                 </form>
                             </th:block>
                         </div>
@@ -226,6 +228,7 @@
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                         <div>
                             <span class="status-badge" th:classappend="'status-' + ${req.status}" th:text="${req.status}">PENDING</span>
+                            <span th:if="${!req.skillOwnerActive}" class="badge bg-secondary ms-2"><i class="bi bi-person-x-fill me-1"></i>Owner Inactive</span>
                             <h4 class="fw-bold mt-2 text-dark" th:text="${req.skillName}">Public Speaking</h4>
                             <p class="mb-1 text-muted">Owner: <strong class="text-dark" th:text="${req.skillOwnerName}">Instructor</strong></p>
                             <p class="mb-2" th:if="${req.message != null && !req.message.isEmpty()}">
@@ -238,7 +241,7 @@
                             <a th:href="@{/messages/{id}(id=${req.skillOwnerId})}" class="btn btn-outline-primary btn-action"><i class="bi bi-chat-dots me-1"></i>Chat</a>
                             <th:block th:if="${req.status.name() == 'ACCEPTED'}">
                                 <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-primary btn-action"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
+                                    <button type="submit" class="btn btn-primary btn-action" th:disabled="${!req.skillOwnerActive}"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
                                 </form>
                             </th:block>
                         </div>
