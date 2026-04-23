@@ -7,6 +7,7 @@ import com.skillshare.skillshare.model.exchange.ExchangeRequest;
 import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
 import com.skillshare.skillshare.model.skill.Skill;
 import com.skillshare.skillshare.model.user.User;
+import com.skillshare.skillshare.model.user.UserStatus;
 import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import com.skillshare.skillshare.repository.SkillRepository;
@@ -76,6 +77,11 @@ public class ExchangeRequestService {
 
     public ExchangeRequestResponseDTO acceptRequest(Long requestId, Long skillOwnerId) {
         ExchangeRequest request = getRequestForOwner(requestId, skillOwnerId);
+        
+        if (request.getRequester().getStatus() != UserStatus.ACTIVE) {
+            throw new IllegalStateException("Cannot accept a request from a deactivated user.");
+        }
+        
         request.accept();
         return mapToDTO(exchangeRequestRepository.save(request));
     }
@@ -92,6 +98,10 @@ public class ExchangeRequestService {
 
         if (!request.getRequester().getId().equals(userId) && !request.getSkillOwner().getId().equals(userId)) {
             throw new IllegalArgumentException("Only exchange participants can complete this exchange");
+        }
+
+        if (request.getRequester().getStatus() != UserStatus.ACTIVE || request.getSkillOwner().getStatus() != UserStatus.ACTIVE) {
+            throw new IllegalStateException("Exchange cannot be completed while a participant's account is deactivated.");
         }
 
         request.complete();
@@ -123,6 +133,9 @@ public class ExchangeRequestService {
             isRated = exchangeRatingRepository.existsByExchangeIdAndRaterId(request.getId(), request.getRequester().getId());
         }
 
+        boolean requesterActive = request.getRequester().getStatus() == UserStatus.ACTIVE;
+        boolean skillOwnerActive = request.getSkillOwner().getStatus() == UserStatus.ACTIVE;
+
         return new ExchangeRequestResponseDTO(
                 request.getId(),
                 request.getRequester().getId(),
@@ -135,6 +148,8 @@ public class ExchangeRequestService {
                 request.getStatus(),
                 request.getCreatedAt(),
                 request.getUpdatedAt(),
-                isRated);
+                isRated,
+                requesterActive,
+                skillOwnerActive);
     }
 }

@@ -17,11 +17,14 @@ public class ExchangeRequestResponseDTO {
     private Instant createdAt;
     private Instant updatedAt;
     private boolean isRated;
+    private boolean requesterActive;
+    private boolean skillOwnerActive;
 
     public ExchangeRequestResponseDTO(Long id, Long requesterId, String requesterName,
             Long skillOwnerId, String skillOwnerName,
             Long skillId, String skillName, String message,
-            ExchangeRequestStatus status, Instant createdAt, Instant updatedAt, boolean isRated) {
+            ExchangeRequestStatus status, Instant createdAt, Instant updatedAt, boolean isRated,
+            boolean requesterActive, boolean skillOwnerActive) {
         this.id = id;
         this.requesterId = requesterId;
         this.requesterName = requesterName;
@@ -34,6 +37,8 @@ public class ExchangeRequestResponseDTO {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.isRated = isRated;
+        this.requesterActive = requesterActive;
+        this.skillOwnerActive = skillOwnerActive;
     }
 
     public Long getId() {
@@ -82,5 +87,13 @@ public class ExchangeRequestResponseDTO {
 
     public boolean isRated() {
         return isRated;
+    }
+
+    public boolean isRequesterActive() {
+        return requesterActive;
+    }
+
+    public boolean isSkillOwnerActive() {
+        return skillOwnerActive;
     }
 }

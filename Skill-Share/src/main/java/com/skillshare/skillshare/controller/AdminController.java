@@ -81,6 +81,9 @@ public class AdminController {
         Double averageRating = exchangeRatingRepository.getAverageRatingForUser(id);
         model.addAttribute("averageRating", averageRating != null ? Math.round(averageRating * 10.0) / 10.0 : 0.0);
 
+        List<SystemMessage> systemMessages = systemMessageRepository.findByRecipientIdOrderByCreatedAtDesc(id);
+        model.addAttribute("systemMessages", systemMessages);
+
         return "admin-user-profile";
     }
 

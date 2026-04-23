@@ -6,6 +6,7 @@ import com.skillshare.skillshare.exception.ResourceNotFoundException;
 import com.skillshare.skillshare.model.exchange.ExchangeMessage;
 import com.skillshare.skillshare.model.exchange.ExchangeRequest;
 import com.skillshare.skillshare.model.user.User;
+import com.skillshare.skillshare.model.user.UserStatus;
 import com.skillshare.skillshare.repository.ExchangeMessageRepository;
 import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.UserRepository;
@@ -73,7 +74,9 @@ public class ExchangeMessageService {
         java.util.Map<Long, User> participantsMap = new java.util.HashMap<>();
         for (ExchangeRequest req : requests) {
             User other = req.getRequester().getId().equals(userId) ? req.getSkillOwner() : req.getRequester();
-            participantsMap.put(other.getId(), other);
+            if (other.getStatus() == UserStatus.ACTIVE) {
+                participantsMap.put(other.getId(), other);
+            }
         }
 
         return participantsMap.values().stream().map(other -> {
