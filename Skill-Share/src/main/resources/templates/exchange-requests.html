@@ -176,10 +176,28 @@
         <div class="tab-content" id="request-tabs-content">
             <!-- Received Requests -->
             <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                    <div class="fw-bold text-dark">Received Requests</div>
+                    <form method="get" th:action="@{/requests}" class="d-flex gap-2 align-items-center m-0">
+                        <input type="hidden" name="tab" value="received">
+                        <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
+                        <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
+                        <select class="form-select form-select-sm" name="incomingStatus" style="min-width: 220px;" aria-label="Filter received requests" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedIncomingStatus == ''}">All statuses</option>
+                            <option value="pending" th:selected="${selectedIncomingStatus == 'pending'}">Pending</option>
+                            <option value="ongoing" th:selected="${selectedIncomingStatus == 'ongoing'}">Accepted / Ongoing</option>
+                            <option value="completed" th:selected="${selectedIncomingStatus == 'completed'}">Completed</option>
+                            <option value="rejected" th:selected="${selectedIncomingStatus == 'rejected'}">Rejected</option>
+                        </select>
+                    </form>
+                </div>
+
                 <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center py-5 text-muted">
                     <i class="bi bi-inbox-fill fs-1"></i>
-                    <h5 class="mt-3">No received requests</h5>
-                    <p>You haven't received any exchange requests yet.</p>
+                    <h5 class="mt-3" th:if="${!incomingFilterApplied}">No received requests</h5>
+                    <h5 class="mt-3" th:if="${incomingFilterApplied}">No records found for this category</h5>
+                    <p th:if="${!incomingFilterApplied}">You haven't received any exchange requests yet.</p>
+                    <p th:if="${incomingFilterApplied}">Try changing the filter to see more results.</p>
                 </div>
 
                 <div th:each="req : ${incomingRequests}" class="request-card">
@@ -217,11 +235,29 @@
 
             <!-- Sent Requests -->
             <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                    <div class="fw-bold text-dark">Sent Requests</div>
+                    <form method="get" th:action="@{/requests}" class="d-flex gap-2 align-items-center m-0">
+                        <input type="hidden" name="tab" value="sent">
+                        <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
+                        <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
+                        <select class="form-select form-select-sm" name="outgoingStatus" style="min-width: 220px;" aria-label="Filter sent requests" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedOutgoingStatus == ''}">All statuses</option>
+                            <option value="pending" th:selected="${selectedOutgoingStatus == 'pending'}">Pending</option>
+                            <option value="ongoing" th:selected="${selectedOutgoingStatus == 'ongoing'}">Ongoing</option>
+                            <option value="completed" th:selected="${selectedOutgoingStatus == 'completed'}">Completed</option>
+                            <option value="rejected" th:selected="${selectedOutgoingStatus == 'rejected'}">Rejected</option>
+                        </select>
+                    </form>
+                </div>
+
                 <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center py-5 text-muted">
                     <i class="bi bi-send-fill fs-1"></i>
-                    <h5 class="mt-3">No sent requests</h5>
-                    <p>You haven't sent any exchange requests yet.</p>
-                    <a th:href="@{/browse}" class="btn btn-primary rounded-pill mt-2">Browse Skills</a>
+                    <h5 class="mt-3" th:if="${!outgoingFilterApplied}">No sent requests</h5>
+                    <h5 class="mt-3" th:if="${outgoingFilterApplied}">No records found for this category</h5>
+                    <p th:if="${!outgoingFilterApplied}">You haven't sent any exchange requests yet.</p>
+                    <p th:if="${outgoingFilterApplied}">Try changing the filter to see more results.</p>
+                    <a th:href="@{/browse}" class="btn btn-primary rounded-pill mt-2" th:if="${!outgoingFilterApplied}">Browse Skills</a>
                 </div>
 
                 <div th:each="req : ${outgoingRequests}" class="request-card">
@@ -251,10 +287,26 @@
 
             <!-- Past Exchanges (History) -->
             <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                    <div class="fw-bold text-dark">Past Exchanges</div>
+                    <form method="get" th:action="@{/requests}" class="d-flex gap-2 align-items-center m-0">
+                        <input type="hidden" name="tab" value="history">
+                        <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
+                        <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
+                        <select class="form-select form-select-sm" name="historyRole" style="min-width: 220px;" aria-label="Filter history by role" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedHistoryRole == ''}">All roles</option>
+                            <option value="provider" th:selected="${selectedHistoryRole == 'provider'}">Provider</option>
+                            <option value="receiver" th:selected="${selectedHistoryRole == 'receiver'}">Receiver</option>
+                        </select>
+                    </form>
+                </div>
+
                 <div th:if="${#lists.isEmpty(completedExchanges)}" class="text-center py-5 text-muted">
                     <i class="bi bi-clock-history fs-1"></i>
-                    <h5 class="mt-3">No past exchanges yet</h5>
-                    <p>Completed exchanges will appear here for your reference.</p>
+                    <h5 class="mt-3" th:if="${!historyFilterApplied}">No past exchanges yet</h5>
+                    <h5 class="mt-3" th:if="${historyFilterApplied}">No records found for this category</h5>
+                    <p th:if="${!historyFilterApplied}">Completed exchanges will appear here for your reference.</p>
+                    <p th:if="${historyFilterApplied}">Try changing the filter to see more results.</p>
                 </div>
 
                 <div th:each="exchange : ${completedExchanges}" class="request-card border-success-subtle">
@@ -442,7 +494,16 @@
     <script th:src="@{/js/pwa.js}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const activeTab = /*[[${activeTab}]]*/ 'received';
+            const tabTriggerEl = document.querySelector(`#${activeTab}-tab`);
+            if (tabTriggerEl) {
+                const tab = new bootstrap.Tab(tabTriggerEl);
+                tab.show();
+            }
+        });
+
         const chatModalEl = document.getElementById('chatModal');
         const chatBody = document.getElementById('chatBody');
         const chatLoading = document.getElementById('chatLoading');
