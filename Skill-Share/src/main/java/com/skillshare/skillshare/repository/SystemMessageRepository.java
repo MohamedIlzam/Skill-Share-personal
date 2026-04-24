@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface SystemMessageRepository extends JpaRepository<SystemMessage, Long> {
     List<SystemMessage> findByRecipientIdOrderByCreatedAtDesc(Long recipientId);
+    List<SystemMessage> findByRecipientIdAndAdminMessageOrderByCreatedAtDesc(Long recipientId, boolean adminMessage);
+    long countByRecipientIdAndIsReadFalse(Long recipientId);
 }

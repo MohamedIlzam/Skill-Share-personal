@@ -66,7 +66,8 @@ public class ExchangeRequestService {
 
         createSystemMessage(
                 savedRequest.getSkillOwner().getId(),
-                "New exchange request received from " + requester.getFullName() + " for skill: " + skill.getName());
+                "New exchange request received from " + requester.getFullName() + " for skill: " + skill.getName(),
+                "New Exchange Request");
 
         return mapToDTO(savedRequest);
     }
@@ -115,7 +116,8 @@ public class ExchangeRequestService {
 
         createSystemMessage(
                 saved.getRequester().getId(),
-                saved.getSkillOwner().getFullName() + " accepted your exchange request for skill: " + saved.getSelectedSkill().getName());
+                saved.getSkillOwner().getFullName() + " accepted your exchange request for skill: " + saved.getSelectedSkill().getName(),
+                "Exchange Accepted");
 
         return mapToDTO(saved);
     }
@@ -127,7 +129,8 @@ public class ExchangeRequestService {
 
         createSystemMessage(
                 saved.getRequester().getId(),
-                saved.getSkillOwner().getFullName() + " rejected your exchange request for skill: " + saved.getSelectedSkill().getName());
+                saved.getSkillOwner().getFullName() + " rejected your exchange request for skill: " + saved.getSelectedSkill().getName(),
+                "Request Declined");
 
         return mapToDTO(saved);
     }
@@ -157,19 +160,21 @@ public class ExchangeRequestService {
 
         createSystemMessage(
                 otherUserId,
-                completedByName + " marked the exchange as completed for skill: " + saved.getSelectedSkill().getName());
+                completedByName + " marked the exchange as completed for skill: " + saved.getSelectedSkill().getName(),
+                "Exchange Completed");
 
         createSystemMessage(
                 saved.getRequester().getId(),
-                "Reminder: Please submit a rating for your completed exchange with " + saved.getSkillOwner().getFullName() + ".");
+                "Reminder: Please submit a rating for your completed exchange with " + saved.getSkillOwner().getFullName() + ".",
+                "Rating Required");
 
         return mapToDTO(saved);
     }
 
-    private void createSystemMessage(Long recipientId, String content) {
+    private void createSystemMessage(Long recipientId, String content, String title) {
         User recipient = userRepository.findById(recipientId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        systemMessageRepository.save(new SystemMessage(recipient, content));
+        systemMessageRepository.save(new SystemMessage(recipient, content, title, false));
     }
 
     @Transactional(readOnly = true)

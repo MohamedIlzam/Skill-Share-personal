@@ -30,6 +30,18 @@ public class SystemMessageController {
         User user = userRepository.findByEmail(email).orElseThrow();
 
         List<SystemMessage> messages = systemMessageRepository.findByRecipientIdOrderByCreatedAtDesc(user.getId());
+        
+        boolean hasUnread = false;
+        for (SystemMessage msg : messages) {
+            if (!msg.isRead()) {
+                msg.setRead(true);
+                hasUnread = true;
+            }
+        }
+        if (hasUnread) {
+            systemMessageRepository.saveAll(messages);
+        }
+
         model.addAttribute("messages", messages);
 
         return "system-messages";

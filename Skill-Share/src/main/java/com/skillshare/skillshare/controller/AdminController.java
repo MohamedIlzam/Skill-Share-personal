@@ -81,7 +81,7 @@ public class AdminController {
         Double averageRating = exchangeRatingRepository.getAverageRatingForUser(id);
         model.addAttribute("averageRating", averageRating != null ? Math.round(averageRating * 10.0) / 10.0 : 0.0);
 
-        List<SystemMessage> systemMessages = systemMessageRepository.findByRecipientIdOrderByCreatedAtDesc(id);
+        List<SystemMessage> systemMessages = systemMessageRepository.findByRecipientIdAndAdminMessageOrderByCreatedAtDesc(id, true);
         model.addAttribute("systemMessages", systemMessages);
 
         return "admin-user-profile";
@@ -113,7 +113,7 @@ public class AdminController {
         }
 
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        SystemMessage message = new SystemMessage(user, content);
+        SystemMessage message = new SystemMessage(user, content, "Administration", true);
         systemMessageRepository.save(message);
 
         redirectAttributes.addFlashAttribute("successMessage", "System message sent to the user successfully.");
