@@ -2,6 +2,7 @@ package com.skillshare.skillshare.controller.web;
 
 import com.skillshare.skillshare.dto.exchange.ExchangeRequestCreateDTO;
 import com.skillshare.skillshare.dto.exchange.ExchangeRequestResponseDTO;
+import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
 import com.skillshare.skillshare.security.CustomUserDetails;
 import com.skillshare.skillshare.service.exchange.ExchangeRequestService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -25,18 +27,60 @@ public class ExchangeRequestWebController {
     }
 
     @GetMapping
-    public String showExchangeRequests(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    public String showExchangeRequests(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(value = "tab", required = false) String tab,
+            @RequestParam(value = "incomingStatus", required = false) String incomingStatus,
+            @RequestParam(value = "outgoingStatus", required = false) String outgoingStatus,
+            @RequestParam(value = "historyRole", required = false) String historyRole,
+            Model model) {
         Long userId = userDetails.getUser().getId();
-        List<ExchangeRequestResponseDTO> incomingRequests = exchangeRequestService.getIncomingRequests(userId);
-        List<ExchangeRequestResponseDTO> outgoingRequests = exchangeRequestService.getOutgoingRequests(userId);
-        List<ExchangeRequestResponseDTO> completedExchanges = exchangeRequestService.getCompletedExchangesHistory(userId);
+
+        ExchangeRequestStatus incomingFilter = parseStatusFilter(incomingStatus);
+        ExchangeRequestStatus outgoingFilter = parseStatusFilter(outgoingStatus);
+
+        List<ExchangeRequestResponseDTO> incomingRequests = exchangeRequestService.getIncomingRequests(userId, incomingFilter);
+        List<ExchangeRequestResponseDTO> outgoingRequests = exchangeRequestService.getOutgoingRequests(userId, outgoingFilter);
+        List<ExchangeRequestResponseDTO> completedExchanges = exchangeRequestService.getCompletedExchangesHistory(userId, historyRole);
 
         model.addAttribute("incomingRequests", incomingRequests);
         model.addAttribute("outgoingRequests", outgoingRequests);
         model.addAttribute("completedExchanges", completedExchanges);
         model.addAttribute("currentUserId", userId);
 
+        model.addAttribute("activeTab", StringUtils.hasText(tab) ? tab : "received");
+        model.addAttribute("selectedIncomingStatus", StringUtils.hasText(incomingStatus) ? incomingStatus : "");
+        model.addAttribute("selectedOutgoingStatus", StringUtils.hasText(outgoingStatus) ? outgoingStatus : "");
+        model.addAttribute("selectedHistoryRole", StringUtils.hasText(historyRole) ? historyRole : "");
+
+        model.addAttribute("incomingFilterApplied", StringUtils.hasText(incomingStatus));
+        model.addAttribute("outgoingFilterApplied", StringUtils.hasText(outgoingStatus));
+        model.addAttribute("historyFilterApplied", StringUtils.hasText(historyRole));
+
         return "exchange-requests";
+    }
+
+    private ExchangeRequestStatus parseStatusFilter(String raw) {
+        if (!StringUtils.hasText(raw)) return null;
+
+        if ("pending".equalsIgnoreCase(raw)) {
+            return ExchangeRequestStatus.PENDING;
+        }
+        if ("ongoing".equalsIgnoreCase(raw) || "accepted".equalsIgnoreCase(raw)) {
+            return ExchangeRequestStatus.ACCEPTED;
+        }
+        if ("completed".equalsIgnoreCase(raw)) {
+            return ExchangeRequestStatus.COMPLETED;
+        }
+        if ("rejected".equalsIgnoreCase(raw)) {
+            return ExchangeRequestStatus.REJECTED;
+        }
+
+        try {
+            return ExchangeRequestStatus.valueOf(raw.toUpperCase());
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     @PostMapping("/create")
