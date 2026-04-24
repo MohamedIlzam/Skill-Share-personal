@@ -5,15 +5,18 @@ import com.skillshare.skillshare.dto.exchange.ExchangeRequestResponseDTO;
 import com.skillshare.skillshare.exception.ResourceNotFoundException;
 import com.skillshare.skillshare.model.exchange.ExchangeRequest;
 import com.skillshare.skillshare.model.exchange.ExchangeRequestStatus;
+import com.skillshare.skillshare.model.message.SystemMessage;
 import com.skillshare.skillshare.model.skill.Skill;
 import com.skillshare.skillshare.model.user.User;
 import com.skillshare.skillshare.model.user.UserStatus;
 import com.skillshare.skillshare.repository.ExchangeRequestRepository;
 import com.skillshare.skillshare.repository.ExchangeRatingRepository;
 import com.skillshare.skillshare.repository.SkillRepository;
+import com.skillshare.skillshare.repository.SystemMessageRepository;
 import com.skillshare.skillshare.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,15 +29,18 @@ public class ExchangeRequestService {
     private final ExchangeRatingRepository exchangeRatingRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final SystemMessageRepository systemMessageRepository;
 
     public ExchangeRequestService(ExchangeRequestRepository exchangeRequestRepository,
             ExchangeRatingRepository exchangeRatingRepository,
             SkillRepository skillRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            SystemMessageRepository systemMessageRepository) {
         this.exchangeRequestRepository = exchangeRequestRepository;
         this.exchangeRatingRepository = exchangeRatingRepository;
         this.skillRepository = skillRepository;
         this.userRepository = userRepository;
+        this.systemMessageRepository = systemMessageRepository;
     }
 
     public ExchangeRequestResponseDTO createRequest(Long requesterId, ExchangeRequestCreateDTO dto) {
@@ -58,6 +64,10 @@ public class ExchangeRequestService {
         ExchangeRequest request = new ExchangeRequest(requester, skill.getOwner(), skill, dto.getMessage());
         ExchangeRequest savedRequest = exchangeRequestRepository.save(request);
 
+        createSystemMessage(
+                savedRequest.getSkillOwner().getId(),
+                "New exchange request received from " + requester.getFullName() + " for skill: " + skill.getName());
+
         return mapToDTO(savedRequest);
     }
 
@@ -69,10 +79,28 @@ public class ExchangeRequestService {
     }
 
     @Transactional(readOnly = true)
+    public List<ExchangeRequestResponseDTO> getIncomingRequests(Long skillOwnerId, ExchangeRequestStatus status) {
+        List<ExchangeRequest> requests = (status == null)
+                ? exchangeRequestRepository.findBySkillOwnerIdOrderByCreatedAtDesc(skillOwnerId)
+                : exchangeRequestRepository.findBySkillOwnerIdAndStatusOrderByCreatedAtDesc(skillOwnerId, status);
+
+        return requests.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<ExchangeRequestResponseDTO> getOutgoingRequests(Long requesterId) {
         return exchangeRequestRepository.findByRequesterIdOrderByCreatedAtDesc(requesterId).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExchangeRequestResponseDTO> getOutgoingRequests(Long requesterId, ExchangeRequestStatus status) {
+        List<ExchangeRequest> requests = (status == null)
+                ? exchangeRequestRepository.findByRequesterIdOrderByCreatedAtDesc(requesterId)
+                : exchangeRequestRepository.findByRequesterIdAndStatusOrderByCreatedAtDesc(requesterId, status);
+
+        return requests.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     public ExchangeRequestResponseDTO acceptRequest(Long requestId, Long skillOwnerId) {
@@ -83,13 +111,25 @@ public class ExchangeRequestService {
         }
         
         request.accept();
-        return mapToDTO(exchangeRequestRepository.save(request));
+        ExchangeRequest saved = exchangeRequestRepository.save(request);
+
+        createSystemMessage(
+                saved.getRequester().getId(),
+                saved.getSkillOwner().getFullName() + " accepted your exchange request for skill: " + saved.getSelectedSkill().getName());
+
+        return mapToDTO(saved);
     }
 
     public ExchangeRequestResponseDTO rejectRequest(Long requestId, Long skillOwnerId) {
         ExchangeRequest request = getRequestForOwner(requestId, skillOwnerId);
         request.reject();
-        return mapToDTO(exchangeRequestRepository.save(request));
+        ExchangeRequest saved = exchangeRequestRepository.save(request);
+
+        createSystemMessage(
+                saved.getRequester().getId(),
+                saved.getSkillOwner().getFullName() + " rejected your exchange request for skill: " + saved.getSelectedSkill().getName());
+
+        return mapToDTO(saved);
     }
 
     public ExchangeRequestResponseDTO completeRequest(Long requestId, Long userId) {
@@ -105,7 +145,31 @@ public class ExchangeRequestService {
         }
 
         request.complete();
-        return mapToDTO(exchangeRequestRepository.save(request));
+        ExchangeRequest saved = exchangeRequestRepository.save(request);
+
+        Long otherUserId = saved.getRequester().getId().equals(userId)
+                ? saved.getSkillOwner().getId()
+                : saved.getRequester().getId();
+
+        String completedByName = saved.getRequester().getId().equals(userId)
+                ? saved.getRequester().getFullName()
+                : saved.getSkillOwner().getFullName();
+
+        createSystemMessage(
+                otherUserId,
+                completedByName + " marked the exchange as completed for skill: " + saved.getSelectedSkill().getName());
+
+        createSystemMessage(
+                saved.getRequester().getId(),
+                "Reminder: Please submit a rating for your completed exchange with " + saved.getSkillOwner().getFullName() + ".");
+
+        return mapToDTO(saved);
+    }
+
+    private void createSystemMessage(Long recipientId, String content) {
+        User recipient = userRepository.findById(recipientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        systemMessageRepository.save(new SystemMessage(recipient, content));
     }
 
     @Transactional(readOnly = true)
@@ -114,6 +178,24 @@ public class ExchangeRequestService {
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExchangeRequestResponseDTO> getCompletedExchangesHistory(Long userId, String role) {
+        if (!StringUtils.hasText(role)) {
+            return getCompletedExchangesHistory(userId);
+        }
+
+        List<ExchangeRequest> exchanges;
+        if ("provider".equalsIgnoreCase(role)) {
+            exchanges = exchangeRequestRepository.findBySkillOwnerIdAndStatusOrderByUpdatedAtDesc(userId, ExchangeRequestStatus.COMPLETED);
+        } else if ("receiver".equalsIgnoreCase(role)) {
+            exchanges = exchangeRequestRepository.findByRequesterIdAndStatusOrderByUpdatedAtDesc(userId, ExchangeRequestStatus.COMPLETED);
+        } else {
+            exchanges = exchangeRequestRepository.findExchangeHistoryByUserIdAndStatus(userId, ExchangeRequestStatus.COMPLETED);
+        }
+
+        return exchanges.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     private ExchangeRequest getRequestForOwner(Long requestId, Long skillOwnerId) {
