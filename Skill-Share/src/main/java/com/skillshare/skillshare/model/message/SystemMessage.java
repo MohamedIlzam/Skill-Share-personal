@@ -19,14 +19,26 @@ public class SystemMessage {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private boolean isRead = false;
+
+    @Column(name = "is_admin_message", nullable = false)
+    private boolean adminMessage = false;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     protected SystemMessage() {}
 
-    public SystemMessage(User recipient, String content) {
+    public SystemMessage(User recipient, String content, String title, boolean adminMessage) {
         this.recipient = recipient;
         this.content = content;
+        this.title = title;
+        this.adminMessage = adminMessage;
+        this.isRead = false;
     }
 
     @PrePersist
@@ -48,5 +60,29 @@ public class SystemMessage {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
+    }
+
+    public boolean isAdminMessage() {
+        return adminMessage;
+    }
+
+    public void setAdminMessage(boolean adminMessage) {
+        this.adminMessage = adminMessage;
     }
 }

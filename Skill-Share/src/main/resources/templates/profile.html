@@ -59,72 +59,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Navbar (identical to home / about) ─────── */
-        .navbar-custom {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid var(--card-border);
-            padding: .75rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1050;
-            transition: box-shadow .3s ease;
-        }
-
-        .navbar-custom.scrolled {
-            box-shadow: var(--shadow-sm);
-        }
-
-        .navbar-brand-text {
-            font-weight: 800;
-            font-size: 1.35rem;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -.02em;
-        }
-
-        .nav-link-page {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: .92rem;
-            text-decoration: none;
-            padding: .4rem .8rem;
-            border-radius: .5rem;
-            transition: color .2s, background .2s;
-        }
-
-        .nav-link-page:hover {
-            color: var(--primary);
-            background: var(--primary-subtle);
-        }
-
-        .nav-btn-logout {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 38px;
-            padding: 0 1.2rem;
-            font-size: .9rem;
-            font-weight: 600;
-            color: var(--text-body);
-            background: var(--bg-light);
-            border: 1.5px solid var(--card-border);
-            border-radius: 50rem;
-            cursor: pointer;
-            white-space: nowrap;
-            font-family: inherit;
-            transition: background .2s, border-color .2s, color .2s;
-        }
-
-        .nav-btn-logout:hover {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #dc2626;
-        }
-
         /* ── Page content area ───────────────────────── */
         .profile-page {
             flex: 1;
@@ -420,31 +354,13 @@
             }
         }
     </style>
+    <style th:replace="~{fragments/navbar :: navbar-styles}"></style>
 </head>
 
 <body>
 
     <!-- ══ Navbar (identical to home / about) ══════════ -->
-    <nav class="navbar-custom" id="navbar">
-        <div class="container d-flex align-items-center justify-content-between">
-            <span class="navbar-brand-text">
-                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
-            </span>
-            <div class="d-flex align-items-center gap-3">
-                <a th:href="@{/active-users}" class="nav-link-page">Explore</a>
-                <a th:href="@{/skills}" class="nav-link-page">My Skills</a>
-                <a th:href="@{/requests}" class="nav-link-page">Requests</a>
-                <a th:href="@{/messages}" class="nav-link-page"><i class="bi bi-chat-fill me-1"></i>Messages</a>
-                <a th:href="@{/system-messages}" class="nav-link-page"><i class="bi bi-bell-fill me-1"></i>Notifications</a>
-                <!-- Logout form (POST required by Spring Security) -->
-                <form th:action="@{/logout}" method="post" style="margin:0;">
-                    <button type="submit" class="nav-btn-logout" id="logout-btn">
-                        <i class="bi bi-box-arrow-right me-1"></i>Log out
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="~{fragments/navbar :: navbar(activeTab='profile')}"></div>
 
     <!-- ══ Profile Page ════════════════════════════════ -->
     <main class="profile-page" id="profile-main">

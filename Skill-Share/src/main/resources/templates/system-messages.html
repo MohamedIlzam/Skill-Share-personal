@@ -22,27 +22,11 @@
         .message-content { white-space: pre-wrap; font-size: 0.95rem; color: var(--text-dark); margin-top: 0.5rem; }
         .footer { background: var(--text-dark); color: #94a3b8; text-align: center; padding: 2rem 1rem; font-size: .88rem; margin-top: auto; }
     </style>
+    <style th:replace="~{fragments/navbar :: navbar-styles}"></style>
 </head>
 
 <body>
-    <nav class="navbar-custom">
-        <div class="container d-flex align-items-center justify-content-between">
-            <span class="navbar-brand-text"><i class="bi bi-arrow-left-right me-1"></i>SkillShare</span>
-            <div class="d-flex align-items-center gap-2">
-                <a th:href="@{/active-users}" class="nav-link-custom">Explore</a>
-                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
-                <a th:href="@{/skills}" class="nav-link-custom">My Skills</a>
-                <a th:href="@{/requests}" class="nav-link-custom">Requests</a>
-                <a th:href="@{/messages}" class="nav-link-custom"><i class="bi bi-chat-fill me-1"></i>Messages</a>
-                <a th:href="@{/system-messages}" class="nav-link-custom active"><i class="bi bi-bell-fill me-1"></i>Notifications</a>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <form th:action="@{/logout}" method="post" style="margin:0;">
-                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Logout</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="~{fragments/navbar :: navbar(activeTab='notifications')}"></div>
 
     <main class="container py-5" style="max-width: 800px;">
         <h1 class="fw-bold fs-2 mb-4"><i class="bi bi-bell me-2 text-primary"></i>System Messages</h1>
@@ -56,7 +40,16 @@
         <div th:unless="${#lists.isEmpty(messages)}">
             <div th:each="msg : ${messages}" class="message-card">
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                    <span class="fw-bold text-dark"><i class="bi bi-shield-check text-primary me-2"></i>Administration</span>
+                    <span class="fw-bold text-dark">
+                        <i th:if="${msg.title == 'Administration'}" class="bi bi-shield-check text-primary me-2"></i>
+                        <i th:if="${msg.title == 'New Exchange Request'}" class="bi bi-plus-circle text-success me-2"></i>
+                        <i th:if="${msg.title == 'Exchange Accepted'}" class="bi bi-check-circle text-primary me-2"></i>
+                        <i th:if="${msg.title == 'Request Declined'}" class="bi bi-x-circle text-danger me-2"></i>
+                        <i th:if="${msg.title == 'Exchange Completed'}" class="bi bi-flag-fill text-success me-2"></i>
+                        <i th:if="${msg.title == 'Rating Required'}" class="bi bi-star-fill text-warning me-2"></i>
+                        <i th:if="${msg.title != 'Administration' and msg.title != 'New Exchange Request' and msg.title != 'Exchange Accepted' and msg.title != 'Request Declined' and msg.title != 'Exchange Completed' and msg.title != 'Rating Required'}" class="bi bi-info-circle text-primary me-2"></i>
+                        <span th:text="${msg.title}">Notification Title</span>
+                    </span>
                     <small class="text-muted" th:text="${#temporals.format(msg.createdAt, 'dd MMM yyyy, HH:mm')}">Date</small>
                 </div>
                 <div class="message-content" th:text="${msg.content}">Message Content</div>
