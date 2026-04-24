@@ -70,45 +70,6 @@
             right: -50px;
         }
 
-        /* ── Navbar ── */
-        .navbar-custom {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid var(--card-border);
-            padding: .75rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1050;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .navbar-brand-text {
-            font-weight: 800;
-            font-size: 1.35rem;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -.02em;
-            text-decoration: none;
-        }
-
-        .nav-link-custom {
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: .95rem;
-            text-decoration: none;
-            padding: .5rem 1rem;
-            border-radius: .5rem;
-            transition: color .2s, background .2s;
-        }
-
-        .nav-link-custom:hover,
-        .nav-link-custom.active {
-            color: var(--primary);
-            background: var(--primary-subtle);
-        }
-
         /* ── Main Layout ── */
         .page-header {
             display: flex;
@@ -492,25 +453,12 @@
             }
         }
     </style>
+    <style th:replace="~{fragments/navbar :: navbar-styles}"></style>
 </head>
 
 <body>
 
-    <nav class="navbar-custom">
-        <div class="container d-flex align-items-center justify-content-between">
-            <span class="navbar-brand-text">
-                <i class="bi bi-arrow-left-right me-1"></i>SkillShare
-            </span>
-            <div class="d-flex align-items-center gap-2">
-                <a th:href="@{/active-users}" class="nav-link-custom">Explore</a>
-                <a th:href="@{/profile}" class="nav-link-custom">Profile</a>
-                <a th:href="@{/skills}" class="nav-link-custom active">My Skills</a>
-                <a th:href="@{/requests}" class="nav-link-custom">Requests</a>
-                <a th:href="@{/messages}" class="nav-link-custom"><i class="bi bi-chat-fill me-1"></i>Messages</a>
-                <a th:href="@{/system-messages}" class="nav-link-custom"><i class="bi bi-bell-fill me-1"></i>Notifications</a>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="~{fragments/navbar :: navbar(activeTab='skills')}"></div>
 
     <main class="container flex-grow-1">
 
