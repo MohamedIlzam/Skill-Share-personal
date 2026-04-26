@@ -2,8 +2,8 @@ package com.skillshare.skillshare.model.user;
 
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_profiles")
@@ -41,8 +41,9 @@ public class UserProfile {
 
     @ElementCollection
     @CollectionTable(name = "user_main_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @OrderColumn(name = "skill_order")
     @Column(name = "skill_id")
-    private Set<Long> mainSkillIds = new HashSet<>();
+    private List<Long> mainSkillIds = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -89,8 +90,8 @@ public class UserProfile {
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
     public AvailabilityStatus getAvailabilityStatus() { return availabilityStatus; }
     public void setAvailabilityStatus(AvailabilityStatus availabilityStatus) { this.availabilityStatus = availabilityStatus; }
-    public Set<Long> getMainSkillIds() { return mainSkillIds; }
-    public void setMainSkillIds(Set<Long> mainSkillIds) { this.mainSkillIds = mainSkillIds; }
+    public List<Long> getMainSkillIds() { return mainSkillIds; }
+    public void setMainSkillIds(List<Long> mainSkillIds) { this.mainSkillIds = mainSkillIds; }
     public String getUniversity() { return university; }
     public void setUniversity(String university) { this.university = university; }
     public Instant getCreatedAt() { return createdAt; }

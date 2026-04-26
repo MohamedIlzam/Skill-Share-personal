@@ -96,7 +96,7 @@ public class ActiveUsersController {
         model.addAttribute("ratingSummary", exchangeRatingService.getUserRatingSummary(userId));
         model.addAttribute("userReviews", exchangeRatingService.getUserReviews(userId));
 
-        java.util.Set<Long> mainSkillIds = userProfileService.getProfileByUserId(userId).getMainSkillIds();
+        java.util.List<Long> mainSkillIds = userProfileService.getProfileByUserId(userId).getMainSkillIds();
         java.util.List<com.skillshare.skillshare.model.skill.Skill> availableSkills = skillService.getSkillsByUser(userId).stream()
                 .filter(skill -> mainSkillIds != null && mainSkillIds.contains(skill.getId()))
                 .collect(java.util.stream.Collectors.toList());

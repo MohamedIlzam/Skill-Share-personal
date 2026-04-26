@@ -113,11 +113,11 @@ public class SkillServiceImpl implements SkillService {
                     .collect(java.util.stream.Collectors.toSet());
             
             List<UserProfile> profiles = userProfileRepository.findAllByUserIdIn(userIds);
-            java.util.Map<Long, java.util.Set<Long>> userToMainSkillsMap = profiles.stream()
+            java.util.Map<Long, java.util.List<Long>> userToMainSkillsMap = profiles.stream()
                     .collect(java.util.stream.Collectors.toMap(p -> p.getUser().getId(), UserProfile::getMainSkillIds));
 
             for (Skill skill : skills) {
-                java.util.Set<Long> mainSkillIds = userToMainSkillsMap.get(skill.getOwner().getId());
+                java.util.List<Long> mainSkillIds = userToMainSkillsMap.get(skill.getOwner().getId());
                 if (mainSkillIds == null || mainSkillIds.isEmpty()) {
                     skill.setMainSkill(true);
                 } else if (mainSkillIds.contains(skill.getId())) {

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
@@ -22,5 +22,5 @@ public class UserProfileDTO {
     private String university;
     private String profilePictureUrl;
     private AvailabilityStatus availabilityStatus;
-    private Set<Long> mainSkillIds;
+    private List<Long> mainSkillIds;
 }

@@ -33,6 +33,6 @@ public class UserProfileUpdateDTO {
 
     private MultipartFile profilePicture;
 
-    private java.util.Set<Long> mainSkillIds;
+    private java.util.List<Long> mainSkillIds;
     private String mainSkillIdsString;
 }

@@ -34,7 +34,7 @@ public class ProfileController {
         java.util.List<com.skillshare.skillshare.model.skill.Skill> mainSkills = new java.util.ArrayList<>();
         java.util.List<com.skillshare.skillshare.model.skill.Skill> otherSkills = new java.util.ArrayList<>();
         
-        java.util.Set<Long> mainSkillIds = profile.getMainSkillIds();
+        java.util.List<Long> mainSkillIds = profile.getMainSkillIds();
         
         for (com.skillshare.skillshare.model.skill.Skill skill : allSkills) {
             if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {

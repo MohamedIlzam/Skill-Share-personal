@@ -308,7 +308,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             java.util.List<com.skillshare.skillshare.model.skill.Skill> allSkills = 
                     skillRepository.findAllByOwnerId(profile.getUser().getId());
             
-            java.util.Set<Long> mainSkillIds = profile.getMainSkillIds();
+            java.util.List<Long> mainSkillIds = profile.getMainSkillIds();
 
             for (com.skillshare.skillshare.model.skill.Skill skill : allSkills) {
                 if (mainSkillIds != null && mainSkillIds.contains(skill.getId())) {
