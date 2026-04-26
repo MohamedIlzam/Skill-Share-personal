@@ -5,6 +5,7 @@ import com.skillshare.skillshare.model.user.PasswordResetToken;
 import com.skillshare.skillshare.model.user.User;
 import com.skillshare.skillshare.repository.PasswordResetTokenRepository;
 import com.skillshare.skillshare.repository.UserRepository;
+import com.skillshare.skillshare.service.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Value("${server.port:8080}")
     private String serverPort;
@@ -49,11 +51,11 @@ public class PasswordResetService {
             PasswordResetToken resetToken = new PasswordResetToken(user);
             tokenRepository.save(resetToken);
             
-            // Simulate sending email by logging token
-            logger.info("\n========== PASSWORD RESET SIMULATION ==========");
-            logger.info("Requested for email: {}", normalizedEmail);
-            logger.info("Reset Link -> http://localhost:{}/reset-password?token={}", serverPort, resetToken.getToken());
-            logger.info("===============================================\n");
+            // Send email
+            String resetLink = "http://localhost:" + serverPort + "/reset-password?token=" + resetToken.getToken();
+            emailService.sendPasswordResetEmail(normalizedEmail, resetLink);
+            
+            logger.info("Password reset email dispatched to: {}", normalizedEmail);
         } else {
             logger.info("Password reset requested for unregistered email: {}", normalizedEmail);
         }
