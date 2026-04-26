@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: skill-share
+    env: docker
+    plan: free
+    region: ohio # Change this if your Aiven DB is in a different region like Oregon/Frankfurt
+    envVars:
+      - key: PORT
+        value: 8085
+      - key: SPRING_DATASOURCE_URL
+        sync: false # Set this in the Render Dashboard
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false # Set this in the Render Dashboard
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false # Set this in the Render Dashboard
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
