@@ -1,218 +1,116 @@
-Skill-Swap (Skill Sharing & Exchange Web Application)
-Overview
-
-Skill-Swap is a web-based platform that enables users to exchange skills without monetary transactions. Users can list skills they can offer, request skills they need, and complete exchanges through a structured workflow. The system promotes collaboration, peer learning, and fair skill-based interaction while ensuring transparency and accountability.
-
-The solution follows a layered architecture using Spring Boot and is developed using Agile methodology, applying object-oriented principles and human-centered design practices to ensure maintainability, scalability, and usability.
-
-Main Features and Scope
-1) User Management
-
-User registration and login
-
-Secure authentication and role-based access
-
-Profile management
-
-Display of user ratings and completed exchanges
-
-2) Skill Management
-
-Add, edit, and delete offered skills
-
-Skill categorization
-
-Proficiency level selection
-
-Skill browsing and filtering
-
-3) Skill Exchange Workflow
-
-Request a skill from another user
-
-Accept or reject exchange requests
-
-Status tracking (request → accepted/rejected → completed)
-
-Exchange history tracking
-
-4) Rating System
-
-Mutual rating after exchange completion
-
-Review history visibility
-
-5) Admin Features
-
-Monitor users and exchanges
-
-View system statistics
-
-View user feedback
-
-Main Users
-General Users (Students)
-
-Create profiles
-
-List and manage skills
-
-Initiate and manage exchange requests
-
-Provide ratings and feedback
-
-Administrator
-
-Monitor platform activity
-
-Moderate inappropriate behavior
-
-View overall system performance
-
-Technology Stack
-Backend
-
-Java 17
-
-Spring Boot
-
-Spring Web (REST API)
-
-Spring Data JPA
-
-Spring Security
-
-Hibernate ORM
-
-Frontend
-
-Thymeleaf
-
-HTML / CSS
-
-Bootstrap
-
-Database
-
-MySQL
-
-Development Tools
-
-Maven
-
-Git & GitHub
-
-Postman (API testing)
-
-Architecture
-
-The system is designed using a layered backend architecture to support clean separation of concerns and maintainability:
-
-Controller Layer: Request routing + API endpoints / web routes
-
-Service Layer: Business logic + validation + workflow rules
-
-Repository Layer: Database operations (Spring Data JPA)
-
-Model Layer: Domain entities (e.g., User, Skill, Exchange, Rating)
-
-This structure supports future additions without major redesign.
-
-Sprint 1 Goal and Scope
-Sprint 1 Goal
-
-Sprint 1 establishes the initial functional prototype by implementing:
-
-Core system infrastructure
-
-Database connection
-
-Basic user authentication features
-
-A minimal vertical slice that proves users can enter and access the system
-
-Sprint 1 “Working Vertical Slice” (Must work by end of Sprint)
-
-At the end of Sprint 1, the system should allow a user to:
-
-Register a new account through a web interface
-
-Log in using their credentials
-
-Access a protected profile page
-
-View basic profile information
-
-Sprint 1 Epics Included
-
-Epic 1 – System Setup & Architecture (project initialization, DB config, layered architecture setup)
-
-Epic 2 – User Authentication & Registration (register + login + required backend components and UI)
-
-Epic 3 – User Profile Management (Partial) (basic protected profile display after login)
-
-Getting Started
-Prerequisites
-
-Java 17 installed
-
-Maven (or use the included Maven wrapper mvnw)
-
-MySQL running locally (or via Docker)
-
-Database Setup (MySQL)
-
-Create a database:
-
+# SkillShare
+
+SkillShare is a peer-to-peer skill exchange web application where users can offer skills, request skills they want to learn, message other users, and complete exchanges with a rating system.
+
+The main application is a Spring Boot project located in `Skill-Share/`.
+
+## Features
+- **User management**
+  - Registration and login
+  - Profile management
+- **Skill management**
+  - Offer skills
+  - Browse and request skills
+- **Skill exchange workflow**
+  - Send / accept / reject requests
+  - Track progress and history
+- **Messaging & notifications**
+  - Direct user-to-user messaging
+  - Notifications for important updates
+- **Ratings**
+  - Mutual rating after completion
+
+## Tech Stack
+- **Backend**
+  - Java 17
+  - Spring Boot
+  - Spring MVC, Spring Security
+  - Spring Data JPA (Hibernate)
+- **Frontend**
+  - Thymeleaf templates
+  - HTML/CSS
+- **Database**
+  - MySQL
+- **Testing**
+  - Cypress (UI testing)
+
+## Prerequisites
+- Java 17 (JDK)
+- MySQL Server
+- Git
+
+Note: Maven is not required because the project includes the Maven Wrapper (`mvnw.cmd`).
+
+## Local Setup (Windows)
+
+### 1) Create the database
+Create a MySQL database named `skillshare_db`.
+
+```sql
 CREATE DATABASE skillshare_db;
+```
 
-Configure database connection in application.properties (or use environment variables).
+### 2) Configure database credentials
+The application reads DB settings from environment variables (with sensible defaults). The defaults are defined in:
 
-Run the Application
+`Skill-Share/src/main/resources/application.properties`
 
-Using Maven wrapper:
+Required variables (recommended):
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
 
-./mvnw spring-boot:run
+Default values (if not set):
+- URL: `jdbc:mysql://localhost:3306/skillshare_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC`
+- Username: `root`
+- Password: (empty)
 
-Optional (example for custom port + password override):
+Server port:
+- `PORT` (default `8085`)
 
-./mvnw spring-boot:run "-Dspring-boot.run.arguments=--server.port=8081 --spring.datasource.password=YOUR_PASSWORD"
-Deliverables by Sprint (High-Level Roadmap)
-Sprint 1 (Current)
+### 3) Run the application
+From the `Skill-Share/` folder:
 
-Project setup + DB connection
+```bat
+.\mvnw.cmd spring-boot:run
+```
 
-Layered architecture packages
+If you want to run with explicit env vars (example credentials):
 
-User registration + login
+```bat
+set SPRING_DATASOURCE_USERNAME=root
+set SPRING_DATASOURCE_PASSWORD=root123
+set SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/skillshare_db?useSSL=false^&allowPublicKeyRetrieval=true^&serverTimezone=UTC
+set PORT=8085
+.\mvnw.cmd spring-boot:run
+```
 
-Protected profile page (basic info)
+Then open:
+- `http://localhost:8085/`
 
-Future Sprints (Planned Features)
+## Running Cypress Tests
+Cypress configuration and dependencies are in `Skill-Share/package.json`.
 
-Skill management (CRUD + categories + filtering)
+From the `Skill-Share/` folder:
 
-Exchange workflow (requests, acceptance/rejection, completion)
+```bat
+npm install
+npm run cypress:open
+```
 
-Rating system (mutual rating + review history)
+Or run headless:
 
-Admin monitoring tools + system statistics
+```bat
+npm run cypress:run
+```
 
-UI improvements and full integration testing
-
-Team & Client
-Team Members
-
-IT24200310 – S. Arun
-
-IT24103433 – Jadavan M.
-
-IT24610792 – Ilzam M.I.M
-
-IT24101633 – Heshanth T.
-
-Client Details
-
-Client Name: Kandasamy Sugarthan
-
-Designation: Data Governance Manager
+## Troubleshooting
+- **Port already in use**
+  - Change `PORT` (or free the port), then restart the app.
+- **Database connection fails**
+  - Ensure MySQL is running.
+  - Ensure `skillshare_db` exists.
+  - Confirm `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD`.
+- **App starts but pages don’t update**
+  - Hard refresh the browser:
+    - Chrome/Edge: `Ctrl+F5` or `Ctrl+Shift+R`
