@@ -35,8 +35,6 @@ class ExchangeRequestEntityTest {
         skill = new Skill("Java Programming", SkillCategory.PROGRAMMING, SkillProficiency.ADVANCED, skillOwner);
     }
 
-    // ─── Story 1: Request a Skill Exchange ────────────────────────────────
-
     @Test
     @DisplayName("S1-Scenario1: New exchange request defaults to PENDING status")
     void newRequest_shouldHavePendingStatus() {
