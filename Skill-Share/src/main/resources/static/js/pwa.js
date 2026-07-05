@@ -5,6 +5,15 @@ if ('serviceWorker' in navigator) {
             console.log('SW registration failed: ', err);
         });
     });
+
+    // Automatically reload page when new service worker takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

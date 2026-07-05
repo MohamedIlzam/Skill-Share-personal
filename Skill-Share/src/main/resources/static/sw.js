@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skillshare-v2';
+const CACHE_NAME = 'skillshare-v3';
 const urlsToCache = [
   '/css/pwa.css',
   '/manifest.json',

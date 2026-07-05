@@ -549,17 +549,7 @@
                 white-space: normal !important;
                 font-size: 1.15rem !important;
             }
-            /* Find People / Find Skills tabs full-width */
-            .btn-group.rounded-pill {
-                width: 100%;
-                display: flex;
-            }
-            .btn-group.rounded-pill a {
-                flex: 1;
-                font-size: 0.85rem;
-                padding-left: 0.5rem !important;
-                padding-right: 0.5rem !important;
-            }
+
         }
     </style>
     <style th:replace="~{fragments/navbar :: navbar-styles}"></style>
@@ -601,6 +591,30 @@
     <main class="browse-main">
         <div class="container">
 
+            <!-- Notifications -->
+            <div th:if="${successParam}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successParam}">Success message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${errorParam}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorParam}">Error message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Shared Navigation Tabs -->
+            <div class="row justify-content-center mb-4 mb-sm-5">
+                <div class="col-auto">
+                    <div class="btn-group rounded-pill p-1 bg-white shadow-sm border">
+                        <a th:href="@{/active-users}" class="btn btn-light rounded-pill px-4 fw-bold">
+                            <i class="bi bi-people-fill me-2"></i>Find People
+                        </a>
+                        <a th:href="@{/browse}" class="btn btn-primary rounded-pill px-4 fw-bold">
+                            <i class="bi bi-lightbulb-fill me-2"></i>Find Skills
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Figma-like Filter Card -->
             <div class="bg-white border border-slate-200 rounded-2xl p-3 p-sm-4 mb-4 mb-sm-5 shadow-sm">
                 <div class="filter-flex">
@@ -626,33 +640,6 @@
                             <option value="proficiency" th:selected="${selectedSort == 'proficiency'}">Highest Proficiency</option>
                             <option value="lowest-proficiency" th:selected="${selectedSort == 'lowest-proficiency'}">Lowest Proficiency</option>
                         </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Shared Navigation Tabs -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 w-100">
-                    <!-- Notifications -->
-                    <div th:if="${successParam}" class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successParam}">Success
-                            message</span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    <div th:if="${errorParam}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorParam}">Error
-                            message</span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="btn-group rounded-pill p-1 bg-white shadow-sm border">
-                        <a th:href="@{/active-users}" class="btn btn-light rounded-pill px-4 fw-bold">
-                            <i class="bi bi-people-fill me-2"></i>Find People
-                        </a>
-                        <a th:href="@{/browse}" class="btn btn-primary rounded-pill px-4 fw-bold">
-                            <i class="bi bi-lightbulb-fill me-2"></i>Find Skills
-                        </a>
                     </div>
                 </div>
             </div>
