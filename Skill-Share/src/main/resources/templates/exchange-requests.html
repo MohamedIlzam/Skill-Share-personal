@@ -57,7 +57,7 @@
 
         /* Container max-width */
         .browse-container {
-            max-width: 1100px;
+            max-width: 680px;
             margin: 0 auto;
             width: 100%;
         }
@@ -82,27 +82,38 @@
             gap: 0.35rem;
         }
 
-        /* Tab styling */
+        /* Rounded utility helper classes */
+        .rounded-xl {
+            border-radius: 0.75rem !important;
+        }
+        .rounded-2xl {
+            border-radius: 1rem !important;
+        }
+        .rounded-3xl {
+            border-radius: 1.5rem !important;
+        }
+        .rounded-pill-container {
+            border-radius: 50rem !important;
+        }
+        .tab-nav-container {
+            border-radius: 0.75rem !important;
+        }
+
+        /* Tab styling - Pill rounded corners & reduced height */
         .tab-pill-btn {
             background: transparent;
             color: #64748b;
             transition: all 0.2s ease;
             font-family: 'Inter', sans-serif;
             border: none;
+            border-radius: 50rem !important;
+            font-size: 0.9rem;
         }
         .tab-pill-btn.active {
             background: #2563eb !important;
             color: #ffffff !important;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        }
-
-        /* Sticky Sidebar on Desktop */
-        @media (min-width: 768px) {
-            .sticky-sidebar {
-                position: sticky;
-                top: 88px;
-                z-index: 10;
-            }
+            border-radius: 50rem !important;
         }
 
         /* Avatar Initials */
@@ -358,385 +369,361 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <!-- Responsive Dashboard Row -->
-        <div class="row mt-2">
-            
-            <!-- Left Column: Tab Navigation (acts as a sidebar on larger screen sizes) -->
-            <div class="col-md-4 mb-4">
-                <div class="sticky-sidebar">
-                    <!-- Tab Navigation Container -->
-                    <div class="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-sm">
-                        <div class="nav flex-column gap-2" id="request-tabs" role="tablist">
-                            <button class="nav-link active tab-pill-btn d-flex align-items-center justify-content-between py-3 px-4 rounded-xl fw-bold border-0 w-100" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
-                                <span class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-inbox-fill"></i> Received Requests
-                                </span>
-                                <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(incomingRequests)}">0</span>
-                            </button>
-                            <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-3 px-4 rounded-xl fw-bold border-0 w-100" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
-                                <span class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-send-fill"></i> Sent Requests
-                                </span>
-                                <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(outgoingRequests)}">0</span>
-                            </button>
-                            <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-3 px-4 rounded-xl fw-bold border-0 w-100" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
-                                <span class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-clock-history"></i> Past Exchanges
-                                </span>
-                                <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(completedExchanges)}">0</span>
-                            </button>
-                        </div>
-                    </div>
+        <!-- Tab Navigation Container (Modern rounded corners, single row on desktop, reduced height) -->
+        <div class="bg-white p-2 border border-slate-200/80 shadow-sm mb-4 tab-nav-container">
+            <div class="nav flex-column flex-md-row gap-2" id="request-tabs" role="tablist">
+                <button class="nav-link active tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true" style="height: auto;">
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi bi-inbox-fill"></i> Received Requests
+                    </span>
+                    <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(incomingRequests)}">0</span>
+                </button>
+                <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false" style="height: auto;">
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi bi-send-fill"></i> Sent Requests
+                    </span>
+                    <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(outgoingRequests)}">0</span>
+                </button>
+                <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false" style="height: auto;">
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history"></i> Past Exchanges
+                    </span>
+                    <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(completedExchanges)}">0</span>
+                </button>
+            </div>
+        </div>
 
-                    <!-- Pro Tip Banner (Visible on Desktop Sidebar) -->
-                    <div class="pro-tip-banner d-none d-md-flex">
-                        <div class="pro-tip-icon-badge">
-                            <i class="bi bi-hand-thumbs-up-fill"></i>
+        <div class="tab-content" id="request-tabs-content">
+            <!-- Received Requests -->
+            <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                    <div class="fw-bold text-navy">Received List</div>
+                    <form method="get" th:action="@{/requests}" class="m-0">
+                        <input type="hidden" name="tab" value="received">
+                        <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
+                        <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
+                        <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="incomingStatus" style="min-width: 140px; background-color: #fff;" aria-label="Filter received requests" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedIncomingStatus == ''}">All statuses</option>
+                            <option value="pending" th:selected="${selectedIncomingStatus == 'pending'}">Pending</option>
+                            <option value="ongoing" th:selected="${selectedIncomingStatus == 'ongoing'}">Ongoing</option>
+                            <option value="completed" th:selected="${selectedIncomingStatus == 'completed'}">Completed</option>
+                            <option value="rejected" th:selected="${selectedIncomingStatus == 'rejected'}">Rejected</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
+                    <i class="bi bi-inbox fs-1 text-slate-300"></i>
+                    <h5 class="mt-3 fw-bold text-navy" th:if="${!incomingFilterApplied}">No received requests</h5>
+                    <h5 class="mt-3 fw-bold text-navy" th:if="${incomingFilterApplied}">No matching requests</h5>
+                    <p class="small mb-0" th:if="${!incomingFilterApplied}">You haven't received any exchange requests yet.</p>
+                    <p class="small mb-0" th:if="${incomingFilterApplied}">Try changing the filter to see more results.</p>
+                </div>
+
+                <!-- Request Card Stack -->
+                <div class="d-flex flex-column gap-3">
+                    <div th:each="req : ${incomingRequests}" class="request-card" th:attr="data-skill=${req.skillName}, data-user=${req.requesterName}">
+                        <!-- Top Header Row -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-initials" th:with="name=${req.requesterName}, spaceIdx=${#strings.indexOf(name, ' ')}">
+                                    <span th:text="${#strings.substring(name, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(name)} ? ${#strings.substring(name, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
+                                </div>
+                                <div>
+                                    <div class="small text-muted text-xs mb-0.5">Requested by</div>
+                                    <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="user-link fw-bold" th:text="${req.requesterName}">John Doe</a>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span class="status-pill status-pill-pending" th:if="${req.status.name() == 'PENDING'}">
+                                    <i class="bi bi-clock-fill"></i> PENDING
+                                </span>
+                                <span class="status-pill status-pill-accepted" th:if="${req.status.name() == 'ACCEPTED'}">
+                                    <i class="bi bi-check-circle-fill"></i> ACCEPTED
+                                </span>
+                                <span class="status-pill status-pill-rejected" th:if="${req.status.name() == 'REJECTED'}">
+                                    <i class="bi bi-x-circle-fill"></i> REJECTED
+                                </span>
+                                <span class="status-pill status-pill-completed" th:if="${req.status.name() == 'COMPLETED'}">
+                                    <i class="bi bi-check2-all"></i> COMPLETED
+                                </span>
+                                <small class="text-muted text-xs mt-1" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</small>
+                            </div>
                         </div>
-                        <div class="d-flex flex-column gap-0.5">
-                            <strong class="text-navy" style="font-size: 0.95rem;">Pro Tip</strong>
-                            <p class="small mb-0 text-navy" style="opacity: 0.85; line-height: 1.4;">Review profiles before accepting requests. Check their skills and reviews to ensure a good match!</p>
+
+                        <!-- Card Body Elements -->
+                        <div class="mb-3">
+                            <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
+                                <span th:text="${req.skillName}">React Development</span>
+                                <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
+                            </h5>
+
+                            <!-- Offering Tag -->
+                            <div class="offering-capsule mb-3">
+                                <i class="bi bi-tag-fill"></i> Offering Exchange
+                            </div>
+
+                            <!-- Inactive warning if requester is inactive -->
+                            <div th:if="${!req.requesterActive}" class="alert alert-warning py-2 px-3 small d-flex align-items-center gap-2 mb-2 rounded-xl border-0 shadow-sm">
+                                <i class="bi bi-person-x-fill text-warning"></i>
+                                <span>Requester is currently inactive</span>
+                            </div>
+
+                            <!-- Message Quote Block -->
+                            <div th:if="${req.message != null && !req.message.isEmpty()}" class="quote-block">
+                                <i class="bi bi-chat-left-quote-fill quote-icon"></i>
+                                <span th:text="${req.message}">Message</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons Stack -->
+                        <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
+                            <!-- Option C: Decision/Pending with Decline Option -->
+                            <div th:if="${req.status.name() == 'PENDING'}" class="d-flex flex-column gap-2 w-100">
+                                <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post" class="w-100 m-0">
+                                    <button type="submit" class="btn-accept-solid w-100" th:disabled="${!req.requesterActive}">
+                                        <i class="bi bi-check-lg"></i> Accept
+                                    </button>
+                                </form>
+                                <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post" class="w-100 m-0">
+                                    <button type="submit" class="btn-decline-outline w-100">
+                                        <i class="bi bi-x-lg"></i> Decline
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Option B: Accepted -> Mark Complete -->
+                            <div th:if="${req.status.name() == 'ACCEPTED'}" class="w-100">
+                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post" class="w-100 m-0">
+                                    <button type="submit" class="btn-complete-solid w-100" th:disabled="${!req.requesterActive}">
+                                        <i class="bi bi-check2-all"></i> Mark Complete
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Universal Card Footer Buttons -->
+                            <div class="d-flex gap-2 w-100 mt-1">
+                                <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                        th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.requesterName}">
+                                    <i class="bi bi-chat-left-text"></i> Message
+                                </button>
+                                <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="btn-card-footer flex-fill text-decoration-none">
+                                    <i class="bi bi-person-circle"></i> View Profile
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Lists of Cards -->
-            <div class="col-md-8">
-                <div class="tab-content" id="request-tabs-content">
-                    
-                    <!-- Received Requests Tab Content -->
-                    <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
-                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div class="fw-bold text-navy" style="font-size: 1.1rem;">Received List</div>
-                            <form method="get" th:action="@{/requests}" class="m-0">
-                                <input type="hidden" name="tab" value="received">
-                                <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
-                                <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
-                                <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="incomingStatus" style="min-width: 140px; background-color: #fff;" aria-label="Filter received requests" onchange="this.form.submit()">
-                                    <option value="" th:selected="${selectedIncomingStatus == ''}">All statuses</option>
-                                    <option value="pending" th:selected="${selectedIncomingStatus == 'pending'}">Pending</option>
-                                    <option value="ongoing" th:selected="${selectedIncomingStatus == 'ongoing'}">Ongoing</option>
-                                    <option value="completed" th:selected="${selectedIncomingStatus == 'completed'}">Completed</option>
-                                    <option value="rejected" th:selected="${selectedIncomingStatus == 'rejected'}">Rejected</option>
-                                </select>
-                            </form>
-                        </div>
+            <!-- Sent Requests -->
+            <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                    <div class="fw-bold text-navy">Sent List</div>
+                    <form method="get" th:action="@{/requests}" class="m-0">
+                        <input type="hidden" name="tab" value="sent">
+                        <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
+                        <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
+                        <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="outgoingStatus" style="min-width: 140px; background-color: #fff;" aria-label="Filter sent requests" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedOutgoingStatus == ''}">All statuses</option>
+                            <option value="pending" th:selected="${selectedOutgoingStatus == 'pending'}">Pending</option>
+                            <option value="ongoing" th:selected="${selectedOutgoingStatus == 'ongoing'}">Ongoing</option>
+                            <option value="completed" th:selected="${selectedOutgoingStatus == 'completed'}">Completed</option>
+                            <option value="rejected" th:selected="${selectedOutgoingStatus == 'rejected'}">Rejected</option>
+                        </select>
+                    </form>
+                </div>
 
-                        <!-- Empty State -->
-                        <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
-                            <i class="bi bi-inbox fs-1 text-slate-300"></i>
-                            <h5 class="mt-3 fw-bold text-navy" th:if="${!incomingFilterApplied}">No received requests</h5>
-                            <h5 class="mt-3 fw-bold text-navy" th:if="${incomingFilterApplied}">No matching requests</h5>
-                            <p class="small mb-0" th:if="${!incomingFilterApplied}">You haven't received any exchange requests yet.</p>
-                            <p class="small mb-0" th:if="${incomingFilterApplied}">Try changing the filter to see more results.</p>
-                        </div>
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
+                    <i class="bi bi-send fs-1 text-slate-300"></i>
+                    <h5 class="mt-3 fw-bold text-navy" th:if="${!outgoingFilterApplied}">No sent requests</h5>
+                    <h5 class="mt-3 fw-bold text-navy" th:if="${outgoingFilterApplied}">No matching requests</h5>
+                    <p class="small mb-2" th:if="${!outgoingFilterApplied}">You haven't sent any exchange requests yet.</p>
+                    <p class="small mb-2" th:if="${outgoingFilterApplied}">Try changing the filter to see more results.</p>
+                    <a th:href="@{/browse}" class="btn btn-primary rounded-pill btn-sm px-4 fw-bold shadow-sm" th:if="${!outgoingFilterApplied}">Browse Skills</a>
+                </div>
 
-                        <!-- Request Card Stack -->
-                        <div class="d-flex flex-column gap-3">
-                            <div th:each="req : ${incomingRequests}" class="request-card" th:attr="data-skill=${req.skillName}, data-user=${req.requesterName}">
-                                <!-- Top Header Row -->
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-initials" th:with="name=${req.requesterName}, spaceIdx=${#strings.indexOf(name, ' ')}">
-                                            <span th:text="${#strings.substring(name, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(name)} ? ${#strings.substring(name, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
-                                        </div>
-                                        <div>
-                                            <div class="small text-muted text-xs mb-0.5">Requested by</div>
-                                            <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="user-link fw-bold" th:text="${req.requesterName}">John Doe</a>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column align-items-end gap-1">
-                                        <span class="status-pill status-pill-pending" th:if="${req.status.name() == 'PENDING'}">
-                                            <i class="bi bi-clock-fill"></i> PENDING
-                                        </span>
-                                        <span class="status-pill status-pill-accepted" th:if="${req.status.name() == 'ACCEPTED'}">
-                                            <i class="bi bi-check-circle-fill"></i> ACCEPTED
-                                        </span>
-                                        <span class="status-pill status-pill-rejected" th:if="${req.status.name() == 'REJECTED'}">
-                                            <i class="bi bi-x-circle-fill"></i> REJECTED
-                                        </span>
-                                        <span class="status-pill status-pill-completed" th:if="${req.status.name() == 'COMPLETED'}">
-                                            <i class="bi bi-check2-all"></i> COMPLETED
-                                        </span>
-                                        <small class="text-muted text-xs mt-1" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</small>
-                                    </div>
+                <!-- Request Card Stack -->
+                <div class="d-flex flex-column gap-3">
+                    <div th:each="req : ${outgoingRequests}" class="request-card" th:attr="data-skill=${req.skillName}, data-user=${req.skillOwnerName}">
+                        <!-- Top Header Row -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-initials bg-indigo" th:with="name=${req.skillOwnerName}, spaceIdx=${#strings.indexOf(name, ' ')}">
+                                    <span th:text="${#strings.substring(name, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(name)} ? ${#strings.substring(name, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
                                 </div>
-
-                                <!-- Card Body Elements -->
-                                <div class="mb-3">
-                                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
-                                        <span th:text="${req.skillName}">React Development</span>
-                                        <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
-                                    </h5>
-
-                                    <!-- Offering Tag -->
-                                    <div class="offering-capsule mb-3">
-                                        <i class="bi bi-tag-fill"></i> Offering Exchange
-                                    </div>
-
-                                    <!-- Inactive warning if requester is inactive -->
-                                    <div th:if="${!req.requesterActive}" class="alert alert-warning py-2 px-3 small d-flex align-items-center gap-2 mb-2 rounded-xl border-0 shadow-sm">
-                                        <i class="bi bi-person-x-fill text-warning"></i>
-                                        <span>Requester is currently inactive</span>
-                                    </div>
-
-                                    <!-- Message Quote Block -->
-                                    <div th:if="${req.message != null && !req.message.isEmpty()}" class="quote-block">
-                                        <i class="bi bi-chat-left-quote-fill quote-icon"></i>
-                                        <span th:text="${req.message}">Message</span>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons Stack -->
-                                <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
-                                    <!-- Option C: Decision/Pending with Decline Option -->
-                                    <div th:if="${req.status.name() == 'PENDING'}" class="d-flex flex-column gap-2 w-100">
-                                        <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post" class="w-100 m-0">
-                                            <button type="submit" class="btn-accept-solid w-100" th:disabled="${!req.requesterActive}">
-                                                <i class="bi bi-check-lg"></i> Accept
-                                            </button>
-                                        </form>
-                                        <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post" class="w-100 m-0">
-                                            <button type="submit" class="btn-decline-outline w-100">
-                                                <i class="bi bi-x-lg"></i> Decline
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Option B: Accepted -> Mark Complete -->
-                                    <div th:if="${req.status.name() == 'ACCEPTED'}" class="w-100">
-                                        <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post" class="w-100 m-0">
-                                            <button type="submit" class="btn-complete-solid w-100" th:disabled="${!req.requesterActive}">
-                                                <i class="bi bi-check2-all"></i> Mark Complete
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Universal Card Footer Buttons -->
-                                    <div class="d-flex gap-2 w-100 mt-1">
-                                        <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
-                                                th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.requesterName}">
-                                            <i class="bi bi-chat-left-text"></i> Message
-                                        </button>
-                                        <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="btn-card-footer flex-fill text-decoration-none">
-                                            <i class="bi bi-person-circle"></i> View Profile
-                                        </a>
-                                    </div>
+                                <div>
+                                    <div class="small text-muted text-xs mb-0.5">Owner</div>
+                                    <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="user-link fw-bold" th:text="${req.skillOwnerName}">Jane Smith</a>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Sent Requests Tab Content -->
-                    <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
-                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div class="fw-bold text-navy" style="font-size: 1.1rem;">Sent List</div>
-                            <form method="get" th:action="@{/requests}" class="m-0">
-                                <input type="hidden" name="tab" value="sent">
-                                <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
-                                <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
-                                <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="outgoingStatus" style="min-width: 140px; background-color: #fff;" aria-label="Filter sent requests" onchange="this.form.submit()">
-                                    <option value="" th:selected="${selectedOutgoingStatus == ''}">All statuses</option>
-                                    <option value="pending" th:selected="${selectedOutgoingStatus == 'pending'}">Pending</option>
-                                    <option value="ongoing" th:selected="${selectedOutgoingStatus == 'ongoing'}">Ongoing</option>
-                                    <option value="completed" th:selected="${selectedOutgoingStatus == 'completed'}">Completed</option>
-                                    <option value="rejected" th:selected="${selectedOutgoingStatus == 'rejected'}">Rejected</option>
-                                </select>
-                            </form>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
-                            <i class="bi bi-send fs-1 text-slate-300"></i>
-                            <h5 class="mt-3 fw-bold text-navy" th:if="${!outgoingFilterApplied}">No sent requests</h5>
-                            <h5 class="mt-3 fw-bold text-navy" th:if="${outgoingFilterApplied}">No matching requests</h5>
-                            <p class="small mb-2" th:if="${!outgoingFilterApplied}">You haven't sent any exchange requests yet.</p>
-                            <p class="small mb-2" th:if="${outgoingFilterApplied}">Try changing the filter to see more results.</p>
-                            <a th:href="@{/browse}" class="btn btn-primary rounded-pill btn-sm px-4 fw-bold shadow-sm" th:if="${!outgoingFilterApplied}">Browse Skills</a>
-                        </div>
-
-                        <!-- Request Card Stack -->
-                        <div class="d-flex flex-column gap-3">
-                            <div th:each="req : ${outgoingRequests}" class="request-card" th:attr="data-skill=${req.skillName}, data-user=${req.skillOwnerName}">
-                                <!-- Top Header Row -->
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-initials bg-indigo" th:with="name=${req.skillOwnerName}, spaceIdx=${#strings.indexOf(name, ' ')}">
-                                            <span th:text="${#strings.substring(name, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(name)} ? ${#strings.substring(name, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
-                                        </div>
-                                        <div>
-                                            <div class="small text-muted text-xs mb-0.5">Owner</div>
-                                            <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="user-link fw-bold" th:text="${req.skillOwnerName}">Jane Smith</a>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column align-items-end gap-1">
-                                        <span class="status-pill status-pill-pending" th:if="${req.status.name() == 'PENDING'}">
-                                            <i class="bi bi-clock-fill"></i> PENDING
-                                        </span>
-                                        <span class="status-pill status-pill-accepted" th:if="${req.status.name() == 'ACCEPTED'}">
-                                            <i class="bi bi-check-circle-fill"></i> ACCEPTED
-                                        </span>
-                                        <span class="status-pill status-pill-rejected" th:if="${req.status.name() == 'REJECTED'}">
-                                            <i class="bi bi-x-circle-fill"></i> REJECTED
-                                        </span>
-                                        <span class="status-pill status-pill-completed" th:if="${req.status.name() == 'COMPLETED'}">
-                                            <i class="bi bi-check2-all"></i> COMPLETED
-                                        </span>
-                                        <small class="text-muted text-xs mt-1" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</small>
-                                    </div>
-                                </div>
-
-                                <!-- Card Body Elements -->
-                                <div class="mb-3">
-                                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
-                                        <span th:text="${req.skillName}">Database Design</span>
-                                        <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
-                                    </h5>
-
-                                    <!-- Offering Tag -->
-                                    <div class="offering-capsule mb-3">
-                                        <i class="bi bi-tag-fill"></i> Offering Exchange
-                                    </div>
-
-                                    <!-- Inactive warning if owner is inactive -->
-                                    <div th:if="${!req.skillOwnerActive}" class="alert alert-warning py-2 px-3 small d-flex align-items-center gap-2 mb-2 rounded-xl border-0 shadow-sm">
-                                        <i class="bi bi-person-x-fill text-warning"></i>
-                                        <span>Skill owner is currently inactive</span>
-                                    </div>
-
-                                    <!-- Message Quote Block -->
-                                    <div th:if="${req.message != null && !req.message.isEmpty()}" class="quote-block">
-                                        <i class="bi bi-chat-left-quote-fill quote-icon"></i>
-                                        <span th:text="${req.message}">Message</span>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons Stack -->
-                                <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
-                                    <!-- Option B: Accepted -> Mark Complete -->
-                                    <div th:if="${req.status.name() == 'ACCEPTED'}" class="w-100">
-                                        <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post" class="w-100 m-0">
-                                            <button type="submit" class="btn-complete-solid w-100" th:disabled="${!req.skillOwnerActive}">
-                                                <i class="bi bi-check2-all"></i> Mark Complete
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Universal Card Footer Buttons -->
-                                    <div class="d-flex gap-2 w-100 mt-1">
-                                        <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
-                                                th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.skillOwnerName}">
-                                            <i class="bi bi-chat-left-text"></i> Message
-                                        </button>
-                                        <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="btn-card-footer flex-fill text-decoration-none">
-                                            <i class="bi bi-person-circle"></i> View Profile
-                                        </a>
-                                    </div>
-                                </div>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span class="status-pill status-pill-pending" th:if="${req.status.name() == 'PENDING'}">
+                                    <i class="bi bi-clock-fill"></i> PENDING
+                                </span>
+                                <span class="status-pill status-pill-accepted" th:if="${req.status.name() == 'ACCEPTED'}">
+                                    <i class="bi bi-check-circle-fill"></i> ACCEPTED
+                                </span>
+                                <span class="status-pill status-pill-rejected" th:if="${req.status.name() == 'REJECTED'}">
+                                    <i class="bi bi-x-circle-fill"></i> REJECTED
+                                </span>
+                                <span class="status-pill status-pill-completed" th:if="${req.status.name() == 'COMPLETED'}">
+                                    <i class="bi bi-check2-all"></i> COMPLETED
+                                </span>
+                                <small class="text-muted text-xs mt-1" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</small>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Past Exchanges Tab Content -->
-                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
-                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div class="fw-bold text-navy" style="font-size: 1.1rem;">Past Exchanges</div>
-                            <form method="get" th:action="@{/requests}" class="m-0">
-                                <input type="hidden" name="tab" value="history">
-                                <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
-                                <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
-                                <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="historyRole" style="min-width: 140px; background-color: #fff;" aria-label="Filter history by role" onchange="this.form.submit()">
-                                    <option value="" th:selected="${selectedHistoryRole == ''}">All roles</option>
-                                    <option value="provider" th:selected="${selectedHistoryRole == 'provider'}">Provider</option>
-                                    <option value="receiver" th:selected="${selectedHistoryRole == 'receiver'}">Receiver</option>
-                                </select>
-                            </form>
+                        <!-- Card Body Elements -->
+                        <div class="mb-3">
+                            <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
+                                <span th:text="${req.skillName}">Database Design</span>
+                                <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
+                            </h5>
+
+                            <!-- Offering Tag -->
+                            <div class="offering-capsule mb-3">
+                                <i class="bi bi-tag-fill"></i> Offering Exchange
+                            </div>
+
+                            <!-- Inactive warning if owner is inactive -->
+                            <div th:if="${!req.skillOwnerActive}" class="alert alert-warning py-2 px-3 small d-flex align-items-center gap-2 mb-2 rounded-xl border-0 shadow-sm">
+                                <i class="bi bi-person-x-fill text-warning"></i>
+                                <span>Skill owner is currently inactive</span>
+                            </div>
+
+                            <!-- Message Quote Block -->
+                            <div th:if="${req.message != null && !req.message.isEmpty()}" class="quote-block">
+                                <i class="bi bi-chat-left-quote-fill quote-icon"></i>
+                                <span th:text="${req.message}">Message</span>
+                            </div>
                         </div>
 
-                        <!-- Empty State -->
-                        <div th:if="${#lists.isEmpty(completedExchanges)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
-                            <i class="bi bi-clock-history fs-1 text-slate-300"></i>
-                            <h5 class="mt-3 fw-bold text-navy" th:if="${!historyFilterApplied}">No past exchanges yet</h5>
-                            <h5 class="mt-3 fw-bold text-navy" th:if="${historyFilterApplied}">No matching exchanges</h5>
-                            <p class="small mb-0" th:if="${!historyFilterApplied}">Completed exchanges will appear here for your reference.</p>
-                            <p class="small mb-0" th:if="${historyFilterApplied}">Try changing the filter to see more results.</p>
-                        </div>
+                        <!-- Action Buttons Stack -->
+                        <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
+                            <!-- Option B: Accepted -> Mark Complete -->
+                            <div th:if="${req.status.name() == 'ACCEPTED'}" class="w-100">
+                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post" class="w-100 m-0">
+                                    <button type="submit" class="btn-complete-solid w-100" th:disabled="${!req.skillOwnerActive}">
+                                        <i class="bi bi-check2-all"></i> Mark Complete
+                                    </button>
+                                </form>
+                            </div>
 
-                        <!-- Request Card Stack -->
-                        <div class="d-flex flex-column gap-3">
-                            <div th:each="exchange : ${completedExchanges}" class="request-card" th:attr="data-skill=${exchange.skillName}, data-user=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
-                                <!-- Top Header Row -->
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-initials bg-purple" th:with="partnerName=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}, spaceIdx=${#strings.indexOf(partnerName, ' ')}">
-                                            <span th:text="${#strings.substring(partnerName, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(partnerName)} ? ${#strings.substring(partnerName, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
-                                        </div>
-                                        <div>
-                                            <div class="small text-muted text-xs mb-0.5">Exchange Partner</div>
-                                            <strong class="text-navy" th:text="${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">User Name</strong>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column align-items-end gap-1">
-                                        <span class="status-pill status-pill-completed">
-                                            <i class="bi bi-check2-all"></i> COMPLETED
-                                        </span>
-                                        <small class="text-muted text-xs mt-1" th:text="${#temporals.format(exchange.updatedAt, 'dd MMM yyyy')}">Date</small>
-                                    </div>
-                                </div>
-
-                                <!-- Card Body Elements -->
-                                <div class="mb-3">
-                                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
-                                        <span th:text="${exchange.skillName}">React Development</span>
-                                        <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
-                                    </h5>
-
-                                    <!-- Role Badge -->
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-light text-slate-700 border px-2.5 py-1 rounded-pill small" th:if="${exchange.requesterId == currentUserId}">Role: Receiver</span>
-                                        <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-pill small" th:if="${exchange.requesterId != currentUserId}">Role: Provider</span>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons Stack -->
-                                <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
-                                    <!-- Rating trigger -->
-                                    <div th:if="${exchange.requesterId == currentUserId}" class="w-100">
-                                        <button type="button" class="btn-complete-solid w-100" th:if="${!exchange.rated}" data-bs-toggle="modal" data-bs-target="#rateModal" th:attr="data-exchange-id=${exchange.id}, data-partner-name=${exchange.skillOwnerName}">
-                                            <i class="bi bi-star-fill"></i> Rate Partner
-                                        </button>
-                                        <button type="button" class="btn btn-secondary w-100 disabled text-white" th:if="${exchange.rated}" style="border-radius: 0.75rem; padding: 0.75rem;">
-                                            <i class="bi bi-check-circle-fill"></i> Rated
-                                        </button>
-                                    </div>
-
-                                    <!-- Universal Card Footer Buttons -->
-                                    <div class="d-flex gap-2 w-100 mt-1">
-                                        <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
-                                                th:attr="data-request-id=${exchange.id}, data-skill-name=${exchange.skillName}, data-partner-name=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
-                                            <i class="bi bi-chat-left-text"></i> Message
-                                        </button>
-                                        <a th:href="@{/profile/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" class="btn-card-footer flex-fill text-decoration-none">
-                                            <i class="bi bi-person-circle"></i> View Profile
-                                        </a>
-                                    </div>
-                                </div>
+                            <!-- Universal Card Footer Buttons -->
+                            <div class="d-flex gap-2 w-100 mt-1">
+                                <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                        th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.skillOwnerName}">
+                                    <i class="bi bi-chat-left-text"></i> Message
+                                </button>
+                                <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="btn-card-footer flex-fill text-decoration-none">
+                                    <i class="bi bi-person-circle"></i> View Profile
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Pro Tip Banner (Visible on Mobile/Tablet bottom layout) -->
-                <div class="pro-tip-banner d-md-none">
-                    <div class="pro-tip-icon-badge">
-                        <i class="bi bi-hand-thumbs-up-fill"></i>
-                    </div>
-                    <div class="d-flex flex-column gap-0.5">
-                        <strong class="text-navy" style="font-size: 0.95rem;">Pro Tip</strong>
-                        <p class="small mb-0 text-navy" style="opacity: 0.85; line-height: 1.4;">Review profiles before accepting requests. Check their skills and reviews to ensure a good match!</p>
+            <!-- Past Exchanges (History) -->
+            <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                    <div class="fw-bold text-navy">Past Exchanges</div>
+                    <form method="get" th:action="@{/requests}" class="m-0">
+                        <input type="hidden" name="tab" value="history">
+                        <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
+                        <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
+                        <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="historyRole" style="min-width: 140px; background-color: #fff;" aria-label="Filter history by role" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedHistoryRole == ''}">All roles</option>
+                            <option value="provider" th:selected="${selectedHistoryRole == 'provider'}">Provider</option>
+                            <option value="receiver" th:selected="${selectedHistoryRole == 'receiver'}">Receiver</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(completedExchanges)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
+                    <i class="bi bi-clock-history fs-1 text-slate-300"></i>
+                    <h5 class="mt-3 fw-bold text-navy" th:if="${!historyFilterApplied}">No past exchanges yet</h5>
+                    <h5 class="mt-3 fw-bold text-navy" th:if="${historyFilterApplied}">No matching exchanges</h5>
+                    <p class="small mb-0" th:if="${!historyFilterApplied}">Completed exchanges will appear here for your reference.</p>
+                    <p class="small mb-0" th:if="${historyFilterApplied}">Try changing the filter to see more results.</p>
+                </div>
+
+                <!-- Request Card Stack -->
+                <div class="d-flex flex-column gap-3">
+                    <div th:each="exchange : ${completedExchanges}" class="request-card" th:attr="data-skill=${exchange.skillName}, data-user=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
+                        <!-- Top Header Row -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-initials bg-purple" th:with="partnerName=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}, spaceIdx=${#strings.indexOf(partnerName, ' ')}">
+                                    <span th:text="${#strings.substring(partnerName, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(partnerName)} ? ${#strings.substring(partnerName, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
+                                </div>
+                                <div>
+                                    <div class="small text-muted text-xs mb-0.5">Exchange Partner</div>
+                                    <strong class="text-navy" th:text="${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">User Name</strong>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span class="status-pill status-pill-completed">
+                                    <i class="bi bi-check2-all"></i> COMPLETED
+                                </span>
+                                <small class="text-muted text-xs mt-1" th:text="${#temporals.format(exchange.updatedAt, 'dd MMM yyyy')}">Date</small>
+                            </div>
+                        </div>
+
+                        <!-- Card Body Elements -->
+                        <div class="mb-3">
+                            <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
+                                <span th:text="${exchange.skillName}">React Development</span>
+                                <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
+                            </h5>
+
+                            <!-- Role Badge -->
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-light text-slate-700 border px-2.5 py-1 rounded-pill small" th:if="${exchange.requesterId == currentUserId}">Role: Receiver</span>
+                                <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-pill small" th:if="${exchange.requesterId != currentUserId}">Role: Provider</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons Stack -->
+                        <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
+                            <!-- Rating trigger -->
+                            <div th:if="${exchange.requesterId == currentUserId}" class="w-100">
+                                <button type="button" class="btn-complete-solid w-100" th:if="${!exchange.rated}" data-bs-toggle="modal" data-bs-target="#rateModal" th:attr="data-exchange-id=${exchange.id}, data-partner-name=${exchange.skillOwnerName}">
+                                    <i class="bi bi-star-fill"></i> Rate Partner
+                                </button>
+                                <button type="button" class="btn btn-secondary w-100 disabled text-white" th:if="${exchange.rated}" style="border-radius: 0.75rem; padding: 0.75rem;">
+                                    <i class="bi bi-check-circle-fill"></i> Rated
+                                </button>
+                            </div>
+
+                            <!-- Universal Card Footer Buttons -->
+                            <div class="d-flex gap-2 w-100 mt-1">
+                                <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                        th:attr="data-request-id=${exchange.id}, data-skill-name=${exchange.skillName}, data-partner-name=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
+                                    <i class="bi bi-chat-left-text"></i> Message
+                                </button>
+                                <a th:href="@{/profile/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" class="btn-card-footer flex-fill text-decoration-none">
+                                    <i class="bi bi-person-circle"></i> View Profile
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Pro Tip Banner -->
+        <div class="pro-tip-banner">
+            <div class="pro-tip-icon-badge">
+                <i class="bi bi-hand-thumbs-up-fill"></i>
+            </div>
+            <div class="d-flex flex-column gap-0.5">
+                <strong class="text-navy" style="font-size: 0.95rem;">Pro Tip</strong>
+                <p class="small mb-0 text-navy" style="opacity: 0.85; line-height: 1.4;">Review profiles before accepting requests. Check their skills and reviews to ensure a good match!</p>
             </div>
         </div>
 
