@@ -82,21 +82,35 @@
             gap: 0.35rem;
         }
 
-        /* Tab styling - Box style with no corner radius & reduced height */
+        /* Rounded utility helper classes */
+        .rounded-xl {
+            border-radius: 0.75rem !important;
+        }
+        .rounded-2xl {
+            border-radius: 1rem !important;
+        }
+        .rounded-3xl {
+            border-radius: 1.5rem !important;
+        }
+        .rounded-pill-container {
+            border-radius: 50rem !important;
+        }
+
+        /* Tab styling - Pill rounded corners & reduced height */
         .tab-pill-btn {
             background: transparent;
             color: #64748b;
             transition: all 0.2s ease;
             font-family: 'Inter', sans-serif;
             border: none;
-            border-radius: 0 !important;
+            border-radius: 50rem !important;
             font-size: 0.9rem;
         }
         .tab-pill-btn.active {
             background: #2563eb !important;
             color: #ffffff !important;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-            border-radius: 0 !important;
+            border-radius: 50rem !important;
         }
 
         /* Avatar Initials */
@@ -352,22 +366,22 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <!-- Tab Navigation Container (NO corner radius, single row on desktop, reduced height) -->
-        <div class="bg-white p-2 border border-slate-200/80 shadow-sm mb-4" style="border-radius: 0 !important;">
+        <!-- Tab Navigation Container (Modern pill rounded corners, single row on desktop, reduced height) -->
+        <div class="bg-white p-2 border border-slate-200/80 shadow-sm mb-4 rounded-pill-container">
             <div class="nav flex-column flex-md-row gap-2" id="request-tabs" role="tablist">
-                <button class="nav-link active tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true" style="border-radius: 0 !important; height: auto;">
+                <button class="nav-link active tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true" style="height: auto;">
                     <span class="d-flex align-items-center gap-2">
                         <i class="bi bi-inbox-fill"></i> Received Requests
                     </span>
                     <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(incomingRequests)}">0</span>
                 </button>
-                <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false" style="border-radius: 0 !important; height: auto;">
+                <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false" style="height: auto;">
                     <span class="d-flex align-items-center gap-2">
                         <i class="bi bi-send-fill"></i> Sent Requests
                     </span>
                     <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(outgoingRequests)}">0</span>
                 </button>
-                <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false" style="border-radius: 0 !important; height: auto;">
+                <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-2 px-3 fw-bold border-0 flex-md-fill" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false" style="height: auto;">
                     <span class="d-flex align-items-center gap-2">
                         <i class="bi bi-clock-history"></i> Past Exchanges
                     </span>
