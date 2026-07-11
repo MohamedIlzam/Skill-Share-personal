@@ -17,74 +17,306 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" th:href="@{/css/pwa.css(v=2)}">
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- CSRF tokens for AJAX -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
             --primary-light: #93c5fd;
             --primary-subtle: #eff6ff;
             --accent: #6366f1;
-            --text-dark: #0f172a;
+            --text-dark: #0A192F;
             --text-body: #334155;
             --text-muted: #64748b;
-            --bg-light: #f8fafc;
+            --bg-light: #F4F7FC;
+            --radius: 1rem;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             color: var(--text-body);
             background: var(--bg-light);
             margin: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-bottom: 80px; /* space for bottom tabbar */
         }
 
+        .text-navy {
+            color: #0A192F !important;
+        }
+
+        /* Container max-width */
+        .browse-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Header Subtitle */
+        .text-muted-blue {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* Pending Count Badge */
+        .pending-badge {
+            background-color: #ffedd5;
+            border: 1px solid #fed7aa;
+            color: #ea580c;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* Tab styling */
+        .tab-pill-btn {
+            background: transparent;
+            color: #64748b;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .tab-pill-btn.active {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Sticky Sidebar on Desktop */
+        @media (min-width: 768px) {
+            .sticky-sidebar {
+                position: sticky;
+                top: 88px;
+                z-index: 10;
+            }
+        }
+
+        /* Avatar Initials */
+        .avatar-initials {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .avatar-initials.bg-indigo {
+            background-color: #6366f1;
+        }
+        .avatar-initials.bg-purple {
+            background-color: #8b5cf6;
+        }
+
+        /* Status Pills */
+        .status-pill {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-pill-pending {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #d97706;
+        }
+        .status-pill-accepted {
+            background-color: #f0fdf4;
+            border: 1px solid #dcfce7;
+            color: #16a34a;
+        }
+        .status-pill-rejected {
+            background-color: #fdf2f2;
+            border: 1px solid #fde2e2;
+            color: #dc2626;
+        }
+        .status-pill-completed {
+            background-color: #f5f3ff;
+            border: 1px solid #e0e7ff;
+            color: #4f46e5;
+        }
+
+        /* Request Card */
         .request-card {
             background: #fff;
             border: 1px solid rgba(148, 163, 184, .15);
-            border-radius: 1rem;
+            border-radius: 1.25rem;
             padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,.06);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
         }
-
         .request-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
         }
 
-        .status-badge {
-            font-weight: 600;
-            padding: 0.4rem 0.8rem;
-            border-radius: 50rem;
+        /* User Link */
+        .user-link {
+            color: #2563eb;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .user-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
         }
 
-        .status-PENDING { background: #fef3c7; color: #d97706; }
-        .status-ACCEPTED { background: #dcfce7; color: #15803d; }
-        .status-REJECTED { background: #fee2e2; color: #b91c1c; }
-        .status-COMPLETED { background: #e0e7ff; color: #4338ca; }
-
-        .btn-action {
-            border-radius: 50rem;
-            font-weight: 600;
-            padding: 0.5rem 1.25rem;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        /* Offering capsule */
+        .offering-capsule {
+            background-color: #f5f3ff;
+            color: #6d28d9;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border: 1px solid #ddd6fe;
         }
 
-        .btn-action:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        /* Quote Message Block */
+        .quote-block {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-style: italic;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        .quote-icon {
+            color: #3b82f6;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 0.15rem;
         }
 
-        .btn-action:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        /* Action Buttons */
+        .btn-accept-solid {
+            background: #16a34a;
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .btn-accept-solid:hover {
+            background: #15803d;
+        }
+
+        .btn-decline-outline {
+            background: #ffffff;
+            color: #dc2626;
+            border: 1.5px solid #dc2626;
+            font-weight: 700;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .btn-decline-outline:hover {
+            background: #fef2f2;
+        }
+
+        .btn-complete-solid {
+            background: #6366f1;
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .btn-complete-solid:hover {
+            background: #4f46e5;
+        }
+
+        .btn-card-footer {
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            font-weight: 700;
+            width: 100%;
+            padding: 0.65rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-card-footer:hover {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* Pro Tip Banner */
+        .pro-tip-banner {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .pro-tip-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
         }
     </style>
     <style th:replace="~{fragments/navbar :: navbar-styles}"></style>
@@ -94,240 +326,434 @@
     <!-- Navbar -->
     <div th:replace="~{fragments/navbar :: navbar(activeTab='requests')}"></div>
 
-    <main class="container py-5 flex-grow-1">
+    <!-- Main Content Area -->
+    <main class="container py-4 flex-grow-1 browse-container px-4">
         
-        <h2 class="fw-bold text-dark mb-4">Exchange Requests</h2>
+        <!-- Page Header & Search -->
+        <div class="mb-4">
+            <h1 class="fw-extrabold text-navy mb-1" style="font-size: 1.75rem;">Exchange Requests</h1>
+            <p class="text-muted-blue mb-3">Manage your skill exchange opportunities</p>
+            
+            <!-- Pending Count Badge -->
+            <div class="d-inline-flex mb-3">
+                <span class="pending-badge" th:with="pendingCount=${#lists.size(incomingRequests.?[status.name() == 'PENDING'])}">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <span th:text="${pendingCount} + ' pending request' + (${pendingCount != 1} ? 's' : '')">2 pending requests</span>
+                </span>
+            </div>
 
-        <div th:if="${successParam}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <!-- Search Input Field -->
+            <div class="position-relative w-100 mt-2">
+                <input type="text" id="requestSearchInput" class="form-control rounded-2xl px-4 py-3 border-0 shadow-sm" placeholder="Search by skill or person..." style="background-image: url('data:image/svg+xml;utf8,<svg fill=\'none\' height=\'24\' stroke=\'%2394a3b8\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><circle cx=\'11\' cy=\'11\' r=\'8\'/><line x1=\'21\' y1=\'21\' x2=\'16.65\' y2=\'16.65\'/></svg>'); background-repeat: no-repeat; background-position: 1rem center; background-size: 1.25rem; padding-left: 3rem !important; font-size: 0.95rem;">
+            </div>
+        </div>
+
+        <!-- Success/Error Param alerts -->
+        <div th:if="${successParam}" class="alert alert-success alert-dismissible fade show rounded-xl shadow-sm border-0" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successParam}">Success message</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <div th:if="${errorParam}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div th:if="${errorParam}" class="alert alert-danger alert-dismissible fade show rounded-xl shadow-sm border-0" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorParam}">Error message</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <ul class="nav nav-pills mb-4" id="request-tabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active rounded-pill fw-bold" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
-                    Received Requests
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link rounded-pill fw-bold" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
-                    Sent Requests
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link rounded-pill fw-bold" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
-                    Past Exchanges
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="request-tabs-content">
-            <!-- Received Requests -->
-            <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
-                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-                    <div class="fw-bold text-dark">Received Requests</div>
-                    <form method="get" th:action="@{/requests}" class="d-flex gap-2 align-items-center m-0">
-                        <input type="hidden" name="tab" value="received">
-                        <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
-                        <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
-                        <select class="form-select form-select-sm" name="incomingStatus" style="min-width: 220px;" aria-label="Filter received requests" onchange="this.form.submit()">
-                            <option value="" th:selected="${selectedIncomingStatus == ''}">All statuses</option>
-                            <option value="pending" th:selected="${selectedIncomingStatus == 'pending'}">Pending</option>
-                            <option value="ongoing" th:selected="${selectedIncomingStatus == 'ongoing'}">Accepted / Ongoing</option>
-                            <option value="completed" th:selected="${selectedIncomingStatus == 'completed'}">Completed</option>
-                            <option value="rejected" th:selected="${selectedIncomingStatus == 'rejected'}">Rejected</option>
-                        </select>
-                    </form>
-                </div>
-
-                <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center py-5 text-muted">
-                    <i class="bi bi-inbox-fill fs-1"></i>
-                    <h5 class="mt-3" th:if="${!incomingFilterApplied}">No received requests</h5>
-                    <h5 class="mt-3" th:if="${incomingFilterApplied}">No records found for this category</h5>
-                    <p th:if="${!incomingFilterApplied}">You haven't received any exchange requests yet.</p>
-                    <p th:if="${incomingFilterApplied}">Try changing the filter to see more results.</p>
-                </div>
-
-                <div th:each="req : ${incomingRequests}" class="request-card">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                        <div>
-                            <span class="status-badge" th:classappend="'status-' + ${req.status}" th:text="${req.status}">PENDING</span>
-                            <span th:if="${!req.requesterActive}" class="badge bg-secondary ms-2"><i class="bi bi-person-x-fill me-1"></i>Requester Inactive</span>
-                            <h4 class="fw-bold mt-2 text-dark" th:text="${req.skillName}">Graphic Design</h4>
-                            <p class="mb-1 text-muted">Requested by: <strong class="text-dark" th:text="${req.requesterName}">User</strong></p>
-                            <p class="mb-2" th:if="${req.message != null && !req.message.isEmpty()}">
-                                <i class="bi bi-chat-left-text text-primary me-2"></i><span th:text="${req.message}">Message here</span>
-                            </p>
-                            <small class="text-muted" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
-                        </div>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="btn btn-outline-info btn-action"><i class="bi bi-person-circle me-1"></i>Profile</a>
-                            <a th:href="@{/messages/{id}(id=${req.requesterId})}" class="btn btn-outline-primary btn-action"><i class="bi bi-chat-dots me-1"></i>Chat</a>
-                            <th:block th:if="${req.status.name() == 'PENDING'}">
-                                <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-success btn-action" th:disabled="${!req.requesterActive}"><i class="bi bi-check-lg me-1"></i>Accept</button>
-                                </form>
-                                <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg me-1"></i>Reject</button>
-                                </form>
-                            </th:block>
-                            <th:block th:if="${req.status.name() == 'ACCEPTED'}">
-                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-primary btn-action" th:disabled="${!req.requesterActive}"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
-                                </form>
-                            </th:block>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sent Requests -->
-            <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
-                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-                    <div class="fw-bold text-dark">Sent Requests</div>
-                    <form method="get" th:action="@{/requests}" class="d-flex gap-2 align-items-center m-0">
-                        <input type="hidden" name="tab" value="sent">
-                        <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
-                        <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
-                        <select class="form-select form-select-sm" name="outgoingStatus" style="min-width: 220px;" aria-label="Filter sent requests" onchange="this.form.submit()">
-                            <option value="" th:selected="${selectedOutgoingStatus == ''}">All statuses</option>
-                            <option value="pending" th:selected="${selectedOutgoingStatus == 'pending'}">Pending</option>
-                            <option value="ongoing" th:selected="${selectedOutgoingStatus == 'ongoing'}">Ongoing</option>
-                            <option value="completed" th:selected="${selectedOutgoingStatus == 'completed'}">Completed</option>
-                            <option value="rejected" th:selected="${selectedOutgoingStatus == 'rejected'}">Rejected</option>
-                        </select>
-                    </form>
-                </div>
-
-                <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center py-5 text-muted">
-                    <i class="bi bi-send-fill fs-1"></i>
-                    <h5 class="mt-3" th:if="${!outgoingFilterApplied}">No sent requests</h5>
-                    <h5 class="mt-3" th:if="${outgoingFilterApplied}">No records found for this category</h5>
-                    <p th:if="${!outgoingFilterApplied}">You haven't sent any exchange requests yet.</p>
-                    <p th:if="${outgoingFilterApplied}">Try changing the filter to see more results.</p>
-                    <a th:href="@{/browse}" class="btn btn-primary rounded-pill mt-2" th:if="${!outgoingFilterApplied}">Browse Skills</a>
-                </div>
-
-                <div th:each="req : ${outgoingRequests}" class="request-card">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                        <div>
-                            <span class="status-badge" th:classappend="'status-' + ${req.status}" th:text="${req.status}">PENDING</span>
-                            <span th:if="${!req.skillOwnerActive}" class="badge bg-secondary ms-2"><i class="bi bi-person-x-fill me-1"></i>Owner Inactive</span>
-                            <h4 class="fw-bold mt-2 text-dark" th:text="${req.skillName}">Public Speaking</h4>
-                            <p class="mb-1 text-muted">Owner: <strong class="text-dark" th:text="${req.skillOwnerName}">Instructor</strong></p>
-                            <p class="mb-2" th:if="${req.message != null && !req.message.isEmpty()}">
-                                <i class="bi bi-chat-left-text text-primary me-2"></i><span th:text="${req.message}">Message here</span>
-                            </p>
-                            <small class="text-muted" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
-                        </div>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="btn btn-outline-info btn-action"><i class="bi bi-person-circle me-1"></i>Profile</a>
-                            <a th:href="@{/messages/{id}(id=${req.skillOwnerId})}" class="btn btn-outline-primary btn-action"><i class="bi bi-chat-dots me-1"></i>Chat</a>
-                            <th:block th:if="${req.status.name() == 'ACCEPTED'}">
-                                <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post">
-                                    <button type="submit" class="btn btn-primary btn-action" th:disabled="${!req.skillOwnerActive}"><i class="bi bi-check2-all me-1"></i>Mark as Completed</button>
-                                </form>
-                            </th:block>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Past Exchanges (History) -->
-            <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
-                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-                    <div class="fw-bold text-dark">Past Exchanges</div>
-                    <form method="get" th:action="@{/requests}" class="d-flex gap-2 align-items-center m-0">
-                        <input type="hidden" name="tab" value="history">
-                        <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
-                        <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
-                        <select class="form-select form-select-sm" name="historyRole" style="min-width: 220px;" aria-label="Filter history by role" onchange="this.form.submit()">
-                            <option value="" th:selected="${selectedHistoryRole == ''}">All roles</option>
-                            <option value="provider" th:selected="${selectedHistoryRole == 'provider'}">Provider</option>
-                            <option value="receiver" th:selected="${selectedHistoryRole == 'receiver'}">Receiver</option>
-                        </select>
-                    </form>
-                </div>
-
-                <div th:if="${#lists.isEmpty(completedExchanges)}" class="text-center py-5 text-muted">
-                    <i class="bi bi-clock-history fs-1"></i>
-                    <h5 class="mt-3" th:if="${!historyFilterApplied}">No past exchanges yet</h5>
-                    <h5 class="mt-3" th:if="${historyFilterApplied}">No records found for this category</h5>
-                    <p th:if="${!historyFilterApplied}">Completed exchanges will appear here for your reference.</p>
-                    <p th:if="${historyFilterApplied}">Try changing the filter to see more results.</p>
-                </div>
-
-                <div th:each="exchange : ${completedExchanges}" class="request-card border-success-subtle">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="status-badge status-COMPLETED">
-                                    <i class="bi bi-check-circle-fill"></i> Completed
+        <!-- Responsive Dashboard Row -->
+        <div class="row mt-2">
+            
+            <!-- Left Column: Tab Navigation (acts as a sidebar on larger screen sizes) -->
+            <div class="col-md-4 mb-4">
+                <div class="sticky-sidebar">
+                    <!-- Tab Navigation Container -->
+                    <div class="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-sm">
+                        <div class="nav flex-column gap-2" id="request-tabs" role="tablist">
+                            <button class="nav-link active tab-pill-btn d-flex align-items-center justify-content-between py-3 px-4 rounded-xl fw-bold border-0 w-100" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-inbox-fill"></i> Received Requests
                                 </span>
-                                <small class="text-muted border-start ps-2" th:text="${#temporals.format(exchange.updatedAt, 'dd MMM yyyy')}">Date</small>
-                            </div>
-                            <h4 class="fw-bold mb-1 text-dark" th:text="${exchange.skillName}">Skill Name</h4>
-                            
-                            <p class="mb-0 text-muted">
-                                Exchange Partner: 
-                                <strong class="text-dark" th:if="${exchange.requesterId == currentUserId}" th:text="${exchange.skillOwnerName}">Provider</strong>
-                                <strong class="text-dark" th:if="${exchange.requesterId != currentUserId}" th:text="${exchange.requesterName}">Receiver</strong>
-                            </p>
+                                <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(incomingRequests)}">0</span>
+                            </button>
+                            <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-3 px-4 rounded-xl fw-bold border-0 w-100" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-send-fill"></i> Sent Requests
+                                </span>
+                                <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(outgoingRequests)}">0</span>
+                            </button>
+                            <button class="nav-link tab-pill-btn d-flex align-items-center justify-content-between py-3 px-4 rounded-xl fw-bold border-0 w-100" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock-history"></i> Past Exchanges
+                                </span>
+                                <span class="badge bg-light text-dark rounded-pill px-2.5 py-1" th:text="${#lists.size(completedExchanges)}">0</span>
+                            </button>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                             <div class="bg-light rounded p-2 text-center border" style="min-width: 100px;">
-                                 <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.6rem;">Your Role</small>
-                                 <span class="badge bg-primary rounded-pill px-2 py-1" th:if="${exchange.requesterId == currentUserId}">Receiver</span>
-                                 <span class="badge bg-info rounded-pill px-2 py-1 text-dark" th:if="${exchange.requesterId != currentUserId}">Provider</span>
-                             </div>
-                             
-                             <a th:href="@{/profile/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" 
-                                class="btn btn-outline-info btn-sm rounded-pill px-3 py-2 fw-bold">
-                                 <i class="bi bi-person-circle me-1"></i>Profile
-                             </a>
-                             
-                             <a th:href="@{/messages/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" 
-                                class="btn btn-outline-primary btn-sm rounded-pill px-3 py-2 fw-bold">
-                                 <i class="bi bi-chat-dots me-1"></i>Chat
-                             </a>
+                    </div>
 
-                             <div th:if="${exchange.requesterId == currentUserId}">
-                                <button type="button" class="btn btn-outline-warning btn-sm fw-bold rounded-pill h-100 px-3 py-2 border-2" th:if="${!exchange.rated}" data-bs-toggle="modal" data-bs-target="#rateModal" th:attr="data-exchange-id=${exchange.id}, data-partner-name=${exchange.skillOwnerName}">
-                                    <i class="bi bi-star-fill me-1"></i> Rate
-                                </button>
-                                <button type="button" class="btn btn-warning btn-sm fw-bold text-white rounded-pill h-100 px-3 py-2 disabled" th:if="${exchange.rated}">
-                                    <i class="bi bi-check-circle-fill me-1"></i> Rated
-                                </button>
+                    <!-- Pro Tip Banner (Visible on Desktop Sidebar) -->
+                    <div class="pro-tip-banner d-none d-md-flex">
+                        <div class="pro-tip-icon-badge">
+                            <i class="bi bi-hand-thumbs-up-fill"></i>
+                        </div>
+                        <div class="d-flex flex-column gap-0.5">
+                            <strong class="text-navy" style="font-size: 0.95rem;">Pro Tip</strong>
+                            <p class="small mb-0 text-navy" style="opacity: 0.85; line-height: 1.4;">Review profiles before accepting requests. Check their skills and reviews to ensure a good match!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Lists of Cards -->
+            <div class="col-md-8">
+                <div class="tab-content" id="request-tabs-content">
+                    
+                    <!-- Received Requests Tab Content -->
+                    <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                            <div class="fw-bold text-navy" style="font-size: 1.1rem;">Received List</div>
+                            <form method="get" th:action="@{/requests}" class="m-0">
+                                <input type="hidden" name="tab" value="received">
+                                <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
+                                <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
+                                <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="incomingStatus" style="min-width: 140px; background-color: #fff;" aria-label="Filter received requests" onchange="this.form.submit()">
+                                    <option value="" th:selected="${selectedIncomingStatus == ''}">All statuses</option>
+                                    <option value="pending" th:selected="${selectedIncomingStatus == 'pending'}">Pending</option>
+                                    <option value="ongoing" th:selected="${selectedIncomingStatus == 'ongoing'}">Ongoing</option>
+                                    <option value="completed" th:selected="${selectedIncomingStatus == 'completed'}">Completed</option>
+                                    <option value="rejected" th:selected="${selectedIncomingStatus == 'rejected'}">Rejected</option>
+                                </select>
+                            </form>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
+                            <i class="bi bi-inbox fs-1 text-slate-300"></i>
+                            <h5 class="mt-3 fw-bold text-navy" th:if="${!incomingFilterApplied}">No received requests</h5>
+                            <h5 class="mt-3 fw-bold text-navy" th:if="${incomingFilterApplied}">No matching requests</h5>
+                            <p class="small mb-0" th:if="${!incomingFilterApplied}">You haven't received any exchange requests yet.</p>
+                            <p class="small mb-0" th:if="${incomingFilterApplied}">Try changing the filter to see more results.</p>
+                        </div>
+
+                        <!-- Request Card Stack -->
+                        <div class="d-flex flex-column gap-3">
+                            <div th:each="req : ${incomingRequests}" class="request-card" th:attr="data-skill=${req.skillName}, data-user=${req.requesterName}">
+                                <!-- Top Header Row -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-initials" th:with="name=${req.requesterName}, spaceIdx=${#strings.indexOf(name, ' ')}">
+                                            <span th:text="${#strings.substring(name, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(name)} ? ${#strings.substring(name, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
+                                        </div>
+                                        <div>
+                                            <div class="small text-muted text-xs mb-0.5">Requested by</div>
+                                            <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="user-link fw-bold" th:text="${req.requesterName}">John Doe</a>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-1">
+                                        <span class="status-pill status-pill-pending" th:if="${req.status.name() == 'PENDING'}">
+                                            <i class="bi bi-clock-fill"></i> PENDING
+                                        </span>
+                                        <span class="status-pill status-pill-accepted" th:if="${req.status.name() == 'ACCEPTED'}">
+                                            <i class="bi bi-check-circle-fill"></i> ACCEPTED
+                                        </span>
+                                        <span class="status-pill status-pill-rejected" th:if="${req.status.name() == 'REJECTED'}">
+                                            <i class="bi bi-x-circle-fill"></i> REJECTED
+                                        </span>
+                                        <span class="status-pill status-pill-completed" th:if="${req.status.name() == 'COMPLETED'}">
+                                            <i class="bi bi-check2-all"></i> COMPLETED
+                                        </span>
+                                        <small class="text-muted text-xs mt-1" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</small>
+                                    </div>
+                                </div>
+
+                                <!-- Card Body Elements -->
+                                <div class="mb-3">
+                                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
+                                        <span th:text="${req.skillName}">React Development</span>
+                                        <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
+                                    </h5>
+
+                                    <!-- Offering Tag -->
+                                    <div class="offering-capsule mb-3">
+                                        <i class="bi bi-tag-fill"></i> Offering Exchange
+                                    </div>
+
+                                    <!-- Inactive warning if requester is inactive -->
+                                    <div th:if="${!req.requesterActive}" class="alert alert-warning py-2 px-3 small d-flex align-items-center gap-2 mb-2 rounded-xl border-0 shadow-sm">
+                                        <i class="bi bi-person-x-fill text-warning"></i>
+                                        <span>Requester is currently inactive</span>
+                                    </div>
+
+                                    <!-- Message Quote Block -->
+                                    <div th:if="${req.message != null && !req.message.isEmpty()}" class="quote-block">
+                                        <i class="bi bi-chat-left-quote-fill quote-icon"></i>
+                                        <span th:text="${req.message}">Message</span>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons Stack -->
+                                <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
+                                    <!-- Option C: Decision/Pending with Decline Option -->
+                                    <div th:if="${req.status.name() == 'PENDING'}" class="d-flex flex-column gap-2 w-100">
+                                        <form th:action="@{/requests/{id}/accept(id=${req.id})}" method="post" class="w-100 m-0">
+                                            <button type="submit" class="btn-accept-solid w-100" th:disabled="${!req.requesterActive}">
+                                                <i class="bi bi-check-lg"></i> Accept
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/requests/{id}/reject(id=${req.id})}" method="post" class="w-100 m-0">
+                                            <button type="submit" class="btn-decline-outline w-100">
+                                                <i class="bi bi-x-lg"></i> Decline
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Option B: Accepted -> Mark Complete -->
+                                    <div th:if="${req.status.name() == 'ACCEPTED'}" class="w-100">
+                                        <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post" class="w-100 m-0">
+                                            <button type="submit" class="btn-complete-solid w-100" th:disabled="${!req.requesterActive}">
+                                                <i class="bi bi-check2-all"></i> Mark Complete
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Universal Card Footer Buttons -->
+                                    <div class="d-flex gap-2 w-100 mt-1">
+                                        <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                                th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.requesterName}">
+                                            <i class="bi bi-chat-left-text"></i> Message
+                                        </button>
+                                        <a th:href="@{/profile/{id}(id=${req.requesterId})}" class="btn-card-footer flex-fill text-decoration-none">
+                                            <i class="bi bi-person-circle"></i> View Profile
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Sent Requests Tab Content -->
+                    <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                            <div class="fw-bold text-navy" style="font-size: 1.1rem;">Sent List</div>
+                            <form method="get" th:action="@{/requests}" class="m-0">
+                                <input type="hidden" name="tab" value="sent">
+                                <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
+                                <input type="hidden" name="historyRole" th:value="${selectedHistoryRole}">
+                                <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="outgoingStatus" style="min-width: 140px; background-color: #fff;" aria-label="Filter sent requests" onchange="this.form.submit()">
+                                    <option value="" th:selected="${selectedOutgoingStatus == ''}">All statuses</option>
+                                    <option value="pending" th:selected="${selectedOutgoingStatus == 'pending'}">Pending</option>
+                                    <option value="ongoing" th:selected="${selectedOutgoingStatus == 'ongoing'}">Ongoing</option>
+                                    <option value="completed" th:selected="${selectedOutgoingStatus == 'completed'}">Completed</option>
+                                    <option value="rejected" th:selected="${selectedOutgoingStatus == 'rejected'}">Rejected</option>
+                                </select>
+                            </form>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
+                            <i class="bi bi-send fs-1 text-slate-300"></i>
+                            <h5 class="mt-3 fw-bold text-navy" th:if="${!outgoingFilterApplied}">No sent requests</h5>
+                            <h5 class="mt-3 fw-bold text-navy" th:if="${outgoingFilterApplied}">No matching requests</h5>
+                            <p class="small mb-2" th:if="${!outgoingFilterApplied}">You haven't sent any exchange requests yet.</p>
+                            <p class="small mb-2" th:if="${outgoingFilterApplied}">Try changing the filter to see more results.</p>
+                            <a th:href="@{/browse}" class="btn btn-primary rounded-pill btn-sm px-4 fw-bold shadow-sm" th:if="${!outgoingFilterApplied}">Browse Skills</a>
+                        </div>
+
+                        <!-- Request Card Stack -->
+                        <div class="d-flex flex-column gap-3">
+                            <div th:each="req : ${outgoingRequests}" class="request-card" th:attr="data-skill=${req.skillName}, data-user=${req.skillOwnerName}">
+                                <!-- Top Header Row -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-initials bg-indigo" th:with="name=${req.skillOwnerName}, spaceIdx=${#strings.indexOf(name, ' ')}">
+                                            <span th:text="${#strings.substring(name, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(name)} ? ${#strings.substring(name, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
+                                        </div>
+                                        <div>
+                                            <div class="small text-muted text-xs mb-0.5">Owner</div>
+                                            <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="user-link fw-bold" th:text="${req.skillOwnerName}">Jane Smith</a>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-1">
+                                        <span class="status-pill status-pill-pending" th:if="${req.status.name() == 'PENDING'}">
+                                            <i class="bi bi-clock-fill"></i> PENDING
+                                        </span>
+                                        <span class="status-pill status-pill-accepted" th:if="${req.status.name() == 'ACCEPTED'}">
+                                            <i class="bi bi-check-circle-fill"></i> ACCEPTED
+                                        </span>
+                                        <span class="status-pill status-pill-rejected" th:if="${req.status.name() == 'REJECTED'}">
+                                            <i class="bi bi-x-circle-fill"></i> REJECTED
+                                        </span>
+                                        <span class="status-pill status-pill-completed" th:if="${req.status.name() == 'COMPLETED'}">
+                                            <i class="bi bi-check2-all"></i> COMPLETED
+                                        </span>
+                                        <small class="text-muted text-xs mt-1" th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</small>
+                                    </div>
+                                </div>
+
+                                <!-- Card Body Elements -->
+                                <div class="mb-3">
+                                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
+                                        <span th:text="${req.skillName}">Database Design</span>
+                                        <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
+                                    </h5>
+
+                                    <!-- Offering Tag -->
+                                    <div class="offering-capsule mb-3">
+                                        <i class="bi bi-tag-fill"></i> Offering Exchange
+                                    </div>
+
+                                    <!-- Inactive warning if owner is inactive -->
+                                    <div th:if="${!req.skillOwnerActive}" class="alert alert-warning py-2 px-3 small d-flex align-items-center gap-2 mb-2 rounded-xl border-0 shadow-sm">
+                                        <i class="bi bi-person-x-fill text-warning"></i>
+                                        <span>Skill owner is currently inactive</span>
+                                    </div>
+
+                                    <!-- Message Quote Block -->
+                                    <div th:if="${req.message != null && !req.message.isEmpty()}" class="quote-block">
+                                        <i class="bi bi-chat-left-quote-fill quote-icon"></i>
+                                        <span th:text="${req.message}">Message</span>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons Stack -->
+                                <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
+                                    <!-- Option B: Accepted -> Mark Complete -->
+                                    <div th:if="${req.status.name() == 'ACCEPTED'}" class="w-100">
+                                        <form th:action="@{/requests/{id}/complete(id=${req.id})}" method="post" class="w-100 m-0">
+                                            <button type="submit" class="btn-complete-solid w-100" th:disabled="${!req.skillOwnerActive}">
+                                                <i class="bi bi-check2-all"></i> Mark Complete
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Universal Card Footer Buttons -->
+                                    <div class="d-flex gap-2 w-100 mt-1">
+                                        <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                                th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.skillOwnerName}">
+                                            <i class="bi bi-chat-left-text"></i> Message
+                                        </button>
+                                        <a th:href="@{/profile/{id}(id=${req.skillOwnerId})}" class="btn-card-footer flex-fill text-decoration-none">
+                                            <i class="bi bi-person-circle"></i> View Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Exchanges Tab Content -->
+                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                            <div class="fw-bold text-navy" style="font-size: 1.1rem;">Past Exchanges</div>
+                            <form method="get" th:action="@{/requests}" class="m-0">
+                                <input type="hidden" name="tab" value="history">
+                                <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
+                                <input type="hidden" name="outgoingStatus" th:value="${selectedOutgoingStatus}">
+                                <select class="form-select form-select-sm border-0 shadow-sm text-dark fw-bold rounded-lg" name="historyRole" style="min-width: 140px; background-color: #fff;" aria-label="Filter history by role" onchange="this.form.submit()">
+                                    <option value="" th:selected="${selectedHistoryRole == ''}">All roles</option>
+                                    <option value="provider" th:selected="${selectedHistoryRole == 'provider'}">Provider</option>
+                                    <option value="receiver" th:selected="${selectedHistoryRole == 'receiver'}">Receiver</option>
+                                </select>
+                            </form>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${#lists.isEmpty(completedExchanges)}" class="text-center py-5 text-muted bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm mb-3">
+                            <i class="bi bi-clock-history fs-1 text-slate-300"></i>
+                            <h5 class="mt-3 fw-bold text-navy" th:if="${!historyFilterApplied}">No past exchanges yet</h5>
+                            <h5 class="mt-3 fw-bold text-navy" th:if="${historyFilterApplied}">No matching exchanges</h5>
+                            <p class="small mb-0" th:if="${!historyFilterApplied}">Completed exchanges will appear here for your reference.</p>
+                            <p class="small mb-0" th:if="${historyFilterApplied}">Try changing the filter to see more results.</p>
+                        </div>
+
+                        <!-- Request Card Stack -->
+                        <div class="d-flex flex-column gap-3">
+                            <div th:each="exchange : ${completedExchanges}" class="request-card" th:attr="data-skill=${exchange.skillName}, data-user=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
+                                <!-- Top Header Row -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-initials bg-purple" th:with="partnerName=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}, spaceIdx=${#strings.indexOf(partnerName, ' ')}">
+                                            <span th:text="${#strings.substring(partnerName, 0, 1).toUpperCase()} + (${spaceIdx > 0 and spaceIdx + 1 < #strings.length(partnerName)} ? ${#strings.substring(partnerName, spaceIdx + 1, spaceIdx + 2).toUpperCase()} : '')">SS</span>
+                                        </div>
+                                        <div>
+                                            <div class="small text-muted text-xs mb-0.5">Exchange Partner</div>
+                                            <strong class="text-navy" th:text="${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">User Name</strong>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-1">
+                                        <span class="status-pill status-pill-completed">
+                                            <i class="bi bi-check2-all"></i> COMPLETED
+                                        </span>
+                                        <small class="text-muted text-xs mt-1" th:text="${#temporals.format(exchange.updatedAt, 'dd MMM yyyy')}">Date</small>
+                                    </div>
+                                </div>
+
+                                <!-- Card Body Elements -->
+                                <div class="mb-3">
+                                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-2 text-navy skill-title-text" style="font-size: 1.15rem;">
+                                        <span th:text="${exchange.skillName}">React Development</span>
+                                        <i class="bi bi-arrow-up-right text-primary" style="font-size: 0.95rem;"></i>
+                                    </h5>
+
+                                    <!-- Role Badge -->
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-light text-slate-700 border px-2.5 py-1 rounded-pill small" th:if="${exchange.requesterId == currentUserId}">Role: Receiver</span>
+                                        <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-pill small" th:if="${exchange.requesterId != currentUserId}">Role: Provider</span>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons Stack -->
+                                <div class="d-flex flex-column gap-2 border-top pt-3 mt-3">
+                                    <!-- Rating trigger -->
+                                    <div th:if="${exchange.requesterId == currentUserId}" class="w-100">
+                                        <button type="button" class="btn-complete-solid w-100" th:if="${!exchange.rated}" data-bs-toggle="modal" data-bs-target="#rateModal" th:attr="data-exchange-id=${exchange.id}, data-partner-name=${exchange.skillOwnerName}">
+                                            <i class="bi bi-star-fill"></i> Rate Partner
+                                        </button>
+                                        <button type="button" class="btn btn-secondary w-100 disabled text-white" th:if="${exchange.rated}" style="border-radius: 0.75rem; padding: 0.75rem;">
+                                            <i class="bi bi-check-circle-fill"></i> Rated
+                                        </button>
+                                    </div>
+
+                                    <!-- Universal Card Footer Buttons -->
+                                    <div class="d-flex gap-2 w-100 mt-1">
+                                        <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                                th:attr="data-request-id=${exchange.id}, data-skill-name=${exchange.skillName}, data-partner-name=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
+                                            <i class="bi bi-chat-left-text"></i> Message
+                                        </button>
+                                        <a th:href="@{/profile/{id}(id=${exchange.requesterId == currentUserId ? exchange.skillOwnerId : exchange.requesterId})}" class="btn-card-footer flex-fill text-decoration-none">
+                                            <i class="bi bi-person-circle"></i> View Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Tip Banner (Visible on Mobile/Tablet bottom layout) -->
+                <div class="pro-tip-banner d-md-none">
+                    <div class="pro-tip-icon-badge">
+                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                    </div>
+                    <div class="d-flex flex-column gap-0.5">
+                        <strong class="text-navy" style="font-size: 0.95rem;">Pro Tip</strong>
+                        <p class="small mb-0 text-navy" style="opacity: 0.85; line-height: 1.4;">Review profiles before accepting requests. Check their skills and reviews to ensure a good match!</p>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
 
-    <footer class="bg-dark text-center py-4 text-white-50 mt-auto">
-        <small>&copy; 2026 SkillShare Marketplace. All rights reserved.</small>
-    </footer>
+    </main>
 
     <!-- Chat Modal -->
     <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content" style="border-radius: 1rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 80vh; max-height: 800px; display: flex; flex-direction: column;">
-                
+            <div class="modal-content shadow-lg border-0" style="border-radius: 1.25rem; height: 80vh; max-height: 800px; display: flex; flex-direction: column; overflow: hidden;">
                 <!-- Header -->
-                <div class="modal-header border-bottom px-4 py-3 bg-light" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <div class="modal-header border-bottom px-4 py-3 bg-light">
                     <div>
-                        <h5 class="modal-title fw-bold text-dark mb-0" id="chatModalSkillName">Skill Name</h5>
+                        <h5 class="modal-title fw-bold text-navy mb-0" id="chatModalSkillName" style="font-size: 1.15rem;">Skill Name</h5>
                         <small class="text-muted" id="chatModalPartnerName">Exchange with Partner</small>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                
                 <!-- Body -->
                 <div class="modal-body p-4 bg-light flex-grow-1" id="chatBody" style="overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
                     <div class="text-center w-100 my-auto text-muted" id="chatLoading">
@@ -339,12 +765,11 @@
                         <p>No messages yet. Say hello!</p>
                     </div>
                 </div>
-                
                 <!-- Footer -->
-                <div class="modal-footer border-top p-3 bg-white" style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                <div class="modal-footer border-top p-3 bg-white">
                     <form id="chatForm" class="w-100 d-flex gap-2 m-0" onsubmit="event.preventDefault(); sendChatMessage();">
                         <input type="hidden" id="currentChatRequestId">
-                        <input type="text" class="form-control rounded-pill px-4" id="chatInputMessage" placeholder="Type a message..." required autocomplete="off">
+                        <input type="text" class="form-control rounded-pill px-4" id="chatInputMessage" placeholder="Type a message..." required autocomplete="off" style="font-size: 0.95rem;">
                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" id="chatSendBtn">
                             <i class="bi bi-send-fill"></i>
                         </button>
@@ -357,13 +782,13 @@
     <!-- Rate Modal -->
     <div class="modal fade" id="rateModal" tabindex="-1" aria-labelledby="rateModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 1rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="rateModalLabel">Rate Exchange</h5>
+            <div class="modal-content shadow-lg border-0" style="border-radius: 1.25rem; overflow: hidden;">
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <h5 class="modal-title fw-bold text-navy" id="rateModalLabel" style="font-size: 1.2rem;">Rate Exchange</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/ratings/submit}" method="post">
-                    <div class="modal-body">
+                    <div class="modal-body px-4 pb-4 pt-2">
                         <input type="hidden" name="exchangeId" id="rateModalExchangeId" value="">
                         <p class="text-muted mb-4">How was your exchange with <strong id="rateModalPartnerName" class="text-dark">partner</strong>?</p>
                         
@@ -379,11 +804,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="reviewMessage" class="form-label fw-bold text-dark">Review Message (Optional)</label>
-                            <textarea class="form-control" id="reviewMessage" name="reviewMessage" rows="3" placeholder="Share details of your experience..."></textarea>
+                            <label for="reviewMessage" class="form-label fw-bold text-navy" style="font-size: 0.95rem;">Review Message (Optional)</label>
+                            <textarea class="form-control rounded-xl" id="reviewMessage" name="reviewMessage" rows="3" placeholder="Share details of your experience..." style="font-size: 0.9rem;"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer border-0 pt-0">
+                    <div class="modal-footer border-0 pt-0 px-4 pb-4">
                         <button type="button" class="btn btn-light rounded-pill fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm" id="submitRateBtn" disabled>Submit Feedback</button>
                     </div>
@@ -412,36 +837,6 @@
         .msg-animate { animation: popupMsg 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 
-    <nav class="pwa-tabbar">
-        <a th:href="@{/active-users}" class="tab-item">
-            <i class="bi bi-people-fill"></i>
-            <span>Users</span>
-        </a>
-        <a th:href="@{/browse}" class="tab-item">
-            <i class="bi bi-search"></i>
-            <span>Browse</span>
-        </a>
-        <a th:href="@{/messages}" class="tab-item">
-            <i class="bi bi-chat-dots-fill"></i>
-            <span>Inbox</span>
-        </a>
-        <a th:href="@{/profile}" class="tab-item">
-            <i class="bi bi-person-fill"></i>
-            <span>Me</span>
-        </a>
-    </nav>
-
-    <div id="ios-install-prompt">
-        <div class="d-flex align-items-center gap-3">
-            <img src="/icons/icon-512.png" width="45" height="45" style="border-radius: 10px;">
-            <div class="flex-grow-1">
-                <h6 class="mb-0 fw-bold">Install SkillShare</h6>
-                <p class="mb-0 small text-muted">Tap <i class="bi bi-share"></i> and then "Add to Home Screen" to use it as an app.</p>
-            </div>
-            <button class="btn-close" onclick="document.getElementById('ios-install-prompt').style.display='none'"></button>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/pwa.js}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
@@ -454,6 +849,22 @@
                 const tab = new bootstrap.Tab(tabTriggerEl);
                 tab.show();
             }
+
+            // Client-side search filtering logic
+            document.getElementById('requestSearchInput').addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.request-card');
+                cards.forEach(card => {
+                    const skillName = card.querySelector('.skill-title-text')?.textContent.toLowerCase() || '';
+                    const userName = card.querySelector('.user-link')?.textContent.toLowerCase() || '';
+                    const partnerName = card.querySelector('.text-navy')?.textContent.toLowerCase() || '';
+                    if (skillName.includes(query) || userName.includes(query) || partnerName.includes(query)) {
+                        card.style.setProperty('display', 'block', 'important');
+                    } else {
+                        card.style.setProperty('display', 'none', 'important');
+                    }
+                });
+            });
         });
 
         const chatModalEl = document.getElementById('chatModal');
