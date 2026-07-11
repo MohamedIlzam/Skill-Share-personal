@@ -206,7 +206,7 @@
                 <span>Skills</span>
             </a>
             <a th:href="@{/requests}" class="mobile-tab-item" th:classappend="${activeTab == 'requests'} ? 'active' : ''">
-                <i class="bi bi-arrow-left-right"></i>
+                <i class="bi" th:classappend="${activeTab == 'requests'} ? 'bi-inbox-fill' : 'bi-inbox'"></i>
                 <span>Requests</span>
             </a>
             <a th:href="@{/messages}" class="mobile-tab-item" th:classappend="${activeTab == 'messages'} ? 'active' : ''">
