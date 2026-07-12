@@ -44,3 +44,7 @@ cypress/screenshots/
 
 .env
 .env.*
+
+# Copilot review files
+copilot_full_review.md
+fetch_reviews.py

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skillshare-v3';
+const CACHE_NAME = 'skillshare-v4';
 const urlsToCache = [
   '/css/pwa.css',
   '/manifest.json',
@@ -38,14 +38,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(event.request, { ignoreSearch: true }))
     );
     return;
   }
   
   // For static assets, use Cache-First strategy
   event.respondWith(
-    caches.match(event.request)
+    caches.match(event.request, { ignoreSearch: true })
       .then((response) => {
         if (response) {
           return response;
