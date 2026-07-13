@@ -7,6 +7,7 @@ describe('Sprint 4 - Admin Management E2E Suite (Hardened & Optimized)', () => {
     const TEST_USER_NAME = 'Arun'; 
 
     beforeEach(() => {
+        cy.viewport(1280, 800);
         // We handle session clearing inside the login command for stability
     });
 
