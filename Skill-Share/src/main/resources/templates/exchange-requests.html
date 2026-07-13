@@ -540,7 +540,7 @@
 
                             <!-- Universal Card Footer Buttons -->
                             <div class="d-flex gap-2 w-100 mt-1">
-                                <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                <button type="button" class="btn-card-footer chat-btn flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
                                         th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.requesterName}">
                                     <i class="bi bi-chat-left-text"></i> Message
                                 </button>
@@ -650,7 +650,7 @@
 
                             <!-- Universal Card Footer Buttons -->
                             <div class="d-flex gap-2 w-100 mt-1">
-                                <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                <button type="button" class="btn-card-footer chat-btn flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
                                         th:attr="data-request-id=${req.id}, data-skill-name=${req.skillName}, data-partner-name=${req.skillOwnerName}">
                                     <i class="bi bi-chat-left-text"></i> Message
                                 </button>
@@ -666,7 +666,7 @@
             <!-- Past Exchanges (History) -->
             <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
                 <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                    <div class="fw-bold text-navy">Past Exchanges</div>
+                    <h2 class="fw-bold text-navy fs-5 mb-0">Past Exchanges</h2>
                     <form method="get" th:action="@{/requests}" class="m-0">
                         <input type="hidden" name="tab" value="history">
                         <input type="hidden" name="incomingStatus" th:value="${selectedIncomingStatus}">
@@ -738,7 +738,7 @@
 
                             <!-- Universal Card Footer Buttons -->
                             <div class="d-flex gap-2 w-100 mt-1">
-                                <button type="button" class="btn-card-footer flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
+                                <button type="button" class="btn-card-footer chat-btn flex-fill" data-bs-toggle="modal" data-bs-target="#chatModal"
                                         th:attr="data-request-id=${exchange.id}, data-skill-name=${exchange.skillName}, data-partner-name=${exchange.requesterId == currentUserId ? exchange.skillOwnerName : exchange.requesterName}">
                                     <i class="bi bi-chat-left-text"></i> Message
                                 </button>

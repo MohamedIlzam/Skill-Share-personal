@@ -24,6 +24,11 @@ public class ProfileController {
     private final ExchangeRatingService exchangeRatingService;
     private final com.skillshare.skillshare.service.auth.AuthService authService;
 
+    @GetMapping("/profile/exchanges")
+    public String showExchangeHistory() {
+        return "redirect:/requests?tab=history";
+    }
+
     @GetMapping("/profile")
     public String showProfile(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUser().getId();

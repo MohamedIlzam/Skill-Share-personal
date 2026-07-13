@@ -7,6 +7,7 @@ describe('Messaging System E2E Tests - Sprint 4', () => {
   };
 
   beforeEach(() => {
+    cy.viewport(1280, 800);
     // Standard login for all scenarios
     login('arun@gmail.com', '12345678');
     cy.url().should('not.include', '/login');

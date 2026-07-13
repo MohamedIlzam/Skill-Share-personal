@@ -38,7 +38,7 @@ describe('Story: Filter Exchange Requests and History', () => {
                     cy.wrap($badge).should('contain.text', 'PENDING');
                 });
             } else {
-                cy.contains('No records found for this category').should('be.visible');
+                cy.contains(/No (matching|sent) requests/i).should('be.visible');
             }
         });
     });
@@ -56,7 +56,7 @@ describe('Story: Filter Exchange Requests and History', () => {
                     cy.wrap($badge).should('contain.text', 'ACCEPTED');
                 });
             } else {
-                cy.contains('No records found for this category').should('be.visible');
+                cy.contains(/No (matching|received) requests/i).should('be.visible');
             }
         });
     });
@@ -72,7 +72,7 @@ describe('Story: Filter Exchange Requests and History', () => {
             if ($body.find('#history .request-card').length > 0) {
                 cy.get('#history .request-card').contains('Provider').should('exist');
             } else {
-                cy.contains('No records found for this category').should('be.visible');
+                cy.contains(/No (matching exchanges|history records)/i).should('be.visible');
             }
         });
     });
@@ -85,7 +85,7 @@ describe('Story: Filter Exchange Requests and History', () => {
         
         cy.get('body').then($body => {
             if ($body.find('#received .request-card').length === 0) {
-                cy.contains('No records found for this category').should('be.visible');
+                cy.contains(/No (matching|received) requests/i).should('be.visible');
             }
         });
     });
