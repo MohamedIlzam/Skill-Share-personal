@@ -48,35 +48,40 @@ describe('Sprint 4 - Skill Bookmarking & Filtering', () => {
         cy.wait('@pageLoad'); // Wait for network request
         cy.wait(1000); // SSR DOM stabilization buffer
 
-        // Search for a specific provider
-        cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(SEARCH_PROVIDER);
-        cy.get('.hero-banner button.btn-search').click({ force: true });
-        cy.wait('@pageLoad');
-        cy.wait(1000); // Stabilize
-        
-        cy.url().should('include', `q=${SEARCH_PROVIDER}`);
-        cy.get('.skill-row').first().should('contain.text', SEARCH_PROVIDER);
+        // Dynamically extract the provider name from the first visible skill row
+        cy.get('.skill-row').first().find('.skill-owner span').invoke('text').then((providerNameText) => {
+            const dynamicProviderName = providerNameText.trim();
 
-        // Search for non-existent provider (Negative test)
-        cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(GHOST_PROVIDER);
-        cy.get('.hero-banner button.btn-search').click({ force: true });
-        cy.wait('@pageLoad');
-        cy.wait(1000); // Stabilize
+            // Search for a specific provider
+            cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(dynamicProviderName);
+            cy.get('.hero-banner button.btn-search').click({ force: true });
+            cy.wait('@pageLoad');
+            cy.wait(1000); // Stabilize
+            
+            cy.url().should('include', `q=${encodeURIComponent(dynamicProviderName)}`);
+            cy.get('.skill-row').first().should('contain.text', dynamicProviderName);
 
-        cy.contains('No matching skills found', { timeout: 10000 }).should('be.visible');
+            // Search for non-existent provider (Negative test)
+            cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(GHOST_PROVIDER);
+            cy.get('.hero-banner button.btn-search').click({ force: true });
+            cy.wait('@pageLoad');
+            cy.wait(1000); // Stabilize
 
-        // Combined Filter Interaction (This triggers an AUTO-SUBMIT in the UI)
-        cy.get('select[name="category"]').select(1);
-        cy.wait('@pageLoad');
-        cy.wait(1000); // Stabilize auto-submit reload
+            cy.contains('No matching skills found', { timeout: 10000 }).should('be.visible');
 
-        cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(SEARCH_PROVIDER);
-        cy.get('.hero-banner button.btn-search').click({ force: true });
-        cy.wait('@pageLoad');
-        cy.wait(1000);
-        
-        // Final assertion on state persistence
-        cy.url().should('include', 'category=');
-        cy.url().should('include', `q=${SEARCH_PROVIDER}`);
+            // Combined Filter Interaction (This triggers an AUTO-SUBMIT in the UI)
+            cy.get('select[name="category"]').select(1);
+            cy.wait('@pageLoad');
+            cy.wait(1000); // Stabilize auto-submit reload
+
+            cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(dynamicProviderName);
+            cy.get('.hero-banner button.btn-search').click({ force: true });
+            cy.wait('@pageLoad');
+            cy.wait(1000);
+            
+            // Final assertion on state persistence
+            cy.url().should('include', 'category=');
+            cy.url().should('include', `q=${encodeURIComponent(dynamicProviderName)}`);
+        });
     });
 });
