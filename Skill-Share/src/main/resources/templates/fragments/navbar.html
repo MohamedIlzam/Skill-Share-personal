@@ -136,7 +136,26 @@
             padding-top: 64px !important;
         }
 
-        @media (max-width: 991.98px) {
+        .desktop-nav-links, .desktop-logout {
+            display: none !important;
+        }
+        .mobile-actions {
+            display: flex !important;
+        }
+
+        @media (min-width: 1025px) {
+            .desktop-nav-links {
+                display: flex !important;
+            }
+            .desktop-logout {
+                display: flex !important;
+            }
+            .mobile-actions {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 1024.98px) {
             body {
                 padding-top: 64px !important;
                 padding-bottom: 74px !important;
@@ -157,7 +176,7 @@
                 </span>
                 
                 <!-- Desktop Links (Hidden on Mobile/Tablet) -->
-                <div class="d-none d-lg-flex align-items-center gap-2">
+                <div class="desktop-nav-links align-items-center gap-2">
                     <a th:href="@{/active-users}" class="nav-link-custom" th:classappend="${activeTab == 'explore'} ? 'active' : ''">Explore</a>
                     <a th:href="@{/profile}" class="nav-link-custom" th:classappend="${activeTab == 'profile'} ? 'active' : ''">Profile</a>
                     <a th:href="@{/skills}" class="nav-link-custom" th:classappend="${activeTab == 'skills'} ? 'active' : ''">My Skills</a>
@@ -172,14 +191,14 @@
                 </div>
 
                 <!-- Desktop Logout (Hidden on Mobile/Tablet) -->
-                <div class="d-none d-lg-flex align-items-center gap-3">
+                <div class="desktop-logout align-items-center gap-3">
                     <form th:action="@{/logout}" method="post" style="margin:0;">
                         <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Logout</button>
                     </form>
                 </div>
 
                 <!-- Mobile Actions (Visible on Mobile/Tablet only) -->
-                <div class="d-flex d-lg-none align-items-center gap-2">
+                <div class="mobile-actions align-items-center gap-2">
                     <!-- Bell Icon for notifications -->
                     <a th:href="@{/system-messages}" class="mobile-icon-btn position-relative" th:classappend="${activeTab == 'notifications'} ? 'active' : ''" title="Notifications">
                         <i class="bi bi-bell-fill"></i>
@@ -196,7 +215,7 @@
         </nav>
 
         <!-- Mobile Bottom Tab Bar (Visible on mobile/tablet viewports only) -->
-        <nav class="mobile-bottom-tabbar d-flex d-lg-none">
+        <nav class="mobile-bottom-tabbar">
             <a th:href="@{/active-users}" class="mobile-tab-item" th:classappend="${activeTab == 'explore'} ? 'active' : ''">
                 <i class="bi" th:classappend="${activeTab == 'explore'} ? 'bi-compass-fill' : 'bi-compass'"></i>
                 <span>Explore</span>
