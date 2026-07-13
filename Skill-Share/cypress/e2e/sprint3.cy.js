@@ -19,6 +19,15 @@ describe('Sprint 3 UI E2E Flows', () => {
             }
         });
 
+        // Ensure the first skill is toggled as a main skill (highlighted)
+        cy.get('.skill-card').first().within(() => {
+            cy.get('.main-skill-toggle').then(($btn) => {
+                if (!$btn.hasClass('active')) {
+                    cy.wrap($btn).click({ force: true });
+                }
+            });
+        });
+
         // Get the first skill name of arun
         cy.get('.skill-card').first().find('.skill-name').invoke('text').then((nameText) => {
             const arunSkill = nameText.trim();
