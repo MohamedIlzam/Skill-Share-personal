@@ -3,6 +3,7 @@ describe('Complete Admin Functionality', () => {
     const targetUser = 'Arun';
 
     beforeEach(() => {
+        cy.viewport(1280, 800);
         cy.clearCookies();
         cy.clearLocalStorage();
         cy.visit('/login');
