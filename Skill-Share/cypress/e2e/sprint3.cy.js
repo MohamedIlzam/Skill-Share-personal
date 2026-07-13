@@ -33,7 +33,7 @@ describe('Sprint 3 UI E2E Flows', () => {
                 if ($body.find('#sent .request-card').length > 0) {
                     $body.find('#sent .request-card').each((index, el) => {
                         const txt = Cypress.$(el).text();
-                        if (txt.includes(arunSkill) && (txt.includes('PENDING') || txt.includes('ACCEPTED') || txt.includes('COMPLETED'))) {
+                        if (txt.includes(arunSkill) && txt.includes('PENDING')) {
                             alreadyRequested = true;
                         }
                     });
@@ -135,6 +135,9 @@ describe('Sprint 3 UI E2E Flows', () => {
     it('Participant marks accepted exchange as completed', () => {
         cy.login(TEST_EMAIL, TEST_PASSWORD);
         cy.visit('/requests');
+        
+        // Click sent tab first since test5 is the requester
+        cy.get('#sent-tab').click();
         
         // Click the 'Mark Complete' button on an accepted request
         cy.contains('button', 'Mark Complete').first().click();
