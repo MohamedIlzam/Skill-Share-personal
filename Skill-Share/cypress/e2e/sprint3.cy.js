@@ -4,6 +4,45 @@ describe('Sprint 3 UI E2E Flows', () => {
     const TEST_EMAIL = 'test5@gmail.com';
     const TEST_PASSWORD = 'password';
 
+    before(() => {
+        // Step 1: Ensure test5@gmail.com has at least one skill in the system
+        cy.login('test5@gmail.com', 'password');
+        cy.visit('/skills');
+        cy.get('body').then(($body) => {
+            if ($body.find('.skill-card, .request-card, tbody tr').length === 0) {
+                // No skills found for this user, let's add one!
+                cy.get('button[data-bs-target="#addSkillModal"]').first().click();
+                cy.get('#addSkillModal #name').type('Sprint 3 Test Skill', { force: true });
+                cy.get('#addSkillModal #category').select('DESIGN', { force: true });
+                cy.get('#addSkillModal #prof-int').click({ force: true });
+                cy.get('#addSkillModal button[type="submit"]').click({ force: true });
+                cy.contains('Skill successfully added!', { timeout: 15000 }).should('be.visible');
+            }
+        });
+
+        // Step 2: Ensure there is a pending request from arun@gmail.com to test5@gmail.com
+        cy.login('arun@gmail.com', '12345678');
+        cy.visit('/requests');
+        cy.get('body').then(($body) => {
+            // Check if there is already an outgoing pending request for test5's skill
+            if ($body.find('#sent .request-card').length === 0) {
+                cy.visit('/browse');
+                cy.get('.hero-banner input[name="q"]').clear({ force: true }).type('Sprint 3 Test Skill');
+                cy.get('.hero-banner button.btn-search').click({ force: true });
+                
+                // If skill exists and we can request it
+                cy.get('body').then(($browseBody) => {
+                    if ($browseBody.find('.skill-row').length > 0) {
+                        cy.get('button[data-bs-target="#requestModal"]').not('[disabled]').first().click({ force: true });
+                        cy.get('#requestModal #modalMessage').type('Setup request for Sprint 3 tests', { force: true });
+                        cy.get('#requestModal button[type="submit"]').click({ force: true });
+                        cy.contains('Exchange request sent successfully!', { timeout: 15000 }).should('be.visible');
+                    }
+                });
+            }
+        });
+    });
+
     it('unauthenticated user is redirected from protected page', () => {
         cy.visit('/profile/exchanges', { failOnStatusCode: false });
         cy.url().should('include', '/login');
@@ -85,8 +124,8 @@ describe('Sprint 3 UI E2E Flows', () => {
         cy.login(TEST_EMAIL, TEST_PASSWORD);
         cy.visit('/requests');
         
-        // Click the 'Mark as Completed' button on an accepted request
-        cy.contains('button', 'Mark as Completed').first().click();
+        // Click the 'Mark Complete' button on an accepted request
+        cy.contains('button', 'Mark Complete').first().click();
         
         // Verify confirmation message
         cy.contains('Exchange marked as completed.').should('be.visible');
