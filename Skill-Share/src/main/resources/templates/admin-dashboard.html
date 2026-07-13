@@ -38,7 +38,7 @@
             flex-direction: column;
             padding-top: 64px;
         }
-        @media (max-width: 767.98px) {
+        @media (max-width: 991.98px) {
             body {
                 padding-bottom: 74px;
             }
@@ -126,7 +126,7 @@
             font-size: 20px;
         }
 
-        @media (max-width: 767.98px) {
+        @media (max-width: 991.98px) {
             .mobile-bottom-tabbar {
                 display: flex !important;
             }
@@ -219,12 +219,12 @@
                 <i class="bi bi-shield-lock-fill me-1"></i>SkillShare Admin
             </span>
             <!-- Desktop Links -->
-            <div class="d-none d-md-flex align-items-center gap-2">
+            <div class="d-none d-lg-flex align-items-center gap-2">
                 <a th:href="@{/admin/dashboard}" class="nav-link-custom active">Dashboard</a>
                 <a th:href="@{/admin/users}" class="nav-link-custom">Users</a>
             </div>
             <!-- Desktop Logout -->
-            <div class="d-none d-md-flex align-items-center gap-3">
+            <div class="d-none d-lg-flex align-items-center gap-3">
                 <form th:action="@{/logout}" method="post" style="margin:0;">
                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
                         <i class="bi bi-box-arrow-right me-1"></i>Logout
@@ -232,7 +232,7 @@
                 </form>
             </div>
             <!-- Mobile Action -->
-            <div class="d-flex d-md-none align-items-center">
+            <div class="d-flex d-lg-none align-items-center">
                 <form th:action="@{/logout}" method="post" style="margin:0;">
                     <button type="submit" class="mobile-icon-btn" title="Logout">
                         <i class="bi bi-box-arrow-right"></i>
@@ -292,7 +292,7 @@
     </main>
 
     <!-- Mobile Bottom Tab Bar -->
-    <nav class="mobile-bottom-tabbar d-flex d-md-none">
+    <nav class="mobile-bottom-tabbar d-flex d-lg-none">
         <a th:href="@{/admin/dashboard}" class="mobile-tab-item active">
             <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
@@ -303,7 +303,7 @@
         </a>
     </nav>
 
-    <footer class="footer d-none d-md-block">
+    <footer class="footer d-none d-lg-block">
         <div class="container">
             <p class="mb-0">&copy; 2026 SkillShare Admin. All rights reserved.</p>
         </div>
