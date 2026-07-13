@@ -4,23 +4,22 @@ describe('Sprint 3 UI E2E Flows', () => {
     const TEST_PASSWORD = 'password';
 
     before(() => {
-        // Step 1: Ensure arun@gmail.com has at least one skill in the system
+        const uniqueSkillName = 'Sprint 3 Test ' + Date.now();
+
+        // Step 1: Ensure arun@gmail.com has at least one unique highlighted (main) skill in the system
         cy.login('arun@gmail.com', '12345678');
         cy.visit('/skills');
-        cy.get('body').then(($body) => {
-            if ($body.find('.skill-card').length === 0) {
-                // No skills found, let's add one
-                cy.get('button[data-bs-toggle="modal"][data-bs-target="#addSkillModal"]').first().click();
-                cy.get('#addSkillModal #name').type('Sprint 3 Test Skill', { force: true });
-                cy.get('#addSkillModal #category').select('DESIGN', { force: true });
-                cy.get('#addSkillModal #prof-int').click({ force: true });
-                cy.get('#addSkillModal button[type="submit"]').click({ force: true });
-                cy.contains('Skill successfully added!', { timeout: 15000 }).should('be.visible');
-            }
-        });
+        
+        // Add the unique skill
+        cy.get('button[data-bs-toggle="modal"][data-bs-target="#addSkillModal"]').first().click();
+        cy.get('#addSkillModal #name').type(uniqueSkillName, { force: true });
+        cy.get('#addSkillModal #category').select('DESIGN', { force: true });
+        cy.get('#addSkillModal #prof-int').click({ force: true });
+        cy.get('#addSkillModal button[type="submit"]').click({ force: true });
+        cy.contains('Skill successfully added!', { timeout: 15000 }).should('be.visible');
 
-        // Ensure the first skill is toggled as a main skill (highlighted)
-        cy.get('.skill-card').first().within(() => {
+        // Toggle it as a main skill (highlighted)
+        cy.contains('.skill-card', uniqueSkillName).within(() => {
             cy.get('.main-skill-toggle').then(($btn) => {
                 if (!$btn.hasClass('active')) {
                     cy.wrap($btn).click({ force: true });
@@ -28,38 +27,16 @@ describe('Sprint 3 UI E2E Flows', () => {
             });
         });
 
-        // Get the first skill name of arun
-        cy.get('.skill-card').first().find('.skill-name').invoke('text').then((nameText) => {
-            const arunSkill = nameText.trim();
-
-            // Step 2: Ensure test5@gmail.com has requested arun's skill
-            cy.login('test5@gmail.com', 'password');
-            cy.visit('/requests');
-            
-            // Check if already requested
-            cy.get('body').then(($body) => {
-                let alreadyRequested = false;
-                if ($body.find('#sent .request-card').length > 0) {
-                    $body.find('#sent .request-card').each((index, el) => {
-                        const txt = Cypress.$(el).text();
-                        if (txt.includes(arunSkill) && txt.includes('PENDING')) {
-                            alreadyRequested = true;
-                        }
-                    });
-                }
-
-                if (!alreadyRequested) {
-                    cy.visit('/browse');
-                    cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(arunSkill);
-                    cy.get('.hero-banner button.btn-search').click({ force: true });
-                    cy.get('.skill-row').should('be.visible');
-                    cy.contains('.skill-row', arunSkill).find('button[data-bs-target="#requestModal"]').click({ force: true });
-                    cy.get('#requestModal #modalMessage').type('Setup request for Sprint 3 tests', { force: true });
-                    cy.get('#requestModal button[type="submit"]').click({ force: true });
-                    cy.contains('Exchange request sent successfully!', { timeout: 15000 }).should('be.visible');
-                }
-            });
-        });
+        // Step 2: Ensure test5@gmail.com has requested this unique skill
+        cy.login('test5@gmail.com', 'password');
+        cy.visit('/browse');
+        cy.get('.hero-banner input[name="q"]').clear({ force: true }).type(uniqueSkillName);
+        cy.get('.hero-banner button.btn-search').click({ force: true });
+        cy.get('.skill-row').should('be.visible');
+        cy.contains('.skill-row', uniqueSkillName).find('button[data-bs-target="#requestModal"]').click({ force: true });
+        cy.get('#requestModal #modalMessage').type('Setup request for Sprint 3 tests', { force: true });
+        cy.get('#requestModal button[type="submit"]').click({ force: true });
+        cy.contains('Exchange request sent successfully!', { timeout: 15000 }).should('be.visible');
     });
 
     it('unauthenticated user is redirected from protected page', () => {
