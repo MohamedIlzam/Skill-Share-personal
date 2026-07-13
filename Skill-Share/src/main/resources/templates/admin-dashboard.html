@@ -230,6 +230,35 @@
         .mobile-icon-btn:hover {
             background: #fecaca;
         }
+
+        /* Desktop Logout Button Redesign */
+        .btn-logout-desktop {
+            background: transparent;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .btn-logout-desktop i {
+            font-size: 1.05rem;
+            transition: transform 0.2s ease;
+        }
+        .btn-logout-desktop:hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+        }
+        .btn-logout-desktop:hover i {
+            transform: translateX(3px);
+        }
     </style>
 </head>
 
@@ -248,8 +277,9 @@
             <!-- Desktop Logout -->
             <div class="desktop-logout align-items-center gap-3">
                 <form th:action="@{/logout}" method="post" style="margin:0;">
-                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                        <i class="bi bi-box-arrow-right me-1"></i>Logout
+                    <button type="submit" class="btn-logout-desktop">
+                        <span>Logout</span>
+                        <i class="bi bi-box-arrow-right"></i>
                     </button>
                 </form>
             </div>
